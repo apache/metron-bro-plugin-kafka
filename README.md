@@ -48,7 +48,7 @@ The following examples highlight different ways that the plugin can be used.  Si
 The goal in this example is to send all HTTP and DNS records to a Kafka topic named `bro`.
  * Any configuration value accepted by librdkafka can be added to the `kafka_conf` configuration table.  
  * By defining `topic_name` all records will be sent to the same Kafka topic.
- * Defining `logs_to_send` will ensure that only HTTP and DNS records are sent. 
+ * Defining `logs_to_send` will ensure that only HTTP and DNS records are sent.
 ```
 @load packages/metron-bro-plugin-kafka/Apache/Kafka
 redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG);
@@ -150,6 +150,39 @@ event bro_init() &priority=-5
 
 ## Settings
 
+### `logs_to_send`
+
+A set of logs to send to kafka.
+
+```
+redef Kafka::logs_to_send = set(Conn::LOG, DHCP::LOG);
+```
+
+### `send_all_active_logs`
+
+If true, all active logs will be sent to kafka other than those specified in
+`logs_to_exclude`.
+
+```
+redef Kafka::send_all_active_logs = T;
+```
+
+### `logs_to_exclude`
+
+A set of logs to exclude from being sent to kafka.
+
+```
+redef Kafka::logs_to_exclude = set(Conn::LOG, DNS::LOG);
+```
+
+### `topic_name`
+
+The name of the topic in Kafka where all Bro logs will be sent to.
+
+```
+redef Kafka::topic_name = "bro";
+```
+
 ### `kafka_conf`
 
 The global configuration settings for Kafka.  These values are passed through
@@ -162,23 +195,6 @@ redef Kafka::kafka_conf = table(
     ["metadata.broker.list"] = "localhost:9092",
     ["client.id"] = "bro"
 );
-```
-
-### `topic_name`
-
-The name of the topic in Kafka where all Bro logs will be sent to.
-
-```
-redef Kafka::topic_name = "bro";
-```
-
-### `max_wait_on_shutdown`
-
-The maximum number of milliseconds that the plugin will wait for any backlog of
-queued messages to be sent to Kafka before forced shutdown.
-
-```
-redef Kafka::max_wait_on_shutdown = 3000;
 ```
 
 ### `tag_json`
@@ -197,6 +213,15 @@ options are `JSON::TS_MILLIS` and `JSON::TS_ISO8601`.
 
 ```
 redef Kafka::json_timestamps = JSON::TS_ISO8601;
+```
+
+### `max_wait_on_shutdown`
+
+The maximum number of milliseconds that the plugin will wait for any backlog of
+queued messages to be sent to Kafka before forced shutdown.
+
+```
+redef Kafka::max_wait_on_shutdown = 3000;
 ```
 
 ### `debug`
