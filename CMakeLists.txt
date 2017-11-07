@@ -23,7 +23,7 @@ find_package(OpenSSL)
 
 if (LIBRDKAFKA_FOUND AND OPENSSL_FOUND)
   include_directories(BEFORE ${LibRDKafka_INCLUDE_DIR} ${OpenSSL_INCLUDE_DIR})
-  bro_plugin_begin(BRO KAFKA)
+  bro_plugin_begin(APACHE KAFKA)
   bro_plugin_cc(src/KafkaWriter.cc)
   bro_plugin_cc(src/Plugin.cc)
   bro_plugin_cc(src/TaggedJSON.cc)
