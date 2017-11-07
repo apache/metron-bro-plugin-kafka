@@ -14,8 +14,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+
+#
 # This is loaded when a user activates the plugin. Include scripts here that should be
 # loaded automatically at that point.
 #
-
-@load ./init.bro

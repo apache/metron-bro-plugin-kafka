@@ -18,11 +18,20 @@
 module Kafka;
 
 export {
-  const topic_name: string = "bro" &redef;
-  const max_wait_on_shutdown: count = 3000 &redef;
-  const tag_json: bool = F &redef;
-  const kafka_conf: table[string] of string = table(
-    ["metadata.broker.list"] = "localhost:9092"
-  ) &redef;
-  const debug: string = "" &redef;
+	## Destination kafka topic name
+	const topic_name: string = "bro" &redef;
+
+	## Maximum wait on shutdown in milliseconds
+	const max_wait_on_shutdown: count = 3000 &redef;
+
+	## Boolean to JSON with a log stream identifier
+	const tag_json: bool = F &redef;
+
+	## Any additional configs to pass to librdkafka
+	const kafka_conf: table[string] of string = table(
+		["metadata.broker.list"] = "localhost:9092"
+	) &redef;
+
+	## A comma separated list of librdkafka debug contexts
+	const debug: string = "" &redef;
 }
