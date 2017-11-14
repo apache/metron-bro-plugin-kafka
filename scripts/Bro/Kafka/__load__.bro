@@ -18,4 +18,4 @@
 # loaded automatically at that point.
 #
 
-@load ./init.bro
+@load ./logs-to-kafka.bro
