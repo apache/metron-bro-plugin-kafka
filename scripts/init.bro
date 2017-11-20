@@ -24,7 +24,7 @@ export {
 	## Maximum wait on shutdown in milliseconds
 	const max_wait_on_shutdown: count = 3000 &redef;
 
-	## Boolean to JSON with a log stream identifier
+	## Whether or not to tag JSON with a log stream identifier
 	const tag_json: bool = F &redef;
 
 	## Any additional configs to pass to librdkafka

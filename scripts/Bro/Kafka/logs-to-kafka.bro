@@ -35,8 +35,7 @@ event bro_init() &priority=-5
 {
 	for (stream_id in Log::active_streams)
 	{
-		if ( stream_id in Kafka::logs_to_exclude ||
-		    (|Kafka::logs_to_send| > 0 && stream_id !in Kafka::logs_to_send) )
+		if ( stream_id in Kafka::logs_to_exclude || stream_id !in Kafka::logs_to_send )
 			next;
 
 		local filter: Log::Filter = [
