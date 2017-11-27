@@ -18,15 +18,6 @@
 
 module Kafka;
 
-export {
-	##
-	## which log streams should be sent to kafka?
-	## example:
-	##		redef Kafka::logs_to_send = set(Conn::Log, HTTP::LOG, DNS::LOG);
-	##
-	const logs_to_send: set[Log::ID] &redef;
-}
-
 event bro_init() &priority=-5
 {
 	for (stream_id in Log::active_streams)
