@@ -1,7 +1,7 @@
 [package]
 description = A Bro log writer plugin that sends logging output to Kafka.
 tags = log writer, bro plugin, kafka
-script_dir = scripts
+script_dir = build/scripts/Apache/Kafka
 build_command = ./configure --bro-dist=%(bro_dist)s --with-librdkafka=%(LIBRDKAFKA_ROOT)s && make
 test_command = ( cd tests && btest -d )
 plugin_dir = build
