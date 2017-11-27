@@ -23,4 +23,3 @@
 #
 
 @load ./init.bro
-@load Apache/Kafka
