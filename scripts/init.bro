@@ -18,6 +18,7 @@
 module Kafka;
 
 export {
+  const logs_to_send: set[Log::ID] &redef;
   const topic_name: string = "bro" &redef;
   const max_wait_on_shutdown: count = 3000 &redef;
   const tag_json: bool = F &redef;
