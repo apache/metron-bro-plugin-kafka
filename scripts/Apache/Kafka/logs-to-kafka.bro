@@ -19,18 +19,6 @@
 
 module Kafka;
 
-export {
-	## Specify which :bro:type:`Log::ID` to exclude from being sent to kafka.
-	##
-	## Example:  redef Kafka::logs_to_exclude = set(SSH::LOG);
-	const logs_to_exclude: set[Log::ID] &redef;
-
-	## Specify which :bro:type:`Log::ID` to send to kafka.
-	##
-	## Example:  redef Kafka::logs_to_send = set(Conn::Log, DNS::LOG);
-	const logs_to_send: set[Log::ID] &redef;
-}
-
 event bro_init() &priority=-5
 {
 	for (stream_id in Log::active_streams)
