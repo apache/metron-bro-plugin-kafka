@@ -22,7 +22,7 @@ event bro_init() &priority=-5
 {
 	for (stream_id in Log::active_streams)
 	{
-		if (stream_id in Kafka::logs_to_send)
+		if ((|logs_to_send| == 0) || stream_id in Kafka::logs_to_send)
 		{
 			local filter: Log::Filter = [
 				$name = fmt("kafka-%s", stream_id),
