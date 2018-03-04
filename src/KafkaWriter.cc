@@ -67,11 +67,6 @@ KafkaWriter::KafkaWriter(WriterFrontend* frontend):
 
 KafkaWriter::~KafkaWriter()
 {
-    // Cleanup Kafka resources
-    while (producer->outq_len() > 0) {
-        producer->poll(1000);
-    }
-    producer->poll(1000);
 
     // Cleanup all the things
     delete topic;
@@ -93,12 +88,15 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     }
 
     // format timestamps
-    if ( strcmp(json_timestamps.c_str(), "JSON::TS_EPOCH") == 0 )
+    if ( strcmp(json_timestamps.c_str(), "JSON::TS_EPOCH") == 0 ) {
       tf = threading::formatter::JSON::TS_EPOCH;
-    else if ( strcmp(json_timestamps.c_str(), "JSON::TS_MILLIS") == 0 )
+    }
+    else if ( strcmp(json_timestamps.c_str(), "JSON::TS_MILLIS") == 0 ) {
       tf = threading::formatter::JSON::TS_MILLIS;
-    else if ( strcmp(json_timestamps.c_str(), "JSON::TS_ISO8601") == 0 )
+    }
+    else if ( strcmp(json_timestamps.c_str(), "JSON::TS_ISO8601") == 0 ) {
       tf = threading::formatter::JSON::TS_ISO8601;
+    }
     else
     {
       Error(Fmt("KafkaWriter::DoInit: Invalid JSON timestamp format %s",
