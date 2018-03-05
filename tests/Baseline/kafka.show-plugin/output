@@ -1,4 +1,4 @@
-Apache::Kafka - Writes logs to Kafka (dynamic, version 0.1)
+Apache::Kafka - Writes logs to Kafka (dynamic, version 0.2)
     [Writer] KafkaWriter (Log::WRITER_KAFKAWRITER)
     [Constant] Kafka::kafka_conf
     [Constant] Kafka::topic_name
