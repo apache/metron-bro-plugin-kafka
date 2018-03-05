@@ -40,9 +40,7 @@ The following examples highlight different ways that the plugin can be used.  Si
 The goal in this example is to send all HTTP and DNS records to a Kafka topic named `bro`.
  * Any configuration value accepted by librdkafka can be added to the `kafka_conf` configuration table.  
  * By defining `topic_name` all records will be sent to the same Kafka topic.
- * Defining `logs_to_send` will ensure that only HTTP and DNS records are sent. An empty set will default to all logs being
- sent.
-
+ * Defining `logs_to_send` will ensure that only HTTP and DNS records are sent. 
 ```
 @load packages/metron-bro-plugin-kafka/Apache/Kafka
 redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG);

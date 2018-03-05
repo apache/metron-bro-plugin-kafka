@@ -96,9 +96,8 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     }
     else if ( strcmp(json_timestamps.c_str(), "JSON::TS_ISO8601") == 0 ) {
       tf = threading::formatter::JSON::TS_ISO8601;
-    }
-    else
-    {
+    } 
+    else {
       Error(Fmt("KafkaWriter::DoInit: Invalid JSON timestamp format %s",
         json_timestamps.c_str()));
       return false;
@@ -107,7 +106,8 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     // initialize the formatter
     if(BifConst::Kafka::tag_json) {
       formatter = new threading::formatter::TaggedJSON(info.path, this, tf);
-    } else {
+    } 
+    else {
       formatter = new threading::formatter::JSON(this, tf);
     }
 
