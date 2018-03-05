@@ -28,7 +28,7 @@ A Bro log writer that sends logging output to Kafka.  This provides a convenient
 
     ```
     $ bro -N Apache::Kafka
-    Apache::Kafka - Writes logs to Kafka (dynamic, version 0.1)
+    Apache::Kafka - Writes logs to Kafka (dynamic, version 0.2)
     ```
 
 ## Activation
