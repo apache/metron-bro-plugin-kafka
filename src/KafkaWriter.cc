@@ -88,6 +88,10 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     }
 
     // format timestamps
+    // NOTE: This string comparision implementation is currently the necessary
+    // way to do it, as there isn't a way to pass the Bro enum into C++ enum.
+    // This makes the user interface consistent with the existing Bro Logging
+    // configuration for the ASCII log output.
     if ( strcmp(json_timestamps.c_str(), "JSON::TS_EPOCH") == 0 ) {
       tf = threading::formatter::JSON::TS_EPOCH;
     }
