@@ -28,6 +28,11 @@ export {
 	## Example:  redef Kafka::logs_to_exclude = set(SSH::LOG);
 	const logs_to_exclude: set[Log::ID] &redef;
 
+	## Specify a different timestamp format.
+	##
+	## Example:  redef Kafka::json_timestamps = JSON::TS_ISO8601;
+	const json_timestamps: JSON::TimestampFormat = JSON::TS_EPOCH &redef;
+
 	## Destination kafka topic name
 	const topic_name: string = "bro" &redef;
 
