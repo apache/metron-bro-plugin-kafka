@@ -35,7 +35,7 @@ This software is a part of the [Apache Metron](http://metron.apache.org/) projec
 
     ```
     $ bro -N Apache::Kafka
-    Apache::Kafka - Writes logs to Kafka (dynamic, version 0.2)
+    Apache::Kafka - Writes logs to Kafka (dynamic, version 0.3)
     ```
 
 ## Activation
