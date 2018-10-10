@@ -5,7 +5,6 @@ script_dir = build/scripts/Apache/Kafka
 build_command = ./configure --bro-dist=%(bro_dist)s --with-librdkafka=%(LIBRDKAFKA_ROOT)s && make
 test_command = ( cd tests && btest -d )
 plugin_dir = build
-config_files = scripts/init.bro
 version = 0.2
 depends =
   bro >=2.5.0
