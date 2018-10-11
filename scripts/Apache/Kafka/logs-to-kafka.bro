@@ -14,7 +14,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-##! load this script to enable log output to kafka
+
+##! Load this script to enable log output to kafka
 
 module Kafka;
 
@@ -22,15 +23,16 @@ event bro_init() &priority=-5
 {
 	for (stream_id in Log::active_streams)
 	{
-		if (stream_id in Kafka::logs_to_send)
-		{
-			local filter: Log::Filter = [
-				$name = fmt("kafka-%s", stream_id),
-				$writer = Log::WRITER_KAFKAWRITER,
-				$config = table(["stream_id"] = fmt("%s", stream_id))
-			];
+		if ( stream_id in Kafka::logs_to_exclude ||
+                   ( |Kafka::send_logs| > 0 && stream_id !in Kafka::logs_to_send ))
+			next;
 
-			Log::add_filter(stream_id, filter);
-		}
+		local filter: Log::Filter = [
+			$name = fmt("kafka-%s", stream_id),
+			$writer = Log::WRITER_KAFKAWRITER,
+			$config = table(["stream_id"] = fmt("%s", stream_id))
+		];
+
+		Log::add_filter(stream_id, filter);
 	}
 }

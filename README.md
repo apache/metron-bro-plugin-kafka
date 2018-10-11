@@ -59,6 +59,19 @@ redef Kafka::kafka_conf = table(
 
 ### Example 2
 
+This bro plugin also has the ability to blacklist logs.  That is, to send all currently active logs *except* for the logs in a specified list.  In this example, we will send all of the enabled logs except for the Conn log.
+
+```
+@load Apache/Kafka/logs-to-kafka.bro
+redef Kafka::logs_to_exclude = set(Conn::LOG);
+redef Kafka::topic_name = "bro";
+redef Kafka::kafka_conf = table(
+    ["metadata.broker.list"] = "localhost:9092"
+);
+```
+
+### Example 3
+
 It is also possible to send each log stream to a uniquely named topic.  The goal in this example is to send all HTTP records to a Kafka topic named `http` and all DNS records to a separate Kafka topic named `dns`.
  * The `topic_name` value must be set to an empty string.
  * The `$path` value of Bro's Log Writer mechanism is used to define the topic name.
@@ -96,7 +109,7 @@ event bro_init()
 }
 ```
 
-### Example 3
+### Example 4
 
 You may want to configure bro to filter log messages with certain characteristics from being sent to your kafka topics.  For instance, Metron currently doesn't support IPv6 source or destination IPs in the default enrichments, so it may be helpful to filter those log messages from being sent to kafka (although there are [multiple ways](#notes) to approach this).  In this example we will do that that, and are assuming a somewhat standard bro kafka plugin configuration, such that:
  * All bro logs are sent to the `bro` topic, by configuring `Kafka::topic_name`.
@@ -144,6 +157,7 @@ event bro_init() &priority=-5
 
 #### Notes
  * `logs_to_send` is mutually exclusive with `$pred`, thus for each log you want to set `$pred` on, you must individually setup a `Log::add_filter` and refrain from including that log in `logs_to_send`.
+ * In Bro 2.5.x the bro project introduced a [logger function](https://www.bro.org/sphinx/cluster/index.html#logger) which removes the logging functions from the manager thread, and taking advantage of that is highly recommended.  If you are running this plugin on Bro 2.4.x, you may encounter issues where the manager thread is taking on too much responsibility and pinning a single CPU core without the ability to spread the load across additional cores.  In this case, it may be in your best interest to prefer using a bro logging predicate over filtering in your Metron cluster [using Stellar](https://github.com/apache/metron/tree/master/metron-stellar/stellar-common) in order to lesson the load of that thread.
  * You can also filter IPv6 logs from within your Metron cluster [using Stellar](https://github.com/apache/metron/tree/master/metron-stellar/stellar-common#is_ip).  In that case, you wouldn't apply a predicate in your bro configuration, and instead Stellar would filter the logs out before they were processed by the enrichment layer of Metron.
  * It is also possible to use the `is_v6_subnet()` bro function in your predicate, as of their [2.5 release](https://www.bro.org/sphinx-git/install/release-notes.html#bro-2-5), however the above example should work on [bro 2.4](https://www.bro.org/sphinx-git/install/release-notes.html#bro-2-4) and newer, which has been the focus of the kafka plugin.
 

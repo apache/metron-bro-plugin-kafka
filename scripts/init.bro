@@ -18,13 +18,35 @@
 module Kafka;
 
 export {
-  const logs_to_send: set[Log::ID] &redef;
-  const topic_name: string = "bro" &redef;
-  const max_wait_on_shutdown: count = 3000 &redef;
-  const tag_json: bool = F &redef;
-  const json_timestamps: JSON::TimestampFormat = JSON::TS_EPOCH &redef;
-  const kafka_conf: table[string] of string = table(
-    ["metadata.broker.list"] = "localhost:9092"
-  ) &redef;
-  const debug: string = "" &redef;
+	## Specify which :bro:type:`Log::ID` to send to kafka.
+	##
+	## Example:  redef Kafka::logs_to_send = set(Conn::Log, DNS::LOG);
+	const logs_to_send: set[Log::ID] &redef;
+
+	## Specify which :bro:type:`Log::ID` to exclude from being sent to kafka.
+	##
+	## Example:  redef Kafka::logs_to_exclude = set(SSH::LOG);
+	const logs_to_exclude: set[Log::ID] &redef;
+
+	## Specify a different timestamp format.
+	##
+	## Example:  redef Kafka::json_timestamps = JSON::TS_ISO8601;
+	const json_timestamps: JSON::TimestampFormat = JSON::TS_EPOCH &redef;
+
+	## Destination kafka topic name
+	const topic_name: string = "bro" &redef;
+
+	## Maximum wait on shutdown in milliseconds
+	const max_wait_on_shutdown: count = 3000 &redef;
+
+	## Whether or not to tag JSON with a log stream identifier
+	const tag_json: bool = F &redef;
+
+	## Any additional configs to pass to librdkafka
+	const kafka_conf: table[string] of string = table(
+		["metadata.broker.list"] = "localhost:9092"
+	) &redef;
+
+	## A comma separated list of librdkafka debug contexts
+	const debug: string = "" &redef;
 }
