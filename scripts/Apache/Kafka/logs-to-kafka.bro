@@ -19,20 +19,33 @@
 
 module Kafka;
 
-event bro_init() &priority=-5
+function send_to_kafka(id: Log::ID): bool
+{
+        if (|logs_to_send| == 0)
+                # Send nothing unless it's explicitly set to send
+                return F;
+        else if (id in logs_to_exclude ||
+                (|logs_to_send| > 0 && id !in logs_to_send))
+                # Don't send logs in the exclusion set
+                return F;
+	else
+                # Send logs that are in the inclusion set, but not the exclusions set
+                return T;
+}
+
+event bro_init() &priority=-10
 {
 	for (stream_id in Log::active_streams)
 	{
-		if ( stream_id in Kafka::logs_to_exclude ||
-                   ( |Kafka::send_logs| > 0 && stream_id !in Kafka::logs_to_send ))
-			next;
-
-		local filter: Log::Filter = [
-			$name = fmt("kafka-%s", stream_id),
-			$writer = Log::WRITER_KAFKAWRITER,
-			$config = table(["stream_id"] = fmt("%s", stream_id))
-		];
-
-		Log::add_filter(stream_id, filter);
+		if (send_to_kafka(stream_id))
+		{
+			local filter: Log::Filter = [
+				$name = fmt("kafka-%s", stream_id),
+				$writer = Log::WRITER_KAFKAWRITER,
+				$config = table(["stream_id"] = fmt("%s", stream_id))
+			];
+	
+			Log::add_filter(stream_id, filter);
+		}
 	}
 }
