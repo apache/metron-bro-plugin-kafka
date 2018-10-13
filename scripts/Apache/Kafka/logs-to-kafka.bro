@@ -28,24 +28,24 @@ function send_to_kafka(id: Log::ID): bool
                 (|logs_to_send| > 0 && id !in logs_to_send))
                 # Don't send logs in the exclusion set
                 return F;
-	else
+        else
                 # Send logs that are in the inclusion set, but not the exclusions set
                 return T;
 }
 
 event bro_init() &priority=-10
 {
-	for (stream_id in Log::active_streams)
-	{
-		if (send_to_kafka(stream_id))
-		{
-			local filter: Log::Filter = [
-				$name = fmt("kafka-%s", stream_id),
-				$writer = Log::WRITER_KAFKAWRITER,
-				$config = table(["stream_id"] = fmt("%s", stream_id))
-			];
-	
-			Log::add_filter(stream_id, filter);
-		}
-	}
+        for (stream_id in Log::active_streams)
+        {
+                if (send_to_kafka(stream_id))
+                {
+                        local filter: Log::Filter = [
+                                $name = fmt("kafka-%s", stream_id),
+                                $writer = Log::WRITER_KAFKAWRITER,
+                                $config = table(["stream_id"] = fmt("%s", stream_id))
+                        ];
+        
+                        Log::add_filter(stream_id, filter);
+                }
+        }
 }
