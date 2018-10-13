@@ -18,6 +18,12 @@
 module Kafka;
 
 export {
+	## Send all active logs to kafka except for those that are explicitly
+	## excluded via logs_to_exclude.
+	##
+	## Example:  redef Kafka::send_all_active_logs = T;
+	const send_all_active_logs: bool = F &redef;
+
         ## Specify which :bro:type:`Log::ID` to send to kafka.
         ##
         ## Example:  redef Kafka::logs_to_send = set(Conn::Log, DNS::LOG);

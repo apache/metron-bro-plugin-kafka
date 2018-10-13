@@ -21,15 +21,17 @@ module Kafka;
 
 function send_to_kafka(id: Log::ID): bool
 {
-        if (|logs_to_send| == 0)
+        if (|logs_to_send| == 0 && send_all_active_logs == F)
                 # Send nothing unless it's explicitly set to send
                 return F;
         else if (id in logs_to_exclude ||
-                (|logs_to_send| > 0 && id !in logs_to_send))
+                (|logs_to_send| > 0 && id !in logs_to_send && send_all_active_logs == F))
                 # Don't send logs in the exclusion set
                 return F;
         else
-                # Send logs that are in the inclusion set, but not the exclusions set
+		# If send_all_active_logs is True, send all logs except those
+		# in the exclusion set.  Otherwise, send only the logs that are
+		# in the inclusion set, but not the exclusions set
                 return T;
 }
 
