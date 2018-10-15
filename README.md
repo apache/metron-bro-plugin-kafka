@@ -8,6 +8,7 @@ This software is a part of the [Apache Metron](http://metron.apache.org/) projec
 * [Activation](#activation)
 * [Settings](#settings)
 * [Kerberos](#kerberos)
+* [Contributing](#contributing)
 
 ## Installation
 
@@ -262,3 +263,8 @@ redef Kafka::kafka_conf = table( ["metadata.broker.list"] = "node1:6667"
                                , ["sasl.kerberos.principal"] = "metron@EXAMPLE.COM"
                                );
 ```
+
+## Contributing
+
+If you are interested in contributing to this plugin, please see the upstream [CONTRIBUTING.md](https://github.com/apache/metron/blob/master/CONTRIBUTING.md).
+
