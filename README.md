@@ -20,11 +20,11 @@ This software is a part of the [Apache Metron](http://metron.apache.org/) projec
     In order to use this plugin within a kerberized Kafka environment, you will also need `libsasl2` installed and will need to pass `--enable-sasl` to the `configure` script.
 
     ```
-    curl -L https://github.com/edenhill/librdkafka/archive/v0.9.4.tar.gz | tar xvz
-    cd librdkafka-0.9.4/
-    ./configure --enable-sasl
-    make
-    sudo make install
+    $ curl -L https://github.com/edenhill/librdkafka/archive/v0.9.4.tar.gz | tar xvz
+    $ cd librdkafka-0.9.4/
+    $ ./configure --enable-sasl
+    $ make
+    $ sudo make install
     ```
 
 1. Configure `bro-pkg` by following the quickstart guide [here](https://bro-package-manager.readthedocs.io/en/stable/quickstart.html).
@@ -32,29 +32,51 @@ This software is a part of the [Apache Metron](http://metron.apache.org/) projec
 1. Install the plugin using `bro-pkg install`.
 
     ```
-    bro-pkg install apache/metron-bro-plugin-kafka
+    $ bro-pkg install apache/metron-bro-plugin-kafka --version master
+    The following packages will be INSTALLED:
+      bro/apache/metron-bro-plugin-kafka (master)
+
+    Verify the following REQUIRED external dependencies:
+    (Ensure their installation on all relevant systems before proceeding):
+      from bro/apache/metron-bro-plugin-kafka (master):
+        librdkafka ~0.9.4
+
+    Proceed? [Y/n]
+    bro/apache/metron-bro-plugin-kafka asks for LIBRDKAFKA_ROOT (Path to librdkafka installation tree) ? [/usr/local/lib]
+    Saved answers to config file: /home/jonzeolla/.bro-pkg/config
+    Running unit tests for "bro/apache/metron-bro-plugin-kafka"
+    all 10 tests successful
+
+
+    Installing "bro/apache/metron-bro-plugin-kafka"........
+    Installed "bro/apache/metron-bro-plugin-kafka" (master)
+    Loaded "bro/apache/metron-bro-plugin-kafka"
     ```
 
 ### Manual Installation
+
+Manually installing the plugin should only occur in situations where installing and configuring `bro-pkg` is not reasonable, such as in a docker container.  If you are running bro in an environment where you do not have Internet connectivity, investigate [bundles](https://bro-package-manager.readthedocs.io/en/stable/bro-pkg.html#bundle) or creating an internal [package source](https://bro-package-manager.readthedocs.io/en/stable/source.html).
+
+These instructions could also be helpful if you were interested in distributing this as a package (such as a deb or rpm).
 
 1. Install [librdkafka](https://github.com/edenhill/librdkafka), a native client library for Kafka.  This plugin has been tested against the latest release of librdkafka, which at the time of this writing is v0.9.4.  
 
     In order to use this plugin within a kerberized Kafka environment, you will also need `libsasl2` installed and will need to pass `--enable-sasl` to the `configure` script.
 
     ```
-    curl -L https://github.com/edenhill/librdkafka/archive/v0.9.4.tar.gz | tar xvz
-    cd librdkafka-0.9.4/
-    ./configure --enable-sasl
-    make
-    sudo make install
+    $ curl -L https://github.com/edenhill/librdkafka/archive/v0.9.4.tar.gz | tar xvz
+    $ cd librdkafka-0.9.4/
+    $ ./configure --enable-sasl
+    $ make
+    $ sudo make install
     ```
 
 1. Build the plugin using the following commands.
 
     ```
-    ./configure --bro-dist=$BRO_SRC
-    make
-    sudo make install
+    $ ./configure --bro-dist=$BRO_SRC
+    $ make
+    $ sudo make install
     ```
 
 1. Run the following command to ensure that the plugin was installed successfully.
@@ -78,7 +100,7 @@ The goal in this example is to send all HTTP and DNS records to a Kafka topic na
 @load packages/metron-bro-plugin-kafka/Apache/Kafka
 redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG);
 redef Kafka::kafka_conf = table(
-    ["metadata.broker.list"] = "localhost:9092"
+    ["metadata.broker.list"] = "server1.example.com:9092,server2.example.com:9092"
 );
 ```
 
@@ -194,7 +216,7 @@ event bro_init() &priority=-10
 
 #### Notes
  * `logs_to_send` is mutually exclusive with `$pred`, thus for each log you want to set `$pred` on, you must individually setup a `Log::add_filter` and refrain from including that log in `logs_to_send`.
- * In Bro 2.5.x the bro project introduced a [logger function](https://www.bro.org/sphinx/cluster/index.html#logger) which removes the logging functions from the manager thread, and taking advantage of that is highly recommended.  If you are running this plugin on Bro 2.4.x, you may encounter issues where the manager thread is taking on too much responsibility and pinning a single CPU core without the ability to spread the load across additional cores.  In this case, it may be in your best interest to prefer using a bro logging predicate over filtering in your Metron cluster [using Stellar](https://github.com/apache/metron/tree/master/metron-stellar/stellar-common) in order to lesson the load of that thread.
+ * In Bro 2.5.x the bro project introduced a [logger function](https://www.bro.org/sphinx/cluster/index.html#logger) which removes the logging functions from the manager thread, and taking advantage of that is highly recommended.  If you are running this plugin on Bro 2.4.x, you may encounter issues where the manager thread is taking on too much responsibility and pinning a single CPU core without the ability to spread the load across additional cores.  In this case, it may be in your best interest to prefer using a bro logging predicate over filtering in your Metron cluster [using Stellar](https://github.com/apache/metron/tree/master/metron-stellar/stellar-common) in order to lessen the load of that thread.
  * You can also filter IPv6 logs from within your Metron cluster [using Stellar](https://github.com/apache/metron/tree/master/metron-stellar/stellar-common#is_ip).  In that case, you wouldn't apply a predicate in your bro configuration, and instead Stellar would filter the logs out before they were processed by the enrichment layer of Metron.
  * It is also possible to use the `is_v6_subnet()` bro function in your predicate, as of their [2.5 release](https://www.bro.org/sphinx-git/install/release-notes.html#bro-2-5), however the above example should work on [bro 2.4](https://www.bro.org/sphinx-git/install/release-notes.html#bro-2-4) and newer, which has been the focus of the kafka plugin.
 
