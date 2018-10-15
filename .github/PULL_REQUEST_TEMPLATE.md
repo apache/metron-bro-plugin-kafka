@@ -4,7 +4,7 @@
 
 ## Pull Request Checklist
 
-Thank you for submitting a contribution to Apache Metron's kafka log writing plugin for Bro.
+Thank you for submitting a contribution to Apache Metron's Bro kafka writer plugin.
 
 In order to streamline the review of the contribution we ask you follow these guidelines and ask you to double check the following:
 
@@ -18,7 +18,7 @@ In order to streamline the review of the contribution we ask you follow these gu
 - [ ] Have you included steps or a guide to how the change may be verified and tested manually?
 - [ ] Have you ensured that the full suite of tests and checks have been executed via:
   ```
-  bro-pkg install $GITHUB_USERNAME/metron-bro-plugin-kafka --version $BRANCH
+  bro-pkg test $GITHUB_USERNAME/metron-bro-plugin-kafka --version $BRANCH
   ```
 - [ ] Have you written or updated unit tests and or integration tests to verify your changes?
 - [ ] If adding new dependencies to the code, are these dependencies licensed in a way that is compatible for inclusion under [ASF 2.0](http://www.apache.org/legal/resolved.html#category-a)?

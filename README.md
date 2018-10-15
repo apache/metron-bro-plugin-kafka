@@ -266,5 +266,5 @@ redef Kafka::kafka_conf = table( ["metadata.broker.list"] = "node1:6667"
 
 ## Contributing
 
-If you are interested in contributing to this plugin, please see the upstream [CONTRIBUTING.md](https://github.com/apache/metron/blob/master/CONTRIBUTING.md).
+If you are interested in contributing to this plugin, please see the Apache Metron [CONTRIBUTING.md](https://github.com/apache/metron/blob/master/CONTRIBUTING.md).
 
