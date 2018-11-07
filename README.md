@@ -27,6 +27,7 @@ This software is a part of the [Apache Metron](http://metron.apache.org/) projec
 1. Build the plugin using the following commands.
 
     ```
+    ##$BRO_SRC should be the path of the BRO source directory you would have downloaded
     ./configure --bro-dist=$BRO_SRC
     make
     sudo make install
@@ -50,7 +51,7 @@ The goal in this example is to send all HTTP and DNS records to a Kafka topic na
  * By defining `topic_name` all records will be sent to the same Kafka topic.
  * Defining `logs_to_send` will ensure that only HTTP and DNS records are sent. 
 ```
-@load packages/metron-bro-plugin-kafka/Apache/Kafka
+@load packages/metron-bro-plugin-kafka/scripts/Apache/Kafka
 redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG);
 redef Kafka::topic_name = "bro";
 redef Kafka::kafka_conf = table(
@@ -67,7 +68,7 @@ It is also possible to send each log stream to a uniquely named topic.  The goal
  * Each log writer accepts a separate configuration table.
 
 ```
-@load packages/metron-bro-plugin-kafka/Apache/Kafka
+@load packages/metron-bro-plugin-kafka/scripts/Apache/Kafka
 redef Kafka::topic_name = "";
 redef Kafka::tag_json = T;
 
@@ -105,7 +106,7 @@ You may want to configure bro to filter log messages with certain characteristic
  * If the log message contains a 128 byte long source or destination IP address, the log is not sent to kafka.
 
 ```
-@load packages/metron-bro-plugin-kafka/Apache/Kafka
+@load packages/metron-bro-plugin-kafka/scripts/Apache/Kafka
 redef Kafka::topic_name = "bro";
 redef Kafka::tag_json = T;
 
