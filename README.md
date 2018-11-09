@@ -60,6 +60,32 @@ redef Kafka::kafka_conf = table(
 
 ### Example 2
 
+This plugin has the ability send all active logs to kafka with the following configuration.
+
+```
+@load packages/metron-bro-plugin-kafka/Apache/Kafka
+redef Kafka::send_all_active_logs = T;
+redef Kafka::kafka_conf = table(
+    ["metadata.broker.list"] = "localhost:9092"
+);
+```
+
+### Example 3
+
+You can also specify a blacklist of bro logs to ensure they aren't being sent to kafka regardless of the `Kafka::send_all_active_logs` and `Kafka::logs_to_send` configurations.  In this example, we will send all of the enabled logs except for the Conn log.
+
+```
+@load packages/metron-bro-plugin-kafka/Apache/Kafka
+redef Kafka::send_all_active_logs = T;
+redef Kafka::logs_to_exclude = set(Conn::LOG);
+redef Kafka::topic_name = "bro";
+redef Kafka::kafka_conf = table(
+    ["metadata.broker.list"] = "localhost:9092"
+);
+```
+
+### Example 4
+
 It is also possible to send each log stream to a uniquely named topic.  The goal in this example is to send all HTTP records to a Kafka topic named `http` and all DNS records to a separate Kafka topic named `dns`.
  * The `topic_name` value must be set to an empty string.
  * The `$path` value of Bro's Log Writer mechanism is used to define the topic name.
@@ -97,7 +123,7 @@ event bro_init()
 }
 ```
 
-### Example 3
+### Example 5
 
 You may want to configure bro to filter log messages with certain characteristics from being sent to your kafka topics.  For instance, Metron currently doesn't support IPv6 source or destination IPs in the default enrichments, so it may be helpful to filter those log messages from being sent to kafka (although there are [multiple ways](#notes) to approach this).  In this example we will do that that, and are assuming a somewhat standard bro kafka plugin configuration, such that:
  * All bro logs are sent to the `bro` topic, by configuring `Kafka::topic_name`.
