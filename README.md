@@ -140,6 +140,32 @@ redef Kafka::kafka_conf = table(
 
 ### Example 4 - Send logs to unique topics
 
+This plugin has the ability send all active logs to kafka with the following configuration.
+
+```
+@load packages/metron-bro-plugin-kafka/Apache/Kafka
+redef Kafka::send_all_active_logs = T;
+redef Kafka::kafka_conf = table(
+    ["metadata.broker.list"] = "localhost:9092"
+);
+```
+
+### Example 3
+
+You can also specify a blacklist of bro logs to ensure they aren't being sent to kafka regardless of the `Kafka::send_all_active_logs` and `Kafka::logs_to_send` configurations.  In this example, we will send all of the enabled logs except for the Conn log.
+
+```
+@load packages/metron-bro-plugin-kafka/Apache/Kafka
+redef Kafka::send_all_active_logs = T;
+redef Kafka::logs_to_exclude = set(Conn::LOG);
+redef Kafka::topic_name = "bro";
+redef Kafka::kafka_conf = table(
+    ["metadata.broker.list"] = "localhost:9092"
+);
+```
+
+### Example 4
+
 It is also possible to send each log stream to a uniquely named topic.  The goal in this example is to send all HTTP records to a Kafka topic named `http` and all DNS records to a separate Kafka topic named `dns`.
  * The `topic_name` value must be set to an empty string.
  * The `$path` value of Bro's Log Writer mechanism is used to define the topic name.
@@ -352,7 +378,8 @@ The kafka topic `bro` has been given permission for the `metron` user to
 write:
 ```
 # login using the metron user
-kinit -kt /etc/security/keytabs/metron.headless.keytab metron@EXAMPLE.COM
+kinit -kt /etc/security/keytabs/metron.
+less.keytab metron@EXAMPLE.COM
 ${KAFKA_HOME}/kafka-broker/bin/kafka-acls.sh --authorizer kafka.security.auth.SimpleAclAuthorizer --authorizer-properties zookeeper.connect=node1:2181 --add --allow-principal User:metron --topic bro
 ```
 

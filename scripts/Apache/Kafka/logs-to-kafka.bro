@@ -14,23 +14,40 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-##! load this script to enable log output to kafka
+
+##! Load this script to enable log output to kafka
 
 module Kafka;
 
-event bro_init() &priority=-5
+function send_to_kafka(id: Log::ID): bool
 {
-	for (stream_id in Log::active_streams)
-	{
-		if (stream_id in Kafka::logs_to_send)
-		{
-			local filter: Log::Filter = [
-				$name = fmt("kafka-%s", stream_id),
-				$writer = Log::WRITER_KAFKAWRITER,
-				$config = table(["stream_id"] = fmt("%s", stream_id))
-			];
+        if (|logs_to_send| == 0 && send_all_active_logs == F)
+                # Send nothing unless it's explicitly set to send
+                return F;
+        else if (id in logs_to_exclude ||
+                (|logs_to_send| > 0 && id !in logs_to_send && send_all_active_logs == F))
+                # Don't send logs in the exclusion set
+                return F;
+        else
+		# If send_all_active_logs is True, send all logs except those
+		# in the exclusion set.  Otherwise, send only the logs that are
+		# in the inclusion set, but not the exclusions set
+                return T;
+}
 
-			Log::add_filter(stream_id, filter);
-		}
-	}
+event bro_init() &priority=-10
+{
+        for (stream_id in Log::active_streams)
+        {
+                if (send_to_kafka(stream_id))
+                {
+                        local filter: Log::Filter = [
+                                $name = fmt("kafka-%s", stream_id),
+                                $writer = Log::WRITER_KAFKAWRITER,
+                                $config = table(["stream_id"] = fmt("%s", stream_id))
+                        ];
+        
+                        Log::add_filter(stream_id, filter);
+                }
+        }
 }
