@@ -15,13 +15,14 @@
 #  limitations under the License.
 #
 
-#
-# This is loaded unconditionally at Bro startup. Include scripts here that should
-# always be loaded.
-#
-# Normally, that will be only code that initializes built-in elements. Load
-# your standard scripts in
-# scripts/<plugin-namespace>/<plugin-name>/__load__.bro instead.
-#
+# @TEST-EXEC: bro ../../../scripts/Apache/Kafka/ %INPUT > output
+# @TEST-EXEC: btest-diff output
 
-@load ./init.bro
+module Kafka;
+
+redef logs_to_send = set(HTTP::LOG, Conn::LOG);
+redef logs_to_exclude = set(Conn::LOG, DNS::LOG);
+
+print send_to_kafka(HTTP::LOG);
+print send_to_kafka(Conn::LOG);
+print send_to_kafka(DNS::LOG);
