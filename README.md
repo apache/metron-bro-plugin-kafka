@@ -54,6 +54,13 @@ This software is a part of the [Apache Metron](http://metron.apache.org/) projec
     Loaded "bro/apache/metron-bro-plugin-kafka"
     ```
 
+1. Run the following command to ensure that the plugin was installed successfully.
+
+    ```
+    $ bro -N Apache::Kafka
+    Apache::Kafka - Writes logs to Kafka (dynamic, version 0.3)
+    ```
+
 ### Manual Installation
 
 Manually installing the plugin should only occur in situations where installing and configuring `bro-pkg` is not reasonable, such as in a docker container.  If you are running bro in an environment where you do not have Internet connectivity, investigate [bundles](https://bro-package-manager.readthedocs.io/en/stable/bro-pkg.html#bundle) or creating an internal [package source](https://bro-package-manager.readthedocs.io/en/stable/source.html).
