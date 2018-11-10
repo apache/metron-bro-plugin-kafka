@@ -378,8 +378,7 @@ The kafka topic `bro` has been given permission for the `metron` user to
 write:
 ```
 # login using the metron user
-kinit -kt /etc/security/keytabs/metron.
-less.keytab metron@EXAMPLE.COM
+kinit -kt /etc/security/keytabs/metron.headless.keytab metron@EXAMPLE.COM
 ${KAFKA_HOME}/kafka-broker/bin/kafka-acls.sh --authorizer kafka.security.auth.SimpleAclAuthorizer --authorizer-properties zookeeper.connect=node1:2181 --add --allow-principal User:metron --topic bro
 ```
 
