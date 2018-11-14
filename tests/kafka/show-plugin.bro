@@ -15,5 +15,5 @@
 #  limitations under the License.
 #
 
-# @TEST-EXEC: bro -NN Apache::Kafka >output
+# @TEST-EXEC: bro -NN Apache::Kafka |sed -e 's/version.*)/version)/g' >output
 # @TEST-EXEC: btest-diff output
