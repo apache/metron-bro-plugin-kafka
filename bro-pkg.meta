@@ -10,6 +10,6 @@ depends =
   bro >=2.5.0
   bro-pkg >=1.2
 external_depends =
-  librdkafka ~0.9.4
+  librdkafka ~0.11.5
 user_vars =
   LIBRDKAFKA_ROOT [/usr/local/lib] "Path to librdkafka installation tree"
