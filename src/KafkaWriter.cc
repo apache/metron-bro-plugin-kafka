@@ -66,16 +66,7 @@ KafkaWriter::KafkaWriter(WriterFrontend* frontend):
 }
 
 KafkaWriter::~KafkaWriter()
-{
-
-    // Cleanup all the things
-    delete topic;
-    delete producer;
-    delete formatter;
-    delete conf;
-    delete topic_conf;
-
-}
+{}
 
 bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading::Field* const* fields)
 {
@@ -202,6 +193,8 @@ bool KafkaWriter::DoFinish(double network_time)
     delete topic;
     delete producer;
     delete formatter;
+    delete conf;
+    delete topic_conf;
 
     return success;
 }
@@ -237,7 +230,7 @@ bool KafkaWriter::DoWrite(int num_fields, const threading::Field* const* fields,
 
 /**
  * Writer-specific method implementing a change of fthe buffering
- * state.	If buffering is disabled, the writer should attempt to
+ * state.  If buffering is disabled, the writer should attempt to
  * write out information as quickly as possible even if doing so may
  * have a performance impact. If enabled (which is the default), it
  * may buffer data as helpful and write it out later in a way
