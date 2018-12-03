@@ -41,8 +41,8 @@ ENV PATH="${PATH}:/usr/bin"
 RUN bro-pkg autoconfig
 
 # install librdkafka
-RUN curl -L https://github.com/edenhill/librdkafka/archive/v0.9.4.tar.gz | tar xvz
-WORKDIR librdkafka-0.9.4/
+RUN curl -L https://github.com/edenhill/librdkafka/archive/v0.11.5.tar.gz | tar xvz
+WORKDIR librdkafka-0.11.5/
 RUN ./configure --enable-sasl
 RUN make
 RUN make install
