@@ -1,3 +1,9 @@
+#ide stuff
+.idea
+*.iml
+*.iws
+.DS_Store
+
 .state
 build
 
