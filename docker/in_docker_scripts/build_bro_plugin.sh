@@ -29,7 +29,7 @@ fi
 echo "================================" >> "${RUN_LOG_PATH}" 2>&1
 
 echo "================================" >> "${RUN_LOG_PATH}" 2>&1
-bro -N Apache::Kafka | tee v
+bro -N Apache::Kafka | tee "${RUN_LOG_PATH}"
 echo "================================" >> "${RUN_LOG_PATH}" 2>&1
 
 echo "@load packages" >> /usr/local/bro/share/bro/site/local.bro
