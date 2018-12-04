@@ -20,8 +20,17 @@
 shopt -s nocasematch
 
 cd /root || exit 1
+
+
+cd code && make clean
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR cleaning project ${rc}" >> "${RUN_LOG_PATH}"
+  exit ${rc};
+fi
+cd /root || exit 1
+
 echo "================================" >> "${RUN_LOG_PATH}" 2>&1
-bro-pkg install ./code --force | tee "${RUN_LOG_PATH}"
+bro-pkg install code --force | tee "${RUN_LOG_PATH}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR running bro-pkg install ${rc}" >> "${RUN_LOG_PATH}"
   exit ${rc};
