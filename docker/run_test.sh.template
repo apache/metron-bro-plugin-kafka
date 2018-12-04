@@ -26,6 +26,7 @@ CREATED_BRO_CONTAINER=false
 RAN_BRO_CONTAINER=false
 
 SKIP_REBUILD_BRO=false
+LEAVE_RUNNING=false
 
 SCRIPT_DIR=./scripts
 CONTAINER_DIR=./containers/bro-localbuild-container
@@ -35,7 +36,8 @@ LOG_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && cd logs && pwd 
 function help {
  echo " "
  echo "usage: ${0}"
- echo "    --skip-docker-build            skip build of bro docker machine"
+ echo "    --skip-docker-build             Skip build of bro docker machine."
+ echo "    --leave-running                 Do not stop containers after script.  The cleanup_containers.sh script should be run when done."
  echo "    -h/--help                       Usage information."
  echo " "
  echo " "
@@ -73,6 +75,16 @@ for i in "$@"; do
    SKIP_REBUILD_BRO=true
    shift # past argument
   ;;
+
+  #
+  # LEAVE_RUNNING
+  #
+  #   --leave-running
+  #
+    --leave-running)
+    LEAVE_RUNNING=true
+    shift # past argument
+   ;;
 
  #
  # -h/--help
@@ -167,4 +179,6 @@ fi
 
 
 #shutdown
-shutdown
+if [[ "$LEAVE_RUNNING" = false ]] ; then
+  shutdown
+fi
