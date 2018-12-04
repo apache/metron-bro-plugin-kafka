@@ -27,6 +27,5 @@ if [ ! -d /root/data ] ; then
   exit 1
 fi
 
-ls /root/data
 # process all pcaps in the data directory and sub directories
 find /root/data -type f -exec bro -r '{}' /usr/local/bro/share/bro/site/local.bro -C  \;
