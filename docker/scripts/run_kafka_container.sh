@@ -71,4 +71,4 @@ docker run -d --name kafka --network "${NETWORK_NAME}" --env ZOOKEEPER_IP=zookee
 rc=$?; if [[ ${rc} != 0 ]]; then
  exit ${rc};
 fi
-echo "Started the kafka container with networ ${NETWORK_NAME}"
+echo "Started the kafka container with network ${NETWORK_NAME}"

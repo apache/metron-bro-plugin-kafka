@@ -121,6 +121,13 @@ else
   RAN_ZK_CONTAINER=true
 fi
 
+#wait for zookeeper to be up
+bash "${SCRIPT_DIR}"/wait_for_zookeeper.sh
+rc=$?; if [[ ${rc} != 0 ]]; then
+  shutdown
+  exit ${rc};
+fi
+
 # run the kafka container
 bash "${SCRIPT_DIR}"/run_kafka_container.sh --network-name=bro-network
 rc=$?; if [[ ${rc} != 0 ]]; then
@@ -128,6 +135,21 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc};
 else
   RAN_KAFKA_CONTAINER=true
+fi
+
+#wait for zookeeper to be up
+bash "${SCRIPT_DIR}"/wait_for_kafka.sh
+rc=$?; if [[ ${rc} != 0 ]]; then
+  shutdown
+  exit ${rc};
+fi
+
+# create the bro kafka topic
+
+bash "${SCRIPT_DIR}"/create_bro_topic_in_kafka.sh
+rc=$?; if [[ ${rc} != 0 ]]; then
+  shutdown
+  exit ${rc};
 fi
 
 #build the bro container
