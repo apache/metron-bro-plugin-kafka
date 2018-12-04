@@ -49,6 +49,7 @@ declare -a DOCKER_PARAMETERS
 
 # handle command line options
 for i in "$@"; do
+  echo $i
  case $i in
  #
  # CONTAINER_PATH
@@ -124,15 +125,6 @@ for i in "$@"; do
    help
    exit 0
    shift # past argument with no value
-  ;;
-
- #
- # Unknown option
- #
-  *)
-   UNKNOWN_OPTION="${i#*=}"
-   echo "Error: unknown option: $UNKNOWN_OPTION"
-   help
   ;;
  esac
 done

@@ -94,18 +94,9 @@ for i in "$@"; do
    exit 0
    shift # past argument with no value
   ;;
-
- #
- # Unknown option
- #
-  *)
-   UNKNOWN_OPTION="${i#*=}"
-   echo "Error: unknown option: $UNKNOWN_OPTION"
-   help
-  ;;
  esac
 done
-
+EXTRA_ARGS="$@"
 echo "Running with "
 echo "SKIP_REBUILD_BRO = $SKIP_REBUILD_BRO"
 echo "==================================================="
@@ -159,7 +150,9 @@ fi
 bash "${SCRIPT_DIR}"/run_bro_container.sh --container-path="${CONTAINER_DIR}" \
   --container-name=bro-docker-container:latest \
   --network-name=bro-network \
-  --log-path="${LOG_PATH}"
+  --log-path="${LOG_PATH}" \
+  $EXTRA_ARGS
+
 
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
