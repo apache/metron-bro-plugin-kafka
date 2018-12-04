@@ -100,5 +100,5 @@ echo "==================================================="
 docker build . --no-cache --tag="${CONTAINER_NAME}"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
-    exit ${rc};
+    exit ${rc}
 fi

@@ -105,7 +105,7 @@ echo "==================================================="
 bash "${SCRIPT_DIR}"/create_docker_network.sh --network-name=bro-network
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
-  exit ${rc};
+  exit ${rc}
 else
   CREATED_NETWORK_FLAG=true
 fi
@@ -116,40 +116,18 @@ fi
 bash "${SCRIPT_DIR}"/run_zookeeper_container.sh --network-name=bro-network
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
-  exit ${rc};
+  exit ${rc}
 else
   RAN_ZK_CONTAINER=true
-fi
-
-#wait for zookeeper to be up
-bash "${SCRIPT_DIR}"/wait_for_zookeeper.sh
-rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
-  exit ${rc};
 fi
 
 # run the kafka container
 bash "${SCRIPT_DIR}"/run_kafka_container.sh --network-name=bro-network
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
-  exit ${rc};
+  exit ${rc}
 else
   RAN_KAFKA_CONTAINER=true
-fi
-
-#wait for zookeeper to be up
-bash "${SCRIPT_DIR}"/wait_for_kafka.sh
-rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
-  exit ${rc};
-fi
-
-# create the bro kafka topic
-
-bash "${SCRIPT_DIR}"/create_bro_topic_in_kafka.sh
-rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
-  exit ${rc};
 fi
 
 #build the bro container
@@ -160,7 +138,7 @@ if [[ "$SKIP_REBUILD_BRO" = false ]] ; then
 
   rc=$?; if [[ ${rc} != 0 ]]; then
     shutdown
-    exit ${rc};
+    exit ${rc}
   else
     CREATED_BRO_CONTAINER=true
   fi
@@ -178,7 +156,7 @@ bash "${SCRIPT_DIR}"/run_bro_container.sh --container-path="${CONTAINER_DIR}" \
 
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
-  exit ${rc};
+  exit ${rc}
 else
   RAN_BRO_CONTAINER=true
 fi

@@ -97,5 +97,5 @@ if [[ ! -f ${DATA_PATH}/rfb/rfb.pcap ]]; then
 fi
 
 rc=$?; if [[ ${rc} != 0 ]]; then
-    exit ${rc};
+    exit ${rc}
 fi

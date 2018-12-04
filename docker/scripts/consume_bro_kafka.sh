@@ -19,4 +19,4 @@
 
 shopt -s nocasematch
 docker run --rm --network bro-network ches/kafka \
-kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092
+  kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092

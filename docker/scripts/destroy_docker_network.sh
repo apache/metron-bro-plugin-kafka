@@ -67,5 +67,5 @@ fi
 
 docker network rm "${NETWORK_NAME}"
 rc=$?; if [[ ${rc} != 0 ]]; then
-exit ${rc};
+  exit ${rc}
 fi

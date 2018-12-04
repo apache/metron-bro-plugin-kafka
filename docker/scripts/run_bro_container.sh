@@ -189,7 +189,7 @@ echo ""
 eval "${DOCKER_CMD_BASE[@]}" "${DOCKER_PARAMETERS[@]}" "${CONTAINER_NAME}" "${DOCKER_CMD}"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
- exit ${rc};
+ exit ${rc}
 fi
 
 echo "Started bro container"

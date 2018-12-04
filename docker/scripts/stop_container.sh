@@ -69,7 +69,7 @@ fi
 docker stop  "${CONTAINER_NAME}"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
- exit ${rc};
+ exit ${rc}
 fi
 
 docker rm  "${CONTAINER_NAME}"

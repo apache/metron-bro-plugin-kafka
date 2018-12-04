@@ -69,6 +69,6 @@ fi
 docker run -d --name zookeeper --network "${NETWORK_NAME}" zookeeper:3.4
 
 rc=$?; if [[ ${rc} != 0 ]]; then
- exit ${rc};
+ exit ${rc}
 fi
 echo "Started the zookeeper container with networ ${NETWORK_NAME}"
