@@ -19,7 +19,7 @@
 
 shopt -s nocasematch
 
-echo "exectuting proces_data_dir.sh in the bro docker container"
+echo "executing process_data_dir.sh in the bro docker container"
 echo " "
 docker exec -w /root bro bash -c "bash built_in_scripts/process_data_dir.sh"
 rc=$?; if [[ ${rc} != 0 ]]; then
