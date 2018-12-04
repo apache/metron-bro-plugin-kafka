@@ -30,7 +30,6 @@ LEAVE_RUNNING=false
 
 SCRIPT_DIR=./scripts
 CONTAINER_DIR=./containers/bro-localbuild-container
-CONTAINER_NAME=
 LOG_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && cd logs && pwd )"
 
 function help {
