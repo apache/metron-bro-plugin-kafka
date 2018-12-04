@@ -67,7 +67,7 @@ fi
 
 docker network create "${NETWORK_NAME}"
 rc=$?; if [[ ${rc} != 0 ]]; then
-exit ${rc};
+  exit ${rc}
 fi
 
 echo "Created network ${NETWORK_NAME}"
