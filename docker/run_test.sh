@@ -25,6 +25,8 @@ RAN_KAFKA_CONTAINER=false
 CREATED_BRO_CONTAINER=false
 RAN_BRO_CONTAINER=false
 
+SKIP_REBUILD_BRO=false
+
 SCRIPT_DIR=./scripts
 CONTAINER_DIR=./containers/bro-localbuild-container
 CONTAINER_NAME=
@@ -32,12 +34,19 @@ LOG_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && cd logs && pwd 
 
 function help {
  echo " "
+ echo "usage: ${0}"
+ echo "    --skip-docker-build            skip build of bro docker machine"
  echo "    -h/--help                       Usage information."
  echo " "
  echo " "
 }
 
 function shutdown {
+
+  if [[ "$RAN_BRO_CONTAINER" = true ]]; then
+    "${SCRIPT_DIR}"/stop_container.sh --container-name=bro
+  fi
+
   if [[ "$RAN_KAFKA_CONTAINER" = true ]]; then
     "${SCRIPT_DIR}"/stop_container.sh --container-name=kafka
   fi
@@ -51,8 +60,46 @@ function shutdown {
   fi
 }
 
+# handle command line options
+for i in "$@"; do
+ case $i in
+
+ #
+ # FORCE_DOCKER_BUILD
+ #
+ #   --skip-docker-build
+ #
+   --skip-docker-build)
+   SKIP_REBUILD_BRO=true
+   shift # past argument
+  ;;
+
+ #
+ # -h/--help
+ #
+  -h|--help)
+   help
+   exit 0
+   shift # past argument with no value
+  ;;
+
+ #
+ # Unknown option
+ #
+  *)
+   UNKNOWN_OPTION="${i#*=}"
+   echo "Error: unknown option: $UNKNOWN_OPTION"
+   help
+  ;;
+ esac
+done
+
+echo "Running with "
+echo "SKIP_REBUILD_BRO = $SKIP_REBUILD_BRO"
+echo "==================================================="
+
 # create the network
-"${SCRIPT_DIR}"/create_docker_network.sh --network-name=bro-network
+bash "${SCRIPT_DIR}"/create_docker_network.sh --network-name=bro-network
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
   exit ${rc};
@@ -63,7 +110,7 @@ fi
 
 
 # run the zookeeper container
-"${SCRIPT_DIR}"/run_zookeeper_container.sh --network-name=bro-network
+bash "${SCRIPT_DIR}"/run_zookeeper_container.sh --network-name=bro-network
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
   exit ${rc};
@@ -72,7 +119,7 @@ else
 fi
 
 # run the kafka container
-"${SCRIPT_DIR}"/run_kafka_container.sh --network-name=bro-network
+bash "${SCRIPT_DIR}"/run_kafka_container.sh --network-name=bro-network
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
   exit ${rc};
@@ -81,21 +128,23 @@ else
 fi
 
 #build the bro container
-"${SCRIPT_DIR}"/build_container.sh \
-  --container-directory="${CONTAINER_DIR}" \
-  --container-name=bro-docker-container:latest
+if [[ "$SKIP_REBUILD_BRO" = false ]] ; then
+  bash "${SCRIPT_DIR}"/build_container.sh \
+    --container-directory="${CONTAINER_DIR}" \
+    --container-name=bro-docker-container:latest
 
-rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
-  exit ${rc};
-else
-  CREATED_BRO_CONTAINER=true
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    shutdown
+    exit ${rc};
+  else
+    CREATED_BRO_CONTAINER=true
+  fi
 fi
 
 
 #run the bro container
 #and optionally the passed script _IN_ the container
-"${SCRIPT_DIR}"/run_bro_container.sh --container-path="${CONTAINER_DIR}" \
+bash "${SCRIPT_DIR}"/run_bro_container.sh --container-path="${CONTAINER_DIR}" \
   --container-name=bro-docker-container:latest \
   --network-name=bro-network \
   --log-path="${LOG_PATH}"
@@ -107,9 +156,14 @@ else
   RAN_BRO_CONTAINER=true
 fi
 
-
+# build the bro plugin
+bash "${SCRIPT_DIR}"/build_bro_plugin_docker.sh
+rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> FAILED TO BUILD PLUGIN.  CHECK LOGS  ${rc}"
+fi
 
 #optionally run the kafka consumer script
+#prompt to shutdown, let them know they will have to call the shutdown script
 
 
 #shutdown

@@ -26,9 +26,6 @@ function help {
  echo "    --container-name                [REQURIED] The name to give the container"
  echo "    --network-name                  [REQUIRED] The docker network name"
  echo "    --scripts-path                  [OPTIONAL] The path with the scripts you may run in the container"
- echo "    --script-name                   [OPTIONAL] The name of the script in the scripts directory to run, " \
-                                            "if not provided we will just drop into shell (not bro will not be built) " \
-                                            "and you will have to run /root/built_in_scripts/build_bro.sh yourself"
  echo "    --data-path                     [OPTIONAL] The name of the directory to map to /root/data"
  echo "    --log-path                      [REQUIRED] The path to log to"
  echo "    --docker-parameter              [OPTIONAL] Each parameter with this name will be passed to docker run"
@@ -46,7 +43,6 @@ NETWORK_NAME=
 OUR_SCRIPTS_PATH="${BRO_PLUGIN_PATH}/docker/in_docker_scripts"
 LOG_PATH=
 SCRIPTS_PATH=
-SCRIPT_NAME=
 DATA_PATH=
 
 declare -a DOCKER_PARAMETERS
@@ -113,15 +109,6 @@ for i in "$@"; do
   ;;
 
  #
- # SCRIPT_NAME
- #
- #
- --script-name=*)
-  SCRIPT_NAME="${i#*=}"
-  shift # past argument=value
- ;;
-
- #
  # DOCKER_PARAMETERS
  #
  #
@@ -174,7 +161,6 @@ echo "CONTAINER_PATH = $CONTAINER_PATH"
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "NETWORK_NAME = ${NETWORK_NAME}"
 echo "SCRIPT_PATH = $SCRIPTS_PATH"
-echo "SCRIPT_NAME = $SCRIPT_NAME"
 echo "LOG_PATH = $LOG_PATH"
 echo "DATA_PATH = $DATA_PATH"
 echo "DOCKER_PARAMETERS = " "${DOCKER_PARAMETERS[@]}"
@@ -191,7 +177,7 @@ echo "Log will be found on host at ${LOG_PATH}/$LOGNAME"
 #build the docker command line
 declare -a DOCKER_CMD_BASE
 DOCKER_CMD="bash"
-DOCKER_CMD_BASE[0]="docker run -it --network ${NETWORK_NAME} "
+DOCKER_CMD_BASE[0]="docker run -d -t --name bro --network ${NETWORK_NAME} "
 DOCKER_CMD_BASE[1]="-e RUN_LOG_PATH=\"/root/logs/${LOGNAME}\" "
 DOCKER_CMD_BASE[2]="-v \"${LOG_PATH}:/root/logs\" "
 DOCKER_CMD_BASE[3]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
@@ -203,9 +189,6 @@ if [[ ! -z "$DATA_PATH" ]]; then
   DOCKER_CMD_BASE[6]="-v \"${DATA_PATH}:/root/data\" "
 fi
 
-if [[ ! -z "$SCRIPT_NAME" ]]; then
-  DOCKER_CMD="bash -c \"/root/built_in_scripts/build_bro.sh\" && \"/root/scripts/${SCRIPT_NAME}\""
-fi
 echo "===============Running Docker==============="
 echo "cmd is eval" "${DOCKER_CMD_BASE[@]}" "${DOCKER_PARAMETERS[@]}" "${CONTAINER_NAME}" "${DOCKER_CMD}"
 echo ""
@@ -216,3 +199,7 @@ eval "${DOCKER_CMD_BASE[@]}" "${DOCKER_PARAMETERS[@]}" "${CONTAINER_NAME}" "${DO
 rc=$?; if [[ ${rc} != 0 ]]; then
  exit ${rc};
 fi
+
+echo "Started bro container"
+echo " "
+echo " "
