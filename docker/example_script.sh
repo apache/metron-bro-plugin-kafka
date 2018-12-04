@@ -134,7 +134,7 @@ fi
 if [[ "$SKIP_REBUILD_BRO" = false ]] ; then
   bash "${SCRIPT_DIR}"/build_container.sh \
     --container-directory="${CONTAINER_DIR}" \
-    --container-name=bro-docker-container:latest
+    --container-name=metron-bro-docker-container:latest
 
   rc=$?; if [[ ${rc} != 0 ]]; then
     shutdown
@@ -148,7 +148,7 @@ fi
 #run the bro container
 #and optionally the passed script _IN_ the container
 bash "${SCRIPT_DIR}"/run_bro_container.sh --container-path="${CONTAINER_DIR}" \
-  --container-name=bro-docker-container:latest \
+  --container-name=metron-bro-docker-container:latest \
   --network-name=bro-network \
   --log-path="${LOG_PATH}" \
   $EXTRA_ARGS

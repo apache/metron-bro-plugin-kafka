@@ -32,7 +32,7 @@ function help {
  echo "    -h/--help                       Usage information."
  echo " "
  echo "example: to skip vagrant up and force docker build with two tags"
- echo "   build-container.sh --container-path ./bro --container-name bro-docker-container"
+ echo "   build-container.sh --container-path ./bro --container-name metron-bro-docker-container"
  echo " "
 }
 

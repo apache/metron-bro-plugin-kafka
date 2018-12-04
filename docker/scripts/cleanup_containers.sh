@@ -19,12 +19,77 @@
 
 shopt -s nocasematch
 
+
+
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-"${SCRIPT_DIR}"/stop_container.sh --container-name=bro
+CONTAINER_NAME=
+NETWORK_NAME=
+
+function help {
+ echo " "
+ echo "usage: ${0}"
+ echo "    --container-name                The container name."
+ echo "    --network-name                  The network name."
+ echo "    -h/--help                       Usage information."
+ echo " "
+ echo " "
+}
+
+# handle command line options
+for i in "$@"; do
+ case $i in
+
+ #
+ # CONTAINER_NAME
+ #
+ #   --container-name
+ #
+   --container-name=*)
+   CONTAINER_NAME="${i#*=}"
+   shift # past argument
+  ;;
+
+  #
+  # NETWORK_NAME
+  #
+  #   --network-name
+  #
+    --leave-running)
+    NETWORK_NAME="${i#*=}"
+    shift # past argument
+   ;;
+
+ #
+ # -h/--help
+ #
+  -h|--help)
+   help
+   exit 0
+   shift # past argument with no value
+  ;;
+ esac
+done
+
+echo "Running with "
+echo "CONTAINER_NAME = $CONTAINER_NAME"
+echo "NETWORK_NAME   = $NETWORK_NAME"
+echo "==================================================="
+
+if [[ -z "$CONTAINER_NAME" ]]; then
+  echo "CONTAINER_NAME must be passed"
+  exit 1
+fi
+
+if [[ -z "$NETWORK_NAME" ]]; then
+  echo "NETWORK_NAME must be passed"
+  exit 1
+fi
+
+"${SCRIPT_DIR}"/stop_container.sh --container-name="${CONTAINER_NAME}"
 
 "${SCRIPT_DIR}"/stop_container.sh --container-name=kafka
 
 "${SCRIPT_DIR}"/stop_container.sh --container-name=zookeeper
 
-"${SCRIPT_DIR}"/destroy_docker_network.sh --network-name=bro-network
+"${SCRIPT_DIR}"/destroy_docker_network.sh --network-name="${NETWORK_NAME}"
