@@ -37,3 +37,21 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 - `logs` : a default log directory to use while running the scripts
 - `scripts` : these are the scripts that are run on the host for creating the docker bits, running containers, running or executing commands against containers ( such as executing one of the built_in_scripts ), and cleaning up resources
 
+
+#### Scripts that execute _in_ the docker container
+
+```bash
+├── build_bro_plugin.sh
+├── configure_bro_plugin.sh
+├── process_data_dir.sh
+├── wait-for-it.sh
+├── wait_for_kafka.sh
+└── wait_for_zk.sh
+```
+
+- `build_bro_plugin.sh`
+- `configure_bro_plugin.sh`
+- `process_data_dir.sh`
+- `wait-for-it.sh`
+- `wait_for_kafka.sh`
+- `wait_for_zk.sh`
