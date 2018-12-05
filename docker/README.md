@@ -31,9 +31,9 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 └── scripts
 ```
 
-- containers : the parent of all of the containers that this project defines.  We use several containers, not all of them ours
-  - bro-localbuild-container : the docker container directory for our bro container, used for building bro, the librdkafka, and our plugin, as well as running bro
-- in_docker_scripts : this directory is mapped to the bro docker container as /root/built_in_scripts.  These represent the library of scripts we provide to be run in the docker container.
-- logs : a default log directory to use while running the scripts
-- scripts : these are the scripts that are run on the host for creating the docker bits, running containers, running or executing commands against containers ( such as executing one of the built_in_scripts ), and cleaning up resources
+- `containers` : the parent of all of the containers that this project defines.  We use several containers, not all of them ours
+  - `bro-localbuild-container` : the docker container directory for our bro container, used for building bro, the librdkafka, and our plugin, as well as running bro
+- `in_docker_scripts` : this directory is mapped to the bro docker container as /root/built_in_scripts.  These represent the library of scripts we provide to be run in the docker container.
+- `logs` : a default log directory to use while running the scripts
+- `scripts` : these are the scripts that are run on the host for creating the docker bits, running containers, running or executing commands against containers ( such as executing one of the built_in_scripts ), and cleaning up resources
 
