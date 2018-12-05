@@ -19,12 +19,21 @@
 
 shopt -s nocasematch
 
-echo "@load packages" >> /usr/local/bro/share/bro/site/local.bro
-echo "redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG, Conn::LOG, DPD::LOG, FTP::LOG, Files::LOG, Known::CERTS_LOG, SMTP::LOG, SSL::LOG, Weird::LOG, Notice::LOG, DHCP::LOG, SSH::LOG, Software::LOG, RADIUS::LOG, X509::LOG, Known::DEVICES_LOG, RFB::LOG, Stats::LOG, CaptureLoss::LOG, SIP::LOG);" >> /usr/local/bro/share/bro/site/local.bro
-echo "redef Kafka::topic_name = \"bro\";" >> /usr/local/bro/share/bro/site/local.bro
-echo "redef Kafka::tag_json = T;" >> /usr/local/bro/share/bro/site/local.bro
-echo "redef Kafka::kafka_conf = table([\"metadata.broker.list\"] = \"kafka:9092\");" >> /usr/local/bro/share/bro/site/local.bro
-echo "redef Kafka::logs_to_exclude = set(Conn::LOG, DHCP::LOG);" >> /usr/local/bro/share/bro/site/local.bro
-echo "redef Known::cert_tracking = ALL_HOSTS;" >> /usr/local/bro/share/bro/site/local.bro
-echo "redef Software::asset_tracking = ALL_HOSTS;" >> /usr/local/bro/share/bro/site/local.bro
+#
+# Configures the bro kafka plugin
+# Configures the kafka broker
+# Configures the plugin for all the traffic types
+#
+
+{
+  echo "@load packages"
+  echo "redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG, Conn::LOG, DPD::LOG, FTP::LOG, Files::LOG, Known::CERTS_LOG, SMTP::LOG, SSL::LOG, Weird::LOG, Notice::LOG, DHCP::LOG, SSH::LOG, Software::LOG, RADIUS::LOG, X509::LOG, Known::DEVICES_LOG, RFB::LOG, Stats::LOG, CaptureLoss::LOG, SIP::LOG);"
+  echo "redef Kafka::topic_name = \"bro\";"
+  echo "redef Kafka::tag_json = T;"
+  echo "redef Kafka::kafka_conf = table([\"metadata.broker.list\"] = \"kafka:9092\");"
+  echo "redef Kafka::logs_to_exclude = set(Conn::LOG, DHCP::LOG);"
+  echo "redef Known::cert_tracking = ALL_HOSTS;"
+  echo "redef Software::asset_tracking = ALL_HOSTS;"
+} >> /usr/local/bro/share/bro/site/local.bro
+
 sed -i '86 a @load policy/protocols/dhcp/known-devices-and-hostnames.bro' /usr/local/bro/share/bro/site/local.bro

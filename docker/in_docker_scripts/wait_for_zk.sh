@@ -19,6 +19,10 @@
 
 shopt -s nocasematch
 
+#
+# Waits until zookeeper is available on the default port
+#
+
 cd /root || exit 1
 
 if [ ! -d /root/scripts ] ; then

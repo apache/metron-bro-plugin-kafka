@@ -19,11 +19,16 @@
 
 shopt -s nocasematch
 
+#
+# For each file in the data directory and sub-directories ( if mapped ), this script will
+# run bro -r with the local.bro configuration.
+#
+
 cd /root || exit 1
-echo "================================" >> $RUN_LOG_PATH 2>&1
+echo "================================" >> "${RUN_LOG_PATH}" 2>&1
 
 if [ ! -d /root/data ] ; then
-  echo "DATA_PATH has not been set and mapped" >> $RUN_LOG_PATH 2&>1
+  echo "DATA_PATH has not been set and mapped" >> "${RUN_LOG_PATH}" 2>&1
   exit 1
 fi
 
