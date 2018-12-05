@@ -19,12 +19,15 @@
 
 shopt -s nocasematch
 
+#
+# Runs the bro container
+#
+
 function help {
  echo " "
  echo "usage: ${0}"
- echo "    --container-path                [REQUIRED] The path with the Dockerfile"
- echo "    --container-name                [REQURIED] The name to give the container"
- echo "    --network-name                  [REQUIRED] The docker network name"
+ echo "    --container-name                [OPTIONAL] The name to give the container. Default bro."
+ echo "    --network-name                  [OPTIONAL] The docker network name. Default bro-network"
  echo "    --scripts-path                  [OPTIONAL] The path with the scripts you may run in the container"
  echo "    --data-path                     [OPTIONAL] The name of the directory to map to /root/data"
  echo "    --log-path                      [REQUIRED] The path to log to"
@@ -37,9 +40,8 @@ function help {
 }
 
 BRO_PLUGIN_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && cd ../.. && pwd )"
-CONTAINER_PATH=
-CONTAINER_NAME=
-NETWORK_NAME=
+CONTAINER_NAME=bro
+NETWORK_NAME=bro-network
 OUR_SCRIPTS_PATH="${BRO_PLUGIN_PATH}/docker/in_docker_scripts"
 LOG_PATH=
 SCRIPTS_PATH=
@@ -49,17 +51,7 @@ declare -a DOCKER_PARAMETERS
 
 # handle command line options
 for i in "$@"; do
-  echo $i
  case $i in
- #
- # CONTAINER_PATH
- #
- #
-  --container-path=*)
-   CONTAINER_PATH="${i#*=}"
-   shift # past argument=value
-  ;;
-
  #
  # CONTAINER_NAME
  #
@@ -129,27 +121,12 @@ for i in "$@"; do
  esac
 done
 
-if [[ -z "$CONTAINER_PATH" ]]; then
-  echo "CONTAINER_PATH must be passed"
-  exit 1
-fi
-
-if [[ -z "$CONTAINER_NAME" ]]; then
-  echo "CONTAINER_NAME must be passed"
-  exit 1
-fi
-if [[ -z "$NETWORK_NAME" ]]; then
-  echo "NETWORK_NAME must be passed"
-  exit 1
-fi
-
 if [[ -z "$LOG_PATH" ]]; then
   echo "LOG_PATH must be passed"
   exit 1
 fi
 
-echo "Running with "
-echo "CONTAINER_PATH = $CONTAINER_PATH"
+echo "Running docker_run_bro_container with "
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "NETWORK_NAME = ${NETWORK_NAME}"
 echo "SCRIPT_PATH = $SCRIPTS_PATH"
@@ -157,9 +134,6 @@ echo "LOG_PATH = $LOG_PATH"
 echo "DATA_PATH = $DATA_PATH"
 echo "DOCKER_PARAMETERS = " "${DOCKER_PARAMETERS[@]}"
 echo "==================================================="
-
-# move over to the docker area
-cd "${CONTAINER_PATH}" || exit 1
 
 DATE=$(date)
 LOG_DATE=${DATE// /_}
@@ -169,7 +143,7 @@ echo "Log will be found on host at ${LOG_PATH}/$LOGNAME"
 #build the docker command line
 declare -a DOCKER_CMD_BASE
 DOCKER_CMD="bash"
-DOCKER_CMD_BASE[0]="docker run -d -t --name bro --network ${NETWORK_NAME} "
+DOCKER_CMD_BASE[0]="docker run -d -t --name ${CONTAINER_NAME} --network ${NETWORK_NAME} "
 DOCKER_CMD_BASE[1]="-e RUN_LOG_PATH=\"/root/logs/${LOGNAME}\" "
 DOCKER_CMD_BASE[2]="-v \"${LOG_PATH}:/root/logs\" "
 DOCKER_CMD_BASE[3]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
@@ -182,11 +156,13 @@ if [[ ! -z "$DATA_PATH" ]]; then
 fi
 
 echo "===============Running Docker==============="
-echo "cmd is eval" "${DOCKER_CMD_BASE[@]}" "${DOCKER_PARAMETERS[@]}" "${CONTAINER_NAME}" "${DOCKER_CMD}"
 echo ""
+echo "eval command is: "
+echo "${DOCKER_CMD_BASE[@]}" "${DOCKER_PARAMETERS[@]}" "${CONTAINER_NAME}" "${DOCKER_CMD}"
 echo ""
+echo "============================================"
 echo ""
-eval "${DOCKER_CMD_BASE[@]}" "${DOCKER_PARAMETERS[@]}" "${CONTAINER_NAME}" "${DOCKER_CMD}"
+eval "${DOCKER_CMD_BASE[@]}" "${DOCKER_PARAMETERS[@]}" metron-bro-docker-container:latest "${DOCKER_CMD}"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
  exit ${rc}

@@ -66,6 +66,10 @@ if [[ -z "$CONTAINER_NAME" ]]; then
   exit 1
 fi
 
+echo "Running stop_container with"
+echo "CONTAINER_NAME= $CONTAINER_NAME"
+echo "==================================================="
+
 docker stop  "${CONTAINER_NAME}"
 
 rc=$?; if [[ ${rc} != 0 ]]; then

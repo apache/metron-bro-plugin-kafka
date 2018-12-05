@@ -21,12 +21,12 @@ shopt -s nocasematch
 function help {
  echo " "
  echo "usage: ${0}"
- echo "    --network-name                  [REQUIRED] The docker network name"
+ echo "    --network-name                  The docker network name. Default bro-network"
  echo "    -h/--help                       Usage information."
  echo " "
 }
 
-NETWORK_NAME=
+NETWORK_NAME=bro-network
 
 # handle command line options
 for i in "$@"; do
@@ -60,10 +60,10 @@ for i in "$@"; do
  esac
 done
 
-if [[ -z "$NETWORK_NAME" ]]; then
-  echo "NETWORK_NAME must be passed"
-  exit 1
-fi
+echo "Running create_docker_network with "
+echo "NETWORK_NAME   = $NETWORK_NAME"
+echo "==================================================="
+
 
 docker network create "${NETWORK_NAME}"
 rc=$?; if [[ ${rc} != 0 ]]; then

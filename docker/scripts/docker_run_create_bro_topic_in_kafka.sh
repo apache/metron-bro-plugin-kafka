@@ -18,5 +18,52 @@
 #
 
 shopt -s nocasematch
-docker run --rm --network bro-network ches/kafka \
+
+function help {
+ echo " "
+ echo "usage: ${0}"
+ echo "    --network-name                  The docker network name.  Default bro-network"
+ echo "    -h/--help                       Usage information."
+ echo " "
+}
+
+NETWORK_NAME=bro-network
+
+# handle command line options
+for i in "$@"; do
+ case $i in
+  #
+  # NETWORK_NAME
+  #
+  #
+  #
+    --network-name=*)
+    NETWORK_NAME="${i#*=}"
+    shift # past argument=value
+   ;;
+ #
+ # -h/--help
+ #
+  -h|--help)
+   help
+   exit 0
+   shift # past argument with no value
+  ;;
+
+ #
+ # Unknown option
+ #
+  *)
+   UNKNOWN_OPTION="${i#*=}"
+   echo "Error: unknown option: $UNKNOWN_OPTION"
+   help
+  ;;
+ esac
+done
+
+echo "Running docker_run_create_bro_topic_in_kafka with "
+echo "NETWORK_NAME = $NETWORK_NAME"
+echo "==================================================="
+
+docker run --rm --network "${NETWORK_NAME}" ches/kafka \
    kafka-topics.sh --create --topic bro --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181

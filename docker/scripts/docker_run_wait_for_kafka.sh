@@ -19,56 +19,13 @@
 
 shopt -s nocasematch
 
-function help {
- echo " "
- echo "usage: ${0}"
- echo "    --network-name                  [REQUIRED] The docker network name"
- echo "    -h/--help                       Usage information."
- echo " "
-}
+#
+# executes a wait script for kafka
 
-NETWORK_NAME=
+DOCKER_SCRIPTS_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && cd  .. >/dev/null && cd in_docker_scripts && pwd )"
 
-# handle command line options
-for i in "$@"; do
- case $i in
-  #
-  # NETWORK_NAME
-  #
-  #
-  #
-    --network-name=*)
-    NETWORK_NAME="${i#*=}"
-    shift # past argument=value
-   ;;
- #
- # -h/--help
- #
-  -h|--help)
-   help
-   exit 0
-   shift # past argument with no value
-  ;;
-
- #
- # Unknown option
- #
-  *)
-   UNKNOWN_OPTION="${i#*=}"
-   echo "Error: unknown option: $UNKNOWN_OPTION"
-   help
-  ;;
- esac
-done
-
-if [[ -z "$NETWORK_NAME" ]]; then
-  echo "NETWORK_NAME must be passed"
-  exit 1
-fi
-
-docker run -d --name kafka --network "${NETWORK_NAME}" --env ZOOKEEPER_IP=zookeeper ches/kafka
+docker run --rm -i -t -w /root --network bro-network  -v "${DOCKER_SCRIPTS_PATH}":/root/scripts centos bash -c "bash /root/scripts/wait_for_kafka.sh"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
  exit ${rc}
 fi
-echo "Started the kafka container with network ${NETWORK_NAME}"

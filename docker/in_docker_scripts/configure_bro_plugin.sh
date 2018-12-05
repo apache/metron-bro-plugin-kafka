@@ -25,6 +25,7 @@ shopt -s nocasematch
 # Configures the plugin for all the traffic types
 #
 
+echo "Configuring kafka plugin"
 {
   echo "@load packages"
   echo "redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG, Conn::LOG, DPD::LOG, FTP::LOG, Files::LOG, Known::CERTS_LOG, SMTP::LOG, SSL::LOG, Weird::LOG, Notice::LOG, DHCP::LOG, SSH::LOG, Software::LOG, RADIUS::LOG, X509::LOG, Known::DEVICES_LOG, RFB::LOG, Stats::LOG, CaptureLoss::LOG, SIP::LOG);"
@@ -35,5 +36,6 @@ shopt -s nocasematch
   echo "redef Known::cert_tracking = ALL_HOSTS;"
   echo "redef Software::asset_tracking = ALL_HOSTS;"
 } >> /usr/local/bro/share/bro/site/local.bro
+
 
 sed -i '86 a @load policy/protocols/dhcp/known-devices-and-hostnames.bro' /usr/local/bro/share/bro/site/local.bro

@@ -22,7 +22,6 @@ shopt -s nocasematch
 CREATED_NETWORK_FLAG=false
 RAN_ZK_CONTAINER=false
 RAN_KAFKA_CONTAINER=false
-CREATED_BRO_CONTAINER=false
 RAN_BRO_CONTAINER=false
 
 SKIP_REBUILD_BRO=false
@@ -95,13 +94,15 @@ for i in "$@"; do
   ;;
  esac
 done
+
 EXTRA_ARGS="$@"
-echo "Running with "
+
+echo "Running build_container with "
 echo "SKIP_REBUILD_BRO = $SKIP_REBUILD_BRO"
 echo "==================================================="
 
 # create the network
-bash "${SCRIPT_DIR}"/create_docker_network.sh --network-name=bro-network
+bash "${SCRIPT_DIR}"/create_docker_network.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
   exit ${rc}
@@ -112,7 +113,7 @@ fi
 
 
 # run the zookeeper container
-bash "${SCRIPT_DIR}"/run_zookeeper_container.sh --network-name=bro-network
+bash "${SCRIPT_DIR}"/docker_run_zookeeper_container.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
   exit ${rc}
@@ -120,13 +121,34 @@ else
   RAN_ZK_CONTAINER=true
 fi
 
+# wait for zookeeper to be up
+bash "${SCRIPT_DIR}"/docker_run_wait_for_zookeeper.sh
+rc=$?; if [[ ${rc} != 0 ]]; then
+  shutdown
+  exit ${rc}
+fi
+
 # run the kafka container
-bash "${SCRIPT_DIR}"/run_kafka_container.sh --network-name=bro-network
+bash "${SCRIPT_DIR}"/docker_run_kafka_container.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   shutdown
   exit ${rc}
 else
   RAN_KAFKA_CONTAINER=true
+fi
+
+# wait for kafka to be up
+bash "${SCRIPT_DIR}"/docker_run_wait_for_kafka.sh
+rc=$?; if [[ ${rc} != 0 ]]; then
+  shutdown
+  exit ${rc}
+fi
+
+# create the bro topic
+bash "${SCRIPT_DIR}"/docker_run_create_bro_topic_in_kafka.sh
+rc=$?; if [[ ${rc} != 0 ]]; then
+  shutdown
+  exit ${rc}
 fi
 
 #build the bro container
@@ -138,17 +160,13 @@ if [[ "$SKIP_REBUILD_BRO" = false ]] ; then
   rc=$?; if [[ ${rc} != 0 ]]; then
     shutdown
     exit ${rc}
-  else
-    CREATED_BRO_CONTAINER=true
   fi
 fi
 
 
 #run the bro container
 #and optionally the passed script _IN_ the container
-bash "${SCRIPT_DIR}"/run_bro_container.sh --container-path="${CONTAINER_DIR}" \
-  --container-name=metron-bro-docker-container:latest \
-  --network-name=bro-network \
+bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
   --log-path="${LOG_PATH}" \
   $EXTRA_ARGS
 
@@ -161,9 +179,15 @@ else
 fi
 
 # build the bro plugin
-bash "${SCRIPT_DIR}"/build_bro_plugin_docker.sh
+bash "${SCRIPT_DIR}"/docker_execute_build_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO BUILD PLUGIN.  CHECK LOGS  ${rc}"
+fi
+
+# configure it the bro plugin
+bash "${SCRIPT_DIR}"/docker_execute_configure_bro_plugin.sh
+rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> FAILED TO CONFIGURE PLUGIN.  CHECK LOGS  ${rc}"
 fi
 
 #optionally run the kafka consumer script

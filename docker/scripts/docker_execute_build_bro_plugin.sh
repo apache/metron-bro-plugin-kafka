@@ -20,34 +20,23 @@
 shopt -s nocasematch
 
 #
-# run's docker build in a provided directory, with a provided name
+# Executes the build_bro_plugin.sh script in the container
 #
 
 function help {
  echo " "
  echo "usage: ${0}"
- echo "    --container-directory           the directory with the Dockerfile"
- echo "    --container-name                the name to give the container"
+ echo "    --container-name                the name of the container default = bro"
  echo "    -h/--help                       Usage information."
  echo " "
  echo " "
 }
 
-CONTAINER_DIRECTORY=
-CONTAINER_NAME=
+CONTAINER_NAME=bro
 
 # handle command line options
 for i in "$@"; do
  case $i in
- #
- # CONTAINER_DIRECTORY
- #
- #
-  --container-directory=*)
-   CONTAINER_DIRECTORY="${i#*=}"
-   shift # past argument=value
-  ;;
-
  #
  # CONTAINER_NAME
  #
@@ -78,29 +67,12 @@ for i in "$@"; do
  esac
 done
 
-if [[ -z "$CONTAINER_DIRECTORY" ]]; then
-  echo "CONTAINER_DIRECTORY must be passed"
-  exit 1
-fi
-
-if [[ -z "$CONTAINER_NAME" ]]; then
-  echo "CONTAINER_NAME must be passed"
-  exit 1
-fi
-
-echo "Running with "
-echo "CONTAINER_DIRECTORY = $CONTAINER_DIRECTORY"
+echo "Running build_bro_plugin_docker with "
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "==================================================="
 
-# move over to the docker area
-cd "${CONTAINER_DIRECTORY}" || exit 1
-pwd
-echo "==================================================="
-echo "docker build of ${CONTAINER_NAME}"
-echo "==================================================="
-docker build . --no-cache --tag="${CONTAINER_NAME}"
-
+docker exec -w /root "${CONTAINER_NAME}" bash -c /root/built_in_scripts/build_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
-    exit ${rc}
+ exit ${rc};
 fi
+echo "Built the bro plugin"

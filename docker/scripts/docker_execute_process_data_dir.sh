@@ -19,9 +19,61 @@
 
 shopt -s nocasematch
 
+#
+# Executes the process_data_dir.sh script in the container
+#
+
+function help {
+ echo " "
+ echo "usage: ${0}"
+ echo "    --container-name                the name of the container default = bro"
+ echo "    -h/--help                       Usage information."
+ echo " "
+ echo " "
+}
+
+CONTAINER_NAME=bro
+
+# handle command line options
+for i in "$@"; do
+ case $i in
+ #
+ # CONTAINER_NAME
+ #
+ #
+ #
+   --container-name=*)
+   CONTAINER_NAME="${i#*=}"
+   shift # past argument=value
+  ;;
+
+ #
+ # -h/--help
+ #
+  -h|--help)
+   help
+   exit 0
+   shift # past argument with no value
+  ;;
+
+ #
+ # Unknown option
+ #
+  *)
+   UNKNOWN_OPTION="${i#*=}"
+   echo "Error: unknown option: $UNKNOWN_OPTION"
+   help
+  ;;
+ esac
+done
+
+echo "Running docker_execute_process_data_dir with "
+echo "CONTAINER_NAME = $CONTAINER_NAME"
+echo "==================================================="
+
 echo "executing process_data_dir.sh in the bro docker container"
 echo " "
-docker exec -w /root bro bash -c "bash built_in_scripts/process_data_dir.sh"
+docker exec -w /root "${CONTAINER_NAME}" bash -c "bash built_in_scripts/process_data_dir.sh"
 rc=$?; if [[ ${rc} != 0 ]]; then
  exit ${rc}
 fi

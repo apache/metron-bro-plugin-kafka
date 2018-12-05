@@ -19,6 +19,9 @@
 
 shopt -s nocasematch
 
+#
+# Stops the containers, and shuts down the NETWORK_NAME
+#
 
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
@@ -29,8 +32,8 @@ NETWORK_NAME=bro-network
 function help {
  echo " "
  echo "usage: ${0}"
- echo "    --container-name                The container name."
- echo "    --network-name                  The network name."
+ echo "    --container-name                The container name. Default bro."
+ echo "    --network-name                  The network name. Default bro-network."
  echo "    -h/--help                       Usage information."
  echo " "
  echo " "
@@ -71,7 +74,7 @@ for i in "$@"; do
  esac
 done
 
-echo "Running with "
+echo "Running cleanup_containers with "
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "NETWORK_NAME   = $NETWORK_NAME"
 echo "==================================================="

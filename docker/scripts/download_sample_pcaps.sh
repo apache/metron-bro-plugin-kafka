@@ -19,6 +19,10 @@
 
 shopt -s nocasematch
 
+#
+# Downloads sample pcap files to the data directory
+#
+
 function help {
  echo " "
  echo "usage: ${0}"
@@ -67,33 +71,33 @@ if [[ -z "$DATA_PATH" ]]; then
   exit 1
 fi
 
-echo "Running with "
+echo "Running download_sample_pcaps with "
 echo "DATA_PATH = $DATA_PATH"
 echo "==================================================="
 
 for folder in nitroba example-traffic ssh ftp radius rfb; do
-  if [[ ! -d ${DATA_PATH}/${folder} ]]; then
-    mkdir -p ${DATA_PATH}/${folder}
+  if [[ ! -d "${DATA_PATH}"/${folder} ]]; then
+    mkdir -p "${DATA_PATH}"/${folder}
   fi
 done
 
-if [[ ! -f ${DATA_PATH}/example-traffic/exercise-traffic.pcap ]]; then
-  wget https://www.bro.org/static/traces/exercise-traffic.pcap -O ${DATA_PATH}/example-traffic/exercise-traffic.pcap
+if [[ ! -f "${DATA_PATH}"/example-traffic/exercise-traffic.pcap ]]; then
+  wget https://www.bro.org/static/traces/exercise-traffic.pcap -O "${DATA_PATH}"/example-traffic/exercise-traffic.pcap
 fi
-if [[ ! -f ${DATA_PATH}/nitroba/nitroba.pcap ]]; then
-  wget http://downloads.digitalcorpora.org/corpora/network-packet-dumps/2008-nitroba/nitroba.pcap -O ${DATA_PATH}/nitroba/nitroba.pcap
+if [[ ! -f "${DATA_PATH}"/nitroba/nitroba.pcap ]]; then
+  wget http://downloads.digitalcorpora.org/corpora/network-packet-dumps/2008-nitroba/nitroba.pcap -O "${DATA_PATH}"/nitroba/nitroba.pcap
 fi
-if [[ ! -f ${DATA_PATH}/ssh/ssh.pcap ]]; then
-  wget https://www.bro.org/static/traces/ssh.pcap -O ${DATA_PATH}/ssh/ssh.pcap
+if [[ ! -f "${DATA_PATH}"/ssh/ssh.pcap ]]; then
+  wget https://www.bro.org/static/traces/ssh.pcap -O "${DATA_PATH}"/ssh/ssh.pcap
 fi
-if [[ ! -f ${DATA_PATH}/ftp/ftp.pcap ]]; then
-  wget https://github.com/markofu/pcaps/blob/master/PracticalPacketAnalysis/ppa-capture-files/ftp.pcap?raw=true -O ${DATA_PATH}/ftp/ftp.pcap
+if [[ ! -f "${DATA_PATH}"/ftp/ftp.pcap ]]; then
+  wget https://github.com/markofu/pcaps/blob/master/PracticalPacketAnalysis/ppa-capture-files/ftp.pcap?raw=true -O "${DATA_PATH}"/ftp/ftp.pcap
 fi
-if [[ ! -f ${DATA_PATH}/radius/radius_localhost.pcapng ]]; then
-  wget https://github.com/EmpowerSecurityAcademy/wireshark/blob/master/radius_localhost.pcapng?raw=true -O ${DATA_PATH}/radius/radius_localhost.pcapng
+if [[ ! -f "${DATA_PATH}"/radius/radius_localhost.pcapng ]]; then
+  wget https://github.com/EmpowerSecurityAcademy/wireshark/blob/master/radius_localhost.pcapng?raw=true -O "${DATA_PATH}"/radius/radius_localhost.pcapng
 fi
-if [[ ! -f ${DATA_PATH}/rfb/rfb.pcap ]]; then
-  wget https://github.com/kholia/my-pcaps/blob/master/VNC/07-vnc-openwall-3.7.pcap?raw=true -O ${DATA_PATH}/rfb/rfb.pcap
+if [[ ! -f "${DATA_PATH}"/rfb/rfb.pcap ]]; then
+  wget https://github.com/kholia/my-pcaps/blob/master/VNC/07-vnc-openwall-3.7.pcap?raw=true -O "${DATA_PATH}"/rfb/rfb.pcap
 fi
 
 rc=$?; if [[ ${rc} != 0 ]]; then

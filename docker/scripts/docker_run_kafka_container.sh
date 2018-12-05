@@ -19,15 +19,19 @@
 
 shopt -s nocasematch
 
+#
+# Runs the kafka container
+#
+
 function help {
  echo " "
  echo "usage: ${0}"
- echo "    --network-name                  [REQUIRED] The docker network name"
+ echo "    --network-name                  The docker network name. Default bro-network"
  echo "    -h/--help                       Usage information."
  echo " "
 }
 
-NETWORK_NAME=
+NETWORK_NAME=bro-network
 
 # handle command line options
 for i in "$@"; do
@@ -61,14 +65,13 @@ for i in "$@"; do
  esac
 done
 
-if [[ -z "$NETWORK_NAME" ]]; then
-  echo "NETWORK_NAME must be passed"
-  exit 1
-fi
+echo "Running docker_run_kafka_container with "
+echo "NETWORK_NAME = $NETWORK_NAME"
+echo "==================================================="
 
-docker run -d --name zookeeper --network "${NETWORK_NAME}" zookeeper:3.4
+docker run -d --name kafka --network "${NETWORK_NAME}" --env ZOOKEEPER_IP=zookeeper ches/kafka
 
 rc=$?; if [[ ${rc} != 0 ]]; then
  exit ${rc}
 fi
-echo "Started the zookeeper container with networ ${NETWORK_NAME}"
+echo "Started the kafka container with network ${NETWORK_NAME}"
