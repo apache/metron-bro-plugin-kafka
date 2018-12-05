@@ -23,8 +23,8 @@ shopt -s nocasematch
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-CONTAINER_NAME=
-NETWORK_NAME=
+CONTAINER_NAME=bro
+NETWORK_NAME=bro-network
 
 function help {
  echo " "
@@ -55,7 +55,7 @@ for i in "$@"; do
   #
   #   --network-name
   #
-    --leave-running)
+    --network-name=*)
     NETWORK_NAME="${i#*=}"
     shift # past argument
    ;;
@@ -76,15 +76,6 @@ echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "NETWORK_NAME   = $NETWORK_NAME"
 echo "==================================================="
 
-if [[ -z "$CONTAINER_NAME" ]]; then
-  echo "CONTAINER_NAME must be passed"
-  exit 1
-fi
-
-if [[ -z "$NETWORK_NAME" ]]; then
-  echo "NETWORK_NAME must be passed"
-  exit 1
-fi
 
 "${SCRIPT_DIR}"/stop_container.sh --container-name="${CONTAINER_NAME}"
 
