@@ -161,7 +161,16 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default bro-network
   ```
-- `download_sample_pcaps.sh`: Downloads the sample pcaps to a specified directory. If they exist, it is a no-op.
+- `download_sample_pcaps.sh`: Downloads the sample pcaps to a specified directory. If they exist, it is a no-op
+  
+   > The sample pcaps are:
+   >  -  https://www.bro.org/static/traces/exercise-traffic.pcap 
+   >  -  http://downloads.digitalcorpora.org/corpora/network-packet-dumps/2008-nitroba/nitroba.pcap 
+   >  -  https://www.bro.org/static/traces/ssh.pcap 
+   >  -  https://github.com/markofu/pcaps/blob/master/PracticalPacketAnalysis/ppa-capture-files/ftp.pcap?raw=true 
+   >  -  https://github.com/EmpowerSecurityAcademy/wireshark/blob/master/radius_localhost.pcapng?raw=true 
+   >  -  https://github.com/kholia/my-pcaps/blob/master/VNC/07-vnc
+
   ###### Parameters
   ```bash
   --data-path                    [REQURIED] The pcap data paths
@@ -171,3 +180,52 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --container-name               [REQUIRED] The Docker container name
   ```
+
+#### The example script
+
+`example_script.sh` is provided as an example of a testing script.  Specific or extended scripts can be created similar to this script to use the containers.
+This script does the following:
+
+1. Creates the Docker network
+2. Runs the zookeeper container
+3. Waits for zookeeper to be available
+4. Runs the kafka container
+5. Waits for kafka to be available
+6. Creates the bro topic
+7. Runs the bro container in the background
+
+> Note that all parameters passed to this script are passed to the `docker_run_bro_container.sh` script
+
+8. Builds the bro plugin
+9. Configures the bro plugin
+
+At this point the containers are up and running in the background (if the --leave-running flag is set), and bro is configured (the local.bro that is).
+
+Other scripts may then be used to do your testing, for example running 
+```bash
+./scripts/docker_execute_process_data_dir.sh &&  ./scripts/docker_run_consume_bro_kafka.sh
+```
+
+> Note: Shown here with the defaults
+
+An example of an end to end scripted run, that sets up the pcaps, runs the containers, executes the pcaps, and listens for the kafka output would be:
+
+```bash
+./scripts/download_sample_pcaps.sh --data-path=/Users/me/tmp/pcap_data \ 
+&& ./example_script.sh --leave-running --data-path=/Users/me/tmp/pcap_data \ 
+&& ./scripts/docker_execute_process_data_dir.sh \
+&&  ./scripts/docker_run_consume_bro_kafka.sh
+```
+
+> NOTE: If the scripts are run repeatedly, and there is no change in bro or the librdkafka, the line `./example_script.sh --leave-running --data-path=/Users/me/tmp/pcap_data ` can be replaced by `./example_script.sh --skip-docker-build --leave-running --data-path=/Users/me/tmp/pcap_data`, which uses the `--skip-docker-build` flag to not rebuild the bro container and building the bro and librdkafka code
+
+> NOTE: If the --leave-running flag is used, the containers will not be stopped.  You must run `cleanup_containers.sh` when you are done to stop them
+
+
+`example_script.sh`
+###### Parameters
+```bash
+--skip-docker-build             Skip build of bro docker machine
+--leave-running                 Do not stop containers after script.  The cleanup_containers.sh script should be run when done
+ 
+```
