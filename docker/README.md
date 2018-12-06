@@ -55,3 +55,49 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 - `wait-for-it.sh`: Waits for a port to be open, so we know something is available.
 - `wait_for_kafka.sh`: Waits for the kafka to be available.
 - `wait_for_zk.sh`: Waits for zookeeper to be available.
+
+
+#### Scripts executed on the host to setup and interact with the docker containers
+
+```bash
+├── build_container.sh
+├── cleanup_containers.sh
+├── create_docker_network.sh
+├── destroy_docker_network.sh
+├── docker_execute_build_bro_plugin.sh
+├── docker_execute_configure_bro_plugin.sh
+├── docker_execute_process_data_dir.sh
+├── docker_execute_shell.sh
+├── docker_run_bro_container.sh
+├── docker_run_consume_bro_kafka.sh
+├── docker_run_create_bro_topic_in_kafka.sh
+├── docker_run_kafka_container.sh
+├── docker_run_wait_for_kafka.sh
+├── docker_run_wait_for_zookeeper.sh
+├── docker_run_zookeeper_container.sh
+├── download_sample_pcaps.sh
+└── stop_container.sh
+```
+
+- `build_container.sh`: runs docker build in the passed directory, and names the results
+  ###### Parameters
+  ```
+   --container-directory           the directory with the Dockerfile
+   --container-name                the name to give the container
+  ```
+- `cleanup_containers.sh`
+- `create_docker_network.sh`
+- `destroy_docker_network.sh`
+- `docker_execute_build_bro_plugin.sh`
+- `docker_execute_configure_bro_plugin.sh`
+- `docker_execute_process_data_dir.sh`
+- `docker_execute_shell.sh`
+- `docker_run_bro_container.sh`
+- `docker_run_consume_bro_kafka.sh`
+- `docker_run_create_bro_topic_in_kafka.sh`
+- `docker_run_kafka_container.sh`
+- `docker_run_wait_for_kafka.sh`
+- `docker_run_wait_for_zookeeper.sh`
+- `docker_run_zookeeper_container.sh`
+- `download_sample_pcaps.sh`
+- `stop_container.sh`
