@@ -49,9 +49,9 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 └── wait_for_zk.sh
 ```
 
-- `build_bro_plugin.sh`
-- `configure_bro_plugin.sh`
-- `process_data_dir.sh`
-- `wait-for-it.sh`
-- `wait_for_kafka.sh`
-- `wait_for_zk.sh`
+- `build_bro_plugin.sh`: Runs `bro-package` to build and install the plugin.  
+- `configure_bro_plugin.sh`: Configures the plugin for the kafka container, and routes all traffic types.
+- `process_data_dir.sh`: Runs `bro -r` for each file in the `/root/data` directory and sub-directories.
+- `wait-for-it.sh`: Waits for a port to be open, so we know something is available.
+- `wait_for_kafka.sh`: Waits for the kafka to be available.
+- `wait_for_zk.sh`: Waits for zookeeper to be available.
