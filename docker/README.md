@@ -99,12 +99,12 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 - `destroy_docker_network.sh`: Destroys a Docker network by calling `docker network rm`
   ###### Parameters
   ```bash
-    --network-name                The Docker network name. Default bro-network
+   --network-name                The Docker network name. Default bro-network
     ```
 - `docker_execute_build_bro_plugin.sh`: Executes `build_bro_plugin` in the bro container
   ###### Parameters
   ```bash
-    --container-name                The container name. Default bro
+   --container-name                The container name. Default bro
   ```
 - `docker_execute_configure_bro_plugin.sh`
   ###### Parameters
