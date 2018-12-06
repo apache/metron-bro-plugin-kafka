@@ -26,8 +26,8 @@ shopt -s nocasematch
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --container-directory           the directory with the Dockerfile"
-  echo "    --container-name                the name to give the container"
+  echo "    --container-directory           The directory with the Dockerfile"
+  echo "    --container-name                The name to give the container"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "

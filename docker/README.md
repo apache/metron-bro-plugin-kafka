@@ -79,25 +79,54 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 └── stop_container.sh
 ```
 
-- `build_container.sh`: runs docker build in the passed directory, and names the results
+- `build_container.sh`: Runs docker build in the passed directory, and names the results
   ###### Parameters
+  ```bash
+   --container-directory          The directory with the Dockerfile
+   --container-name               The name to give the container
   ```
-   --container-directory           the directory with the Dockerfile
-   --container-name                the name to give the container
+- `cleanup_containers.sh`: Stops the containers and destroys the network 
+  ###### Parameters
+  ```bash
+  --container-name                The container name. Default bro
+  --network-name                  The network name. Default bro-network
   ```
-- `cleanup_containers.sh`
-- `create_docker_network.sh`
-- `destroy_docker_network.sh`
-- `docker_execute_build_bro_plugin.sh`
+- `create_docker_network.sh`: Creates the Docker network that the containers will use
+  ###### Parameters
+  ```bash
+  --network-name                  The Docker network name. Default bro-network
+  ```
+- `destroy_docker_network.sh`: Destroys a Docker network by calling `docker network rm`
+  ###### Parameters
+  ```bash
+    --network-name                The Docker network name. Default bro-network
+    ```
+- `docker_execute_build_bro_plugin.sh`: Executes `build_bro_plugin` in the bro container
+  ###### Parameters
+  ```bash
+    --container-name                The container name. Default bro
+  ```
 - `docker_execute_configure_bro_plugin.sh`
+  ###### Parameters
 - `docker_execute_process_data_dir.sh`
+  ###### Parameters
 - `docker_execute_shell.sh`
+  ###### Parameters
 - `docker_run_bro_container.sh`
+  ###### Parameters
 - `docker_run_consume_bro_kafka.sh`
+  ###### Parameters
 - `docker_run_create_bro_topic_in_kafka.sh`
+  ###### Parameters
 - `docker_run_kafka_container.sh`
+  ###### Parameters
 - `docker_run_wait_for_kafka.sh`
+  ###### Parameters
 - `docker_run_wait_for_zookeeper.sh`
+  ###### Parameters
 - `docker_run_zookeeper_container.sh`
+  ###### Parameters
 - `download_sample_pcaps.sh`
+  ###### Parameters
 - `stop_container.sh`
+  ###### Parameters
