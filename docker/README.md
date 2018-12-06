@@ -173,7 +173,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 
   ###### Parameters
   ```bash
-  --data-path                    [REQURIED] The pcap data paths
+  --data-path                    [REQURIED] The pcap data path
   ```
 - `stop_container.sh`: Stops and removes a Docker container with a given name
   ###### Parameters
