@@ -214,7 +214,7 @@ An example of an end to end scripted run, that sets up the pcaps, runs the conta
 ./scripts/download_sample_pcaps.sh --data-path=/Users/me/tmp/pcap_data \ 
 && ./example_script.sh --leave-running --data-path=/Users/me/tmp/pcap_data \ 
 && ./scripts/docker_execute_process_data_dir.sh \
-&&  ./scripts/docker_run_consume_bro_kafka.sh
+&& ./scripts/docker_run_consume_bro_kafka.sh
 ```
 
 > NOTE: If the scripts are run repeatedly, and there is no change in bro or the librdkafka, the line `./example_script.sh --leave-running --data-path=/Users/me/tmp/pcap_data ` can be replaced by `./example_script.sh --skip-docker-build --leave-running --data-path=/Users/me/tmp/pcap_data`, which uses the `--skip-docker-build` flag to not rebuild the bro container and building the bro and librdkafka code
