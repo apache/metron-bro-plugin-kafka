@@ -24,34 +24,34 @@ shopt -s nocasematch
 #
 
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 
 CONTAINER_NAME=bro
 NETWORK_NAME=bro-network
 
 function help {
- echo " "
- echo "usage: ${0}"
- echo "    --container-name                The container name. Default bro."
- echo "    --network-name                  The network name. Default bro-network."
- echo "    -h/--help                       Usage information."
- echo " "
- echo " "
+  echo " "
+  echo "usage: ${0}"
+  echo "    --container-name                The container name. Default bro."
+  echo "    --network-name                  The network name. Default bro-network."
+  echo "    -h/--help                       Usage information."
+  echo " "
+  echo " "
 }
 
 # handle command line options
 for i in "$@"; do
- case $i in
+  case $i in
 
- #
- # CONTAINER_NAME
- #
- #   --container-name
- #
-   --container-name=*)
-   CONTAINER_NAME="${i#*=}"
-   shift # past argument
-  ;;
+  #
+  # CONTAINER_NAME
+  #
+  #   --container-name
+  #
+    --container-name=*)
+      CONTAINER_NAME="${i#*=}"
+      shift # past argument
+    ;;
 
   #
   # NETWORK_NAME
@@ -59,19 +59,19 @@ for i in "$@"; do
   #   --network-name
   #
     --network-name=*)
-    NETWORK_NAME="${i#*=}"
-    shift # past argument
-   ;;
+      NETWORK_NAME="${i#*=}"
+      shift # past argument
+    ;;
 
- #
- # -h/--help
- #
-  -h|--help)
-   help
-   exit 0
-   shift # past argument with no value
-  ;;
- esac
+  #
+  # -h/--help
+  #
+    -h | --help)
+      help
+      exit 0
+      shift # past argument with no value
+    ;;
+  esac
 done
 
 echo "Running cleanup_containers with "

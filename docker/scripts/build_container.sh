@@ -24,13 +24,13 @@ shopt -s nocasematch
 #
 
 function help {
- echo " "
- echo "usage: ${0}"
- echo "    --container-directory           the directory with the Dockerfile"
- echo "    --container-name                the name to give the container"
- echo "    -h/--help                       Usage information."
- echo " "
- echo " "
+  echo " "
+  echo "usage: ${0}"
+  echo "    --container-directory           the directory with the Dockerfile"
+  echo "    --container-name                the name to give the container"
+  echo "    -h/--help                       Usage information."
+  echo " "
+  echo " "
 }
 
 CONTAINER_DIRECTORY=
@@ -38,44 +38,44 @@ CONTAINER_NAME=
 
 # handle command line options
 for i in "$@"; do
- case $i in
- #
- # CONTAINER_DIRECTORY
- #
- #
-  --container-directory=*)
-   CONTAINER_DIRECTORY="${i#*=}"
-   shift # past argument=value
-  ;;
+  case $i in
+  #
+  # CONTAINER_DIRECTORY
+  #
+  #
+    --container-directory=*)
+      CONTAINER_DIRECTORY="${i#*=}"
+      shift # past argument=value
+    ;;
 
- #
- # CONTAINER_NAME
- #
- #
- #
-   --container-name=*)
-   CONTAINER_NAME="${i#*=}"
-   shift # past argument=value
-  ;;
+  #
+  # CONTAINER_NAME
+  #
+  #
+  #
+    --container-name=*)
+      CONTAINER_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
 
- #
- # -h/--help
- #
-  -h|--help)
-   help
-   exit 0
-   shift # past argument with no value
-  ;;
+  #
+  # -h/--help
+  #
+    -h | --help)
+      help
+      exit 0
+      shift # past argument with no value
+    ;;
 
- #
- # Unknown option
- #
-  *)
-   UNKNOWN_OPTION="${i#*=}"
-   echo "Error: unknown option: $UNKNOWN_OPTION"
-   help
-  ;;
- esac
+  #
+  # Unknown option
+  #
+    *)
+      UNKNOWN_OPTION="${i#*=}"
+      echo "Error: unknown option: $UNKNOWN_OPTION"
+      help
+    ;;
+  esac
 done
 
 if [[ -z "$CONTAINER_DIRECTORY" ]]; then
@@ -102,5 +102,5 @@ echo "==================================================="
 docker build . --no-cache --tag="${CONTAINER_NAME}"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
-    exit ${rc}
+  exit ${rc}
 fi

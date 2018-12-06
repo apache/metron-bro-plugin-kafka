@@ -24,47 +24,47 @@ shopt -s nocasematch
 #
 
 function help {
- echo " "
- echo "usage: ${0}"
- echo "    --container-name                the name of the container default = bro"
- echo "    -h/--help                       Usage information."
- echo " "
- echo " "
+  echo " "
+  echo "usage: ${0}"
+  echo "    --container-name                the name of the container default = bro"
+  echo "    -h/--help                       Usage information."
+  echo " "
+  echo " "
 }
 
 CONTAINER_NAME=bro
 
 # handle command line options
 for i in "$@"; do
- case $i in
- #
- # CONTAINER_NAME
- #
- #
- #
-   --container-name=*)
-   CONTAINER_NAME="${i#*=}"
-   shift # past argument=value
-  ;;
+  case $i in
+  #
+  # CONTAINER_NAME
+  #
+  #
+  #
+    --container-name=*)
+      CONTAINER_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
 
- #
- # -h/--help
- #
-  -h|--help)
-   help
-   exit 0
-   shift # past argument with no value
-  ;;
+  #
+  # -h/--help
+  #
+    -h | --help)
+      help
+      exit 0
+      shift # past argument with no value
+    ;;
 
- #
- # Unknown option
- #
-  *)
-   UNKNOWN_OPTION="${i#*=}"
-   echo "Error: unknown option: $UNKNOWN_OPTION"
-   help
-  ;;
- esac
+  #
+  # Unknown option
+  #
+    *)
+      UNKNOWN_OPTION="${i#*=}"
+      echo "Error: unknown option: $UNKNOWN_OPTION"
+      help
+    ;;
+  esac
 done
 
 echo "Running docker_execute_configure_bro_plugin with "
@@ -74,6 +74,6 @@ echo "==================================================="
 
 docker exec -w /root "${CONTAINER_NAME}" bash -c /root/built_in_scripts/configure_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
- exit ${rc};
+  exit ${rc};
 fi
 echo "configured the bro kafka plugin"

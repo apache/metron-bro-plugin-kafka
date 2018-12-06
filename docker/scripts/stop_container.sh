@@ -20,45 +20,45 @@
 shopt -s nocasematch
 
 function help {
- echo " "
- echo "usage: ${0}"
- echo "    --continer-name                  [REQUIRED] The docker container name"
- echo "    -h/--help                       Usage information."
- echo " "
+  echo " "
+  echo "usage: ${0}"
+  echo "    --continer-name                  [REQUIRED] The docker container name"
+  echo "    -h/--help                       Usage information."
+  echo " "
 }
 
 CONTAINER_NAME=
 
 # handle command line options
 for i in "$@"; do
- case $i in
+  case $i in
   #
   # NETWORK_NAME
   #
   #
   #
     --container-name=*)
-    CONTAINER_NAME="${i#*=}"
-    shift # past argument=value
-   ;;
- #
- # -h/--help
- #
-  -h|--help)
-   help
-   exit 0
-   shift # past argument with no value
-  ;;
+      CONTAINER_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
+  #
+  # -h/--help
+  #
+    -h | --help)
+      help
+      exit 0
+      shift # past argument with no value
+    ;;
 
- #
- # Unknown option
- #
-  *)
-   UNKNOWN_OPTION="${i#*=}"
-   echo "Error: unknown option: $UNKNOWN_OPTION"
-   help
-  ;;
- esac
+  #
+  # Unknown option
+  #
+    *)
+      UNKNOWN_OPTION="${i#*=}"
+      echo "Error: unknown option: $UNKNOWN_OPTION"
+      help
+    ;;
+  esac
 done
 
 if [[ -z "$CONTAINER_NAME" ]]; then
@@ -70,10 +70,10 @@ echo "Running stop_container with"
 echo "CONTAINER_NAME= $CONTAINER_NAME"
 echo "==================================================="
 
-docker stop  "${CONTAINER_NAME}"
+docker stop "${CONTAINER_NAME}"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
- exit ${rc}
+  exit ${rc}
 fi
 
-docker rm  "${CONTAINER_NAME}"
+docker rm "${CONTAINER_NAME}"

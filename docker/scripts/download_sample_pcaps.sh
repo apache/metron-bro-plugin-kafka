@@ -24,46 +24,46 @@ shopt -s nocasematch
 #
 
 function help {
- echo " "
- echo "usage: ${0}"
- echo "    --data-path                    the pcap data path"
- echo "    -h/--help                       Usage information."
- echo " "
- echo " "
+  echo " "
+  echo "usage: ${0}"
+  echo "    --data-path                    the pcap data path"
+  echo "    -h/--help                       Usage information."
+  echo " "
+  echo " "
 }
 
 DATA_PATH=
 
 # handle command line options
 for i in "$@"; do
- case $i in
- #
- # DATA_PATH
- #
- #
-  --data-path=*)
-   DATA_PATH="${i#*=}"
-   shift # past argument=value
-  ;;
+  case $i in
+  #
+  # DATA_PATH
+  #
+  #
+    --data-path=*)
+      DATA_PATH="${i#*=}"
+      shift # past argument=value
+    ;;
 
- #
- # -h/--help
- #
-  -h|--help)
-   help
-   exit 0
-   shift # past argument with no value
-  ;;
+  #
+  # -h/--help
+  #
+    -h | --help)
+      help
+      exit 0
+      shift # past argument with no value
+    ;;
 
- #
- # Unknown option
- #
-  *)
-   UNKNOWN_OPTION="${i#*=}"
-   echo "Error: unknown option: $UNKNOWN_OPTION"
-   help
-  ;;
- esac
+  #
+  # Unknown option
+  #
+    *)
+      UNKNOWN_OPTION="${i#*=}"
+      echo "Error: unknown option: $UNKNOWN_OPTION"
+      help
+    ;;
+  esac
 done
 
 if [[ -z "$DATA_PATH" ]]; then
@@ -101,5 +101,5 @@ if [[ ! -f "${DATA_PATH}"/rfb/rfb.pcap ]]; then
 fi
 
 rc=$?; if [[ ${rc} != 0 ]]; then
-    exit ${rc}
+  exit ${rc}
 fi

@@ -24,45 +24,45 @@ shopt -s nocasematch
 #
 
 function help {
- echo " "
- echo "usage: ${0}"
- echo "    --network-name                  The docker network name. Default bro-network"
- echo "    -h/--help                       Usage information."
- echo " "
+  echo " "
+  echo "usage: ${0}"
+  echo "    --network-name                  The docker network name. Default bro-network"
+  echo "    -h/--help                       Usage information."
+  echo " "
 }
 
 NETWORK_NAME=bro-network
 
 # handle command line options
 for i in "$@"; do
- case $i in
+  case $i in
   #
   # NETWORK_NAME
   #
   #
   #
     --network-name=*)
-    NETWORK_NAME="${i#*=}"
-    shift # past argument=value
-   ;;
- #
- # -h/--help
- #
-  -h|--help)
-   help
-   exit 0
-   shift # past argument with no value
-  ;;
+      NETWORK_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
+  #
+  # -h/--help
+  #
+    -h | --help)
+      help
+      exit 0
+      shift # past argument with no value
+    ;;
 
- #
- # Unknown option
- #
-  *)
-   UNKNOWN_OPTION="${i#*=}"
-   echo "Error: unknown option: $UNKNOWN_OPTION"
-   help
-  ;;
- esac
+  #
+  # Unknown option
+  #
+    *)
+      UNKNOWN_OPTION="${i#*=}"
+      echo "Error: unknown option: $UNKNOWN_OPTION"
+      help
+    ;;
+  esac
 done
 
 echo "Running docker_run_zookeeper_container with "
@@ -72,6 +72,6 @@ echo "==================================================="
 docker run -d --name zookeeper --network "${NETWORK_NAME}" zookeeper:3.4
 
 rc=$?; if [[ ${rc} != 0 ]]; then
- exit ${rc}
+  exit ${rc}
 fi
 echo "Started the zookeeper container with networ ${NETWORK_NAME}"

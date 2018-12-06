@@ -24,45 +24,45 @@ shopt -s nocasematch
 #
 
 function help {
- echo " "
- echo "usage: ${0}"
- echo "    --network-name                  The docker network name. Default bro-network"
- echo "    -h/--help                       Usage information."
- echo " "
+  echo " "
+  echo "usage: ${0}"
+  echo "    --network-name                  The docker network name. Default bro-network"
+  echo "    -h/--help                       Usage information."
+  echo " "
 }
 
 NETWORK_NAME=bro-network
 
 # handle command line options
 for i in "$@"; do
- case $i in
+  case $i in
   #
   # NETWORK_NAME
   #
   #
   #
     --network-name=*)
-    NETWORK_NAME="${i#*=}"
-    shift # past argument=value
-   ;;
- #
- # -h/--help
- #
-  -h|--help)
-   help
-   exit 0
-   shift # past argument with no value
-  ;;
+      NETWORK_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
+  #
+  # -h/--help
+  #
+    -h | --help)
+      help
+      exit 0
+      shift # past argument with no value
+    ;;
 
- #
- # Unknown option
- #
-  *)
-   UNKNOWN_OPTION="${i#*=}"
-   echo "Error: unknown option: $UNKNOWN_OPTION"
-   help
-  ;;
- esac
+  #
+  # Unknown option
+  #
+    *)
+      UNKNOWN_OPTION="${i#*=}"
+      echo "Error: unknown option: $UNKNOWN_OPTION"
+      help
+    ;;
+  esac
 done
 
 echo "Running docker_run_consume_bro_kafka with "
@@ -71,4 +71,4 @@ echo "==================================================="
 
 
 docker run --rm --network "${NETWORK_NAME}" ches/kafka \
-  kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092
+ kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092

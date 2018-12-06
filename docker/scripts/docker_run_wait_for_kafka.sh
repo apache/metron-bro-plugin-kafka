@@ -22,10 +22,10 @@ shopt -s nocasematch
 #
 # executes a wait script for kafka
 
-DOCKER_SCRIPTS_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && cd  .. >/dev/null && cd in_docker_scripts && pwd )"
+DOCKER_SCRIPTS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && cd  .. > /dev/null && cd in_docker_scripts && pwd)"
 
-docker run --rm -i -t -w /root --network bro-network  -v "${DOCKER_SCRIPTS_PATH}":/root/scripts centos bash -c "bash /root/scripts/wait_for_kafka.sh"
+docker run --rm -i -t -w /root --network bro-network -v "${DOCKER_SCRIPTS_PATH}":/root/scripts centos bash -c "bash /root/scripts/wait_for_kafka.sh"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
- exit ${rc}
+  exit ${rc}
 fi

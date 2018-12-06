@@ -25,7 +25,7 @@ shopt -s nocasematch
 
 cd /root || exit 1
 
-if [ ! -d /root/scripts ] ; then
+if [ ! -d /root/scripts ]; then
   echo "DOCKER_SCRIPTS_PATH has not been set and mapped"
   exit 1
 fi

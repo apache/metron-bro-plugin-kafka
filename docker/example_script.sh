@@ -29,16 +29,16 @@ LEAVE_RUNNING=false
 
 SCRIPT_DIR=./scripts
 CONTAINER_DIR=./containers/bro-localbuild-container
-LOG_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && cd logs && pwd )"
+LOG_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && cd logs && pwd)"
 
 function help {
- echo " "
- echo "usage: ${0}"
- echo "    --skip-docker-build             Skip build of bro docker machine."
- echo "    --leave-running                 Do not stop containers after script.  The cleanup_containers.sh script should be run when done."
- echo "    -h/--help                       Usage information."
- echo " "
- echo " "
+  echo " "
+  echo "usage: ${0}"
+  echo "    --skip-docker-build             Skip build of bro docker machine."
+  echo "    --leave-running                 Do not stop containers after script.  The cleanup_containers.sh script should be run when done."
+  echo "    -h/--help                       Usage information."
+  echo " "
+  echo " "
 }
 
 function shutdown {
@@ -62,17 +62,17 @@ function shutdown {
 
 # handle command line options
 for i in "$@"; do
- case $i in
+  case $i in
 
- #
- # FORCE_DOCKER_BUILD
- #
- #   --skip-docker-build
- #
-   --skip-docker-build)
-   SKIP_REBUILD_BRO=true
-   shift # past argument
-  ;;
+  #
+  # FORCE_DOCKER_BUILD
+  #
+  #   --skip-docker-build
+  #
+    --skip-docker-build)
+      SKIP_REBUILD_BRO=true
+      shift # past argument
+    ;;
 
   #
   # LEAVE_RUNNING
@@ -80,19 +80,19 @@ for i in "$@"; do
   #   --leave-running
   #
     --leave-running)
-    LEAVE_RUNNING=true
-    shift # past argument
-   ;;
+      LEAVE_RUNNING=true
+      shift # past argument
+    ;;
 
- #
- # -h/--help
- #
-  -h|--help)
-   help
-   exit 0
-   shift # past argument with no value
-  ;;
- esac
+  #
+  # -h/--help
+  #
+    -h | --help)
+      help
+      exit 0
+      shift # past argument with no value
+    ;;
+  esac
 done
 
 EXTRA_ARGS="$@"
@@ -152,23 +152,23 @@ rc=$?; if [[ ${rc} != 0 ]]; then
 fi
 
 #build the bro container
-if [[ "$SKIP_REBUILD_BRO" = false ]] ; then
+if [[ "$SKIP_REBUILD_BRO" = false ]]; then
   bash "${SCRIPT_DIR}"/build_container.sh \
-    --container-directory="${CONTAINER_DIR}" \
-    --container-name=metron-bro-docker-container:latest
+ --container-directory="${CONTAINER_DIR}" \
+ --container-name=metron-bro-docker-container:latest
 
   rc=$?; if [[ ${rc} != 0 ]]; then
-    shutdown
-    exit ${rc}
-  fi
+  shutdown
+  exit ${rc}
+fi
 fi
 
 
 #run the bro container
 #and optionally the passed script _IN_ the container
 bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
-  --log-path="${LOG_PATH}" \
-  $EXTRA_ARGS
+ --log-path="${LOG_PATH}" \
+ $EXTRA_ARGS
 
 
 rc=$?; if [[ ${rc} != 0 ]]; then
@@ -181,13 +181,13 @@ fi
 # build the bro plugin
 bash "${SCRIPT_DIR}"/docker_execute_build_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
-    echo "ERROR> FAILED TO BUILD PLUGIN.  CHECK LOGS  ${rc}"
+  echo "ERROR> FAILED TO BUILD PLUGIN.  CHECK LOGS  ${rc}"
 fi
 
 # configure it the bro plugin
 bash "${SCRIPT_DIR}"/docker_execute_configure_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
-    echo "ERROR> FAILED TO CONFIGURE PLUGIN.  CHECK LOGS  ${rc}"
+  echo "ERROR> FAILED TO CONFIGURE PLUGIN.  CHECK LOGS  ${rc}"
 fi
 
 #optionally run the kafka consumer script
@@ -195,6 +195,6 @@ fi
 
 
 #shutdown
-if [[ "$LEAVE_RUNNING" = false ]] ; then
+if [[ "$LEAVE_RUNNING" = false ]]; then
   shutdown
 fi
