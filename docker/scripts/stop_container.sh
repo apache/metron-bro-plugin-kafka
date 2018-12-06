@@ -19,10 +19,12 @@
 
 shopt -s nocasematch
 
+# Stops the Docker container with a given name
+
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --continer-name                  [REQUIRED] The docker container name"
+  echo "    --container-name                [REQUIRED] The Docker container name"
   echo "    -h/--help                       Usage information."
   echo " "
 }

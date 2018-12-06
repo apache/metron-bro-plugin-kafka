@@ -21,10 +21,59 @@ shopt -s nocasematch
 
 #
 # executes a wait script for kafka
+#
+
+function help {
+  echo " "
+  echo "usage: ${0}"
+  echo "    --network-name                  [OPTIONAL] The Docker network name. Default bro-network"
+  echo "    -h/--help                       Usage information."
+  echo " "
+}
 
 DOCKER_SCRIPTS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && cd  .. > /dev/null && cd in_docker_scripts && pwd)"
 
-docker run --rm -i -t -w /root --network bro-network -v "${DOCKER_SCRIPTS_PATH}":/root/scripts centos bash -c "bash /root/scripts/wait_for_kafka.sh"
+
+NETWORK_NAME=bro-network
+
+# handle command line options
+for i in "$@"; do
+  case $i in
+  #
+  # NETWORK_NAME
+  #
+  #
+  #
+    --network-name=*)
+      NETWORK_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
+  #
+  # -h/--help
+  #
+    -h | --help)
+      help
+      exit 0
+      shift # past argument with no value
+    ;;
+
+  #
+  # Unknown option
+  #
+    *)
+      UNKNOWN_OPTION="${i#*=}"
+      echo "Error: unknown option: $UNKNOWN_OPTION"
+      help
+    ;;
+  esac
+done
+
+echo "Running docker_run_wait_for_kakfa with"
+echo "NETWORK_NAME = $NETWORK_NAME"
+echo "==================================================="
+
+
+docker run --rm -i -t -w /root --network "${NETWORK_NAME}" -v "${DOCKER_SCRIPTS_PATH}":/root/scripts centos bash -c "bash /root/scripts/wait_for_kafka.sh"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}

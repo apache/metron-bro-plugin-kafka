@@ -32,8 +32,8 @@ NETWORK_NAME=bro-network
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --container-name                The container name. Default bro."
-  echo "    --network-name                  The network name. Default bro-network."
+  echo "    --container-name                [OPTIONAL] The Docker container name. Default bro"
+  echo "    --network-name                  [OPTIONAL] The Docker network name. Default bro-network"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "

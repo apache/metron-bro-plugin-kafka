@@ -26,8 +26,8 @@ shopt -s nocasematch
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --data-path                    the pcap data path"
-  echo "    -h/--help                       Usage information."
+  echo "    --data-path                    [REQURIED] The pcap data path"
+  echo "    -h/--help                      Usage information."
   echo " "
   echo " "
 }

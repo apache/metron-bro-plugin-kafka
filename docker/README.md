@@ -82,51 +82,92 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 - `build_container.sh`: Runs docker build in the passed directory, and names the results
   ###### Parameters
   ```bash
-   --container-directory          The directory with the Dockerfile
-   --container-name               The name to give the container
+   --container-directory          [REQUIRED] The directory with the Dockerfile
+   --container-name               [REQUIRED] The name to give the Docker container
   ```
 - `cleanup_containers.sh`: Stops the containers and destroys the network 
   ###### Parameters
   ```bash
-  --container-name                The container name. Default bro
-  --network-name                  The network name. Default bro-network
+  --container-name                [OPTIONAL] The Docker container name. Default bro
+  --network-name                  [OPTIONAL] The Docker network name. Default bro-network
   ```
 - `create_docker_network.sh`: Creates the Docker network that the containers will use
   ###### Parameters
   ```bash
-  --network-name                  The Docker network name. Default bro-network
+  --network-name                  [OPTIONAL] The Docker network name. Default bro-network
   ```
 - `destroy_docker_network.sh`: Destroys a Docker network by calling `docker network rm`
   ###### Parameters
   ```bash
-   --network-name                The Docker network name. Default bro-network
-    ```
-- `docker_execute_build_bro_plugin.sh`: Executes `build_bro_plugin` in the bro container
+   --network-name                 [OPTIONAL] The Docker network name. Default bro-network
+  ```
+- `docker_execute_build_bro_plugin.sh`: Executes `build_bro_plugin.sh` in the bro container
   ###### Parameters
   ```bash
-   --container-name                The container name. Default bro
+   --container-name               [OPTIONAL] The Docker container name. Default bro
   ```
-- `docker_execute_configure_bro_plugin.sh`
+- `docker_execute_configure_bro_plugin.sh`: Executes `configure_bro_plugin.sh` in the bro container
   ###### Parameters
-- `docker_execute_process_data_dir.sh`
+  ```bash
+  --container-name                [OPTIONAL] The Docker container name. Default bro
+  ```
+- `docker_execute_process_data_dir.sh`: Executes `process_data_dir.sh` in the bro container
   ###### Parameters
-- `docker_execute_shell.sh`
+   ```bash
+   --container-name               [OPTIONAL] The Docker container name. Default bro
+   ```
+- `docker_execute_shell.sh`: `docker execute -i -t bash` to get a shell in a given container
   ###### Parameters
-- `docker_run_bro_container.sh`
+  ```bash
+  --container-name                [OPTIONAL] The Docker container name. Default bro
+  ```
+- `docker_run_bro_container.sh`:  Runs the bro docker container in the background
   ###### Parameters
-- `docker_run_consume_bro_kafka.sh`
+  ```bash
+  --container-name                [OPTIONAL] The name to give the container. Default bro
+  --network-name                  [OPTIONAL] The Docker network name. Default bro-network
+  --scripts-path                  [OPTIONAL] The path with the scripts you may run in the container. These are your scripts, not the built in scripts
+  --data-path                     [OPTIONAL] The name of the directory to map to /root/data
+  --log-path                      [REQUIRED] The path to log to
+  --docker-parameter              [OPTIONAL, MULTIPLE] Each parameter with this name will be passed to docker run
+  ```
+- `docker_run_consume_bro_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092`
   ###### Parameters
-- `docker_run_create_bro_topic_in_kafka.sh`
+  ```bash
+  --network-name                 [OPTIONAL] The Docker network name. Default bro-network
+  ```
+- `docker_run_create_bro_topic_in_kafka.sh`: Runs an instance of the kafka container, creating the `bro` topic
   ###### Parameters
-- `docker_run_kafka_container.sh`
+  ```bash
+  --network-name                 [OPTIONAL] The Docker network name. Default bro-network
+  ```
+- `docker_run_kafka_container.sh`: Runs the main instance of the kafka container in the background
   ###### Parameters
-- `docker_run_wait_for_kafka.sh`
+  ```bash
+  --network-name                 [OPTIONAL] The Docker network name. Default bro-network
+  ```
+- `docker_run_wait_for_kafka.sh`: Runs the `wait_for_kafka.sh` in a base centos container
   ###### Parameters
-- `docker_run_wait_for_zookeeper.sh`
+  ```bash
+  --network-name                 [OPTIONAL] The Docker network name. Default bro-network
+  ```
+- `docker_run_wait_for_zookeeper.sh`: Runs the `wait_for_zk.sh` in a base centos container
   ###### Parameters
-- `docker_run_zookeeper_container.sh`
+  ```bash
+  --network-name                 [OPTIONAL] The Docker network name. Default bro-network
+  ```
+- `docker_run_zookeeper_container.sh`: Runs the zookeeper container in the background
   ###### Parameters
-- `download_sample_pcaps.sh`
+  ```bash
+  --network-name                 [OPTIONAL] The Docker network name. Default bro-network
+  ```
+- `download_sample_pcaps.sh`: Downloads the sample pcaps to a specified directory. If they exist, it is a no-op.
   ###### Parameters
-- `stop_container.sh`
+  ```bash
+  --data-path                    [REQURIED] The pcap data paths
+  ```
+- `stop_container.sh`: Stops and removes a Docker container with a given name
   ###### Parameters
+  ```bash
+  --container-name               [REQUIRED] The Docker container name
+  ```
