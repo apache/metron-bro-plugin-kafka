@@ -26,13 +26,14 @@ shopt -s nocasematch
 
 cd /root || exit 1
 echo "================================" >> "${RUN_LOG_PATH}" 2>&1
-echo "==========DATA_PATH=============="
-ls /root/data
-echo "================================="
 if [ ! -d /root/data ] ; then
   echo "DATA_PATH has not been set and mapped" >> "${RUN_LOG_PATH}" 2>&1
   exit 1
 fi
+
+echo "==========DATA_PATH=============="
+ls /root/data
+echo "================================="
 
 # process all pcaps in the data directory and sub directories
 find /root/data -type f -exec echo "processing" '{}' \; -exec bro -r '{}' /usr/local/bro/share/bro/site/local.bro -C  \;
