@@ -131,6 +131,12 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   --log-path                      [REQUIRED] The path to log to
   --docker-parameter              [OPTIONAL, MULTIPLE] Each parameter with this name will be passed to docker run
   ```
+  
+  > NOTE about --scripts-path
+  > The scripts path provided with be mapped into the bro container at `/root/scripts`.  This allows you to _inject_ your own scripts (not managed as part of this source project) into the container.
+  > You can then execute these scripts or use them together as part of testing etc. by creating `docker execute` scripts like those here.
+  > The goal is to allow an individual to use and maintain their own library of scripts to use instead of, or in concert with the scripts maintained by this project.
+  
 - `docker_run_consume_bro_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092`
   ###### Parameters
   ```bash
