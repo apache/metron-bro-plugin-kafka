@@ -140,16 +140,16 @@ echo "Log will be found on host at ${LOG_PATH}/$LOGNAME"
 #build the docker command line
 declare -a DOCKER_CMD_BASE
 DOCKER_CMD="bash"
-DOCKER_CMD_BASE [ 0 ] = "docker run -d -t --name ${CONTAINER_NAME} --network ${NETWORK_NAME} "
-DOCKER_CMD_BASE [ 1 ] = "-e RUN_LOG_PATH=\"/root/logs/${LOGNAME}\" "
-DOCKER_CMD_BASE [ 2 ] = "-v \"${LOG_PATH}:/root/logs\" "
-DOCKER_CMD_BASE [ 3 ] = "-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
-DOCKER_CMD_BASE [ 4 ] = "-v \"${BRO_PLUGIN_PATH}:/root/code\" "
+DOCKER_CMD_BASE[0]="docker run -d -t --name ${CONTAINER_NAME} --network ${NETWORK_NAME} "
+DOCKER_CMD_BASE[1]="-e RUN_LOG_PATH=\"/root/logs/${LOGNAME}\" "
+DOCKER_CMD_BASE[2]="-v \"${LOG_PATH}:/root/logs\" "
+DOCKER_CMD_BASE[3]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
+DOCKER_CMD_BASE[4]="-v \"${BRO_PLUGIN_PATH}:/root/code\" "
 if [[ ! -z "$SCRIPTS_PATH" ]]; then
-  DOCKER_CMD_BASE [ 5 ] = "-v \"${SCRIPTS_PATH}:/root/scripts\" "
+  DOCKER_CMD_BASE[5]="-v \"${SCRIPTS_PATH}:/root/scripts\" "
 fi
 if [[ ! -z "$DATA_PATH" ]]; then
-  DOCKER_CMD_BASE [ 6 ] = "-v \"${DATA_PATH}:/root/data\" "
+  DOCKER_CMD_BASE[6]="-v \"${DATA_PATH}:/root/data\" "
 fi
 
 echo "===============Running Docker==============="
