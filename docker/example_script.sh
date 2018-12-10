@@ -158,9 +158,9 @@ if [[ "$SKIP_REBUILD_BRO" = false ]]; then
  --container-name=metron-bro-docker-container:latest
 
   rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
-  exit ${rc}
-fi
+    shutdown
+    exit ${rc}
+  fi
 fi
 
 
@@ -182,12 +182,16 @@ fi
 bash "${SCRIPT_DIR}"/docker_execute_build_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO BUILD PLUGIN.  CHECK LOGS  ${rc}"
+  shutdown
+  exit ${rc}
 fi
 
 # configure it the bro plugin
 bash "${SCRIPT_DIR}"/docker_execute_configure_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO CONFIGURE PLUGIN.  CHECK LOGS  ${rc}"
+  shutdown
+  exit ${rc}
 fi
 
 #optionally run the kafka consumer script
