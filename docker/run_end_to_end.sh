@@ -27,15 +27,17 @@ RAN_BRO_CONTAINER=false
 SKIP_REBUILD_BRO=false
 LEAVE_RUNNING=false
 
-SCRIPT_DIR=./scripts
-CONTAINER_DIR=./containers/bro-localbuild-container
-LOG_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && cd logs && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
+SCRIPT_DIR="${ROOT_DIR}"/scripts
+CONTAINER_DIR="${ROOT_DIR}"/containers/bro-localbuild-container
+LOG_PATH="${ROOT_DIR}"/logs
+DATA_PATH="${ROOT_DIR}"/data
 
 function help {
   echo " "
   echo "usage: ${0}"
   echo "    --skip-docker-build             Skip build of bro docker machine."
-  echo "    --leave-running                 Do not stop containers after script.  The cleanup_containers.sh script should be run when done."
+  echo "    --data-path                     [OPTIONAL] The pcap data path, defaults to ./data"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
@@ -75,13 +77,13 @@ for i in "$@"; do
     ;;
 
   #
-  # LEAVE_RUNNING
+  # DATA_PATH
   #
-  #   --leave-running
   #
-    --leave-running)
-      LEAVE_RUNNING=true
-      shift # past argument
+  #
+    --data-path=*)
+      DATA_PATH="${i#*=}"
+      shift # past argument=value
     ;;
 
   #
@@ -163,11 +165,14 @@ if [[ "$SKIP_REBUILD_BRO" = false ]]; then
   fi
 fi
 
+# download the pcaps
+download_sample_pcaps.sh --data-path="${DATA_PATH}"
 
 #run the bro container
 #and optionally the passed script _IN_ the container
 bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
  --log-path="${LOG_PATH}" \
+ --data-path="${DATA_PATH}" \
  $EXTRA_ARGS
 
 
@@ -194,11 +199,18 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-#optionally run the kafka consumer script
-#prompt to shutdown, let them know they will have to call the shutdown script
-
-
-#shutdown
-if [[ "$LEAVE_RUNNING" = false ]]; then
-  shutdown
+bash "${SCRIPT_DIR}"/docker_execute_process_data_dir.sh
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS  ${rc}, please run the finish_end_to_end.sh when you are done."
+  exit ${rc}
 fi
+
+bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR> FAILED TO CONSUME DATA FROM KAFKA DATA.  CHECK LOGS  ${rc}, please run the finish_end_to_end.sh when you are done."
+  exit ${rc}
+fi
+
+echo "Run complete, you may now work with the containers if you will.  You need to call finish_end_to_end.sh when you are done"
+
+
