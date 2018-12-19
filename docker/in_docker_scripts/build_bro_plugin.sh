@@ -23,16 +23,6 @@ shopt -s nocasematch
 # Runs bro-package to build and install the plugin
 #
 
-cd /root/code || exit 1
-
-
-make clean
-
-rc=$?; if [[ ${rc} != 0 ]]; then
-  echo "ERROR cleaning project ${rc}" >>"${RUN_LOG_PATH}"
-  exit ${rc}
-fi
-
 cd /root || exit 1
 
 echo "================================" >>"${RUN_LOG_PATH}" 2>&1
