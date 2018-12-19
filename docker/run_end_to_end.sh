@@ -19,11 +19,6 @@
 
 shopt -s nocasematch
 
-CREATED_NETWORK_FLAG=false
-RAN_ZK_CONTAINER=false
-RAN_KAFKA_CONTAINER=false
-RAN_BRO_CONTAINER=false
-
 SKIP_REBUILD_BRO=false
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
@@ -78,7 +73,7 @@ for i in "$@"; do
   esac
 done
 
-EXTRA_ARGS="$@"
+EXTRA_ARGS="$*"
 
 echo "Running build_container with "
 echo "SKIP_REBUILD_BRO = $SKIP_REBUILD_BRO"
@@ -88,8 +83,6 @@ echo "==================================================="
 bash "${SCRIPT_DIR}"/create_docker_network.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
-else
-  CREATED_NETWORK_FLAG=true
 fi
 
 
@@ -98,8 +91,6 @@ fi
 bash "${SCRIPT_DIR}"/docker_run_zookeeper_container.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
-else
-  RAN_ZK_CONTAINER=true
 fi
 
 # wait for zookeeper to be up
@@ -112,8 +103,6 @@ fi
 bash "${SCRIPT_DIR}"/docker_run_kafka_container.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
-else
-  RAN_KAFKA_CONTAINER=true
 fi
 
 # wait for kafka to be up
@@ -147,13 +136,11 @@ bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
 bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
  --log-path="${LOG_PATH}" \
  --data-path="${DATA_PATH}" \
- $EXTRA_ARGS
+ "$EXTRA_ARGS"
 
 
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
-else
-  RAN_BRO_CONTAINER=true
 fi
 
 # build the bro plugin
