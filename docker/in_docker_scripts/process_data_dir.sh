@@ -32,7 +32,7 @@ if [ ! -d /root/data ]; then
 fi
 
 echo "==========DATA_PATH=============="
-ls /root/data
+ls /root/data | grep -v 'afile'
 echo "================================="
 
 # process all pcaps in the data directory and sub directories

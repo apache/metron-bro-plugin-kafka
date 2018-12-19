@@ -25,7 +25,6 @@ RAN_KAFKA_CONTAINER=false
 RAN_BRO_CONTAINER=false
 
 SKIP_REBUILD_BRO=false
-LEAVE_RUNNING=false
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 SCRIPT_DIR="${ROOT_DIR}"/scripts
