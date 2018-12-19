@@ -43,25 +43,6 @@ function help {
   echo " "
 }
 
-function shutdown {
-
-  if [[ "$RAN_BRO_CONTAINER" = true ]]; then
-    "${SCRIPT_DIR}"/stop_container.sh --container-name=bro
-  fi
-
-  if [[ "$RAN_KAFKA_CONTAINER" = true ]]; then
-    "${SCRIPT_DIR}"/stop_container.sh --container-name=kafka
-  fi
-
-  if [[ "$RAN_ZK_CONTAINER" = true ]]; then
-    "${SCRIPT_DIR}"/stop_container.sh --container-name=zookeeper
-  fi
-
-  if [[ "$CREATED_NETWORK_FLAG" = true ]]; then
-    "${SCRIPT_DIR}"/destroy_docker_network.sh --network-name=bro-network
-  fi
-}
-
 # handle command line options
 for i in "$@"; do
   case $i in
@@ -106,7 +87,6 @@ echo "==================================================="
 # create the network
 bash "${SCRIPT_DIR}"/create_docker_network.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
   exit ${rc}
 else
   CREATED_NETWORK_FLAG=true
@@ -117,7 +97,6 @@ fi
 # run the zookeeper container
 bash "${SCRIPT_DIR}"/docker_run_zookeeper_container.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
   exit ${rc}
 else
   RAN_ZK_CONTAINER=true
@@ -126,14 +105,12 @@ fi
 # wait for zookeeper to be up
 bash "${SCRIPT_DIR}"/docker_run_wait_for_zookeeper.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
   exit ${rc}
 fi
 
 # run the kafka container
 bash "${SCRIPT_DIR}"/docker_run_kafka_container.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
   exit ${rc}
 else
   RAN_KAFKA_CONTAINER=true
@@ -142,14 +119,12 @@ fi
 # wait for kafka to be up
 bash "${SCRIPT_DIR}"/docker_run_wait_for_kafka.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
   exit ${rc}
 fi
 
 # create the bro topic
 bash "${SCRIPT_DIR}"/docker_run_create_bro_topic_in_kafka.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
   exit ${rc}
 fi
 
@@ -160,7 +135,6 @@ if [[ "$SKIP_REBUILD_BRO" = false ]]; then
  --container-name=metron-bro-docker-container:latest
 
   rc=$?; if [[ ${rc} != 0 ]]; then
-    shutdown
     exit ${rc}
   fi
 fi
@@ -177,7 +151,6 @@ bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
 
 
 rc=$?; if [[ ${rc} != 0 ]]; then
-  shutdown
   exit ${rc}
 else
   RAN_BRO_CONTAINER=true
@@ -187,7 +160,6 @@ fi
 bash "${SCRIPT_DIR}"/docker_execute_build_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO BUILD PLUGIN.  CHECK LOGS  ${rc}"
-  shutdown
   exit ${rc}
 fi
 
@@ -195,7 +167,6 @@ fi
 bash "${SCRIPT_DIR}"/docker_execute_configure_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO CONFIGURE PLUGIN.  CHECK LOGS  ${rc}"
-  shutdown
   exit ${rc}
 fi
 
