@@ -20,7 +20,8 @@
 shopt -s nocasematch
 
 #
-# Runs a kafka container with the console consumer for the bro topic
+# Runs a kafka container with the console consumer for the bro topic.  The consumer should quit when it has read
+# all of the messages available
 #
 
 function help {
@@ -65,10 +66,5 @@ for i in "$@"; do
   esac
 done
 
-echo "Running docker_run_consume_bro_kafka with "
-echo "NETWORK_NAME = $NETWORK_NAME"
-echo "==================================================="
-
-
 docker run --rm --network "${NETWORK_NAME}" ches/kafka \
- kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092
+ kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092 --timeout-ms 1000

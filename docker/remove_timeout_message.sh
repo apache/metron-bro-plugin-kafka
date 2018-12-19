@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-
+#! /usr/bin/env bash
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
 #  contributor license agreements.  See the NOTICE file distributed with
@@ -17,23 +16,28 @@
 #  limitations under the License.
 #
 
-shopt -s nocasematch
-
 #
-# For each file in the data directory and sub-directories ( if mapped ), this script will
-# run bro -r with the local.bro configuration.
+# remove the exception text from piped input when we have purposefully timed
+# out reading kafka
 #
 
-cd /root || exit 1
-echo "================================" >>"${RUN_LOG_PATH}" 2>&1
-if [ ! -d /root/data ]; then
-  echo "DATA_PATH has not been set and mapped" >>"${RUN_LOG_PATH}" 2>&1
-  exit 1
-fi
-
-echo "==========DATA_PATH=============="
-ls /root/data
-echo "================================="
-
-# process all pcaps in the data directory and sub directories
-find /root/data -type f -name "*.pcap*" -exec echo "processing" '{}' \; -exec bro -r '{}' /usr/local/bro/share/bro/site/local.bro -C \;
+LAST_CMD=
+SKIP_EXCEPTION_TEXT=false
+while read CMD; do
+    if [[ $CMD =~ ('ERROR Error processing message') ]]; then
+        LAST_CMD=$CMD
+    elif [[ $CMD =~ ('kafka.consumer.ConsumerTimeoutException') ]]; then
+        SKIP_EXCEPTION_TEXT=true
+    elif [[ "$SKIP_EXCEPTION_TEXT" = true ]]; then
+        if [[ ! $CMD =~ (^at) ]]; then
+            echo $CMD
+        fi
+    else
+        if [[ ! -z $LAST_CMD ]]; then
+            LAST_CMD=
+        fi
+        if [[ ! $CMD =~ (^--) ]]; then
+            echo $CMD
+        fi
+    fi
+done

@@ -32,6 +32,7 @@ SCRIPT_DIR="${ROOT_DIR}"/scripts
 CONTAINER_DIR="${ROOT_DIR}"/containers/bro-localbuild-container
 LOG_PATH="${ROOT_DIR}"/logs
 DATA_PATH="${ROOT_DIR}"/data
+OUTPUT_PATH="${ROOT_DIR}"/kafka_output
 
 function help {
   echo " "
@@ -166,7 +167,7 @@ if [[ "$SKIP_REBUILD_BRO" = false ]]; then
 fi
 
 # download the pcaps
-download_sample_pcaps.sh --data-path="${DATA_PATH}"
+bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
 
 #run the bro container
 #and optionally the passed script _IN_ the container
@@ -205,12 +206,13 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh
-rc=$?; if [[ ${rc} != 0 ]]; then
-  echo "ERROR> FAILED TO CONSUME DATA FROM KAFKA DATA.  CHECK LOGS  ${rc}, please run the finish_end_to_end.sh when you are done."
-  exit ${rc}
-fi
+DATE=$(date)
+LOG_DATE=${DATE// /_}
+KAFKA_OUTPUT_FILE="${OUTPUT_PATH}/kafka-output-${LOG_DATE}.log"
+bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
 
-echo "Run complete, you may now work with the containers if you will.  You need to call finish_end_to_end.sh when you are done"
+echo "Run complete"
+echo "The kafka output can be found at ${KAFKA_OUTPUT_FILE}"
+echo "You may now work with the containers if you will.  You need to call finish_end_to_end.sh when you are done"
 
 

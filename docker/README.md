@@ -207,6 +207,7 @@ This script does the following:
 10. Configures the bro plugin
 11. Runs bro against all the pcap data
 12. Executes a kafka client to read the data from bro
+13. Stores the output kafka messages in the kafka_output directory for further analysis
 
 At this point the containers are up and running in the background.
 
