@@ -17,7 +17,7 @@
 
 These scripts and containers provide support for building and testing Bro and the metron-bro-plugin-kafka using a number of Docker containers.
 The use of these scripts and containers allow an easier, automated workflow for testing new features, fixes, or regressions than before.
-One of the goals is for this to be extensible, such that new scripts can be introduced and run as well.  This will allow, for example, one or more
+One of the goals is for this to be extensible, such that new scripts can be introduced and run as well.  This will allow, for xample, one or more
 testing scripts to be added to a pull request, and subsequently to a test suite.
 
 
@@ -216,7 +216,7 @@ Other scripts may then be used to do your testing, for example running
 ./scripts/docker_execute_shell.sh
 ```
 
-> NOTE: If the scripts are run repeatedly, and there is no change in bro or the librdkafka, the line `./run_end_to_end.sh ` can be replaced by `./example_script.sh --skip-docker-build `, which uses the `--skip-docker-build` flag to not rebuild the bro container and building the bro and librdkafka code
+> NOTE: If the scripts are run repeatedly, and there is no change in bro or the librdkafka, the line `./run_end_to_end.sh ` can be replaced by `./run_end_to_end.sh --skip-docker-build `, which uses the `--skip-docker-build` flag to not rebuild the bro container and building the bro and librdkafka code
 
 > NOTE: After you are done, you must call the finish_end_to_end.sh script to cleanup
 
