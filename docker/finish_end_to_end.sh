@@ -25,6 +25,7 @@
 shopt -s nocasematch
 set -u # nounset
 set -e # errexit
+set -E # errtrap
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 

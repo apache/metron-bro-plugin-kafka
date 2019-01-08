@@ -20,6 +20,7 @@
 shopt -s nocasematch
 set -u # nounset
 set -e # errexit
+set -E # errtrap
 
 #
 # Downloads sample pcap files to the data directory

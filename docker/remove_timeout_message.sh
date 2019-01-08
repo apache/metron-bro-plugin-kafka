@@ -24,6 +24,7 @@
 shopt -s nocasematch
 set -u # nounset
 set -e # errexit
+set -E # errtrap
 
 LAST_CMD=
 SKIP_EXCEPTION_TEXT=false
