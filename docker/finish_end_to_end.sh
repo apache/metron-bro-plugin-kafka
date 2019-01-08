@@ -27,6 +27,6 @@ shopt -s nocasematch
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 
 # stop all the containers and remote the networks
-bash ${ROOT_DIR}/scripts/cleanup_docker.sh
+bash "${ROOT_DIR}"/scripts/cleanup_docker.sh
 
 

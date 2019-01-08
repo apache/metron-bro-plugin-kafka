@@ -17,6 +17,8 @@
 #  limitations under the License.
 #
 
+# shellcheck disable=SC2010
+
 shopt -s nocasematch
 
 #

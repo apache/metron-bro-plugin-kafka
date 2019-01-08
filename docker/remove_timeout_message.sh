@@ -23,21 +23,21 @@
 
 LAST_CMD=
 SKIP_EXCEPTION_TEXT=false
-while read CMD; do
+while read -r CMD; do
     if [[ ${CMD} =~ ('ERROR Error processing message') ]]; then
         LAST_CMD=${CMD}
     elif [[ ${CMD} =~ ('kafka.consumer.ConsumerTimeoutException') ]]; then
         SKIP_EXCEPTION_TEXT=true
     elif [[ "$SKIP_EXCEPTION_TEXT" = true ]]; then
         if [[ ! ${CMD} =~ (^at) ]]; then
-            echo ${CMD}
+            echo "${CMD}"
         fi
     else
-        if [[ ! -z $LAST_CMD ]]; then
+        if [[ -n "$LAST_CMD" ]]; then
             LAST_CMD=
         fi
         if [[ ! ${CMD} =~ (^--) ]]; then
-            echo ${CMD}
+            echo "${CMD}"
         fi
     fi
 done

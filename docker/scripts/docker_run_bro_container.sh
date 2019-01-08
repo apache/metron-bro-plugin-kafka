@@ -145,10 +145,10 @@ DOCKER_CMD_BASE[1]="-e RUN_LOG_PATH=\"/root/logs/${LOGNAME}\" "
 DOCKER_CMD_BASE[2]="-v \"${LOG_PATH}:/root/logs\" "
 DOCKER_CMD_BASE[3]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
 DOCKER_CMD_BASE[4]="-v \"${BRO_PLUGIN_PATH}:/root/code\" "
-if [[ ! -z "$SCRIPTS_PATH" ]]; then
+if [[ -n "$SCRIPTS_PATH" ]]; then
   DOCKER_CMD_BASE[5]="-v \"${SCRIPTS_PATH}:/root/scripts\" "
 fi
-if [[ ! -z "$DATA_PATH" ]]; then
+if [[ -n "$DATA_PATH" ]]; then
   DOCKER_CMD_BASE[6]="-v \"${DATA_PATH}:/root/data\" "
 fi
 
