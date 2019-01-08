@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2010
 
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
@@ -17,7 +18,6 @@
 #  limitations under the License.
 #
 
-# shellcheck disable=SC2010
 
 shopt -s nocasematch
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2064,SC2124,SC2206,SC2086
 #   Use this script to test if a given TCP host/port are available
 
 cmdname=$(basename $0)
