@@ -19,6 +19,7 @@
 
 shopt -s nocasematch
 set -u # nounset
+set -e # errexit
 
 # Stops the Docker container with a given name
 

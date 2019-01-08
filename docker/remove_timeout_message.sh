@@ -23,6 +23,7 @@
 
 shopt -s nocasematch
 set -u # nounset
+set -e # errexit
 
 LAST_CMD=
 SKIP_EXCEPTION_TEXT=false
