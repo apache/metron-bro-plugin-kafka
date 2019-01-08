@@ -103,7 +103,3 @@ fi
 if [[ ! -f "${DATA_PATH}"/rfb/rfb.pcap ]]; then
   wget https://github.com/kholia/my-pcaps/blob/master/VNC/07-vnc-openwall-3.7.pcap?raw=true -O "${DATA_PATH}"/rfb/rfb.pcap
 fi
-
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc}
-fi
