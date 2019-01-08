@@ -35,9 +35,9 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 
 - `containers`: The parent of all of the containers that this project defines.  We use several containers, not all of them ours.
   - `bro-localbuild-container`: The docker container directory for our bro container, used for building bro, the librdkafka, and our plugin, as well as running bro.
-- `data`: TODO
+- `data`: The default path for pcap data to be used in tests.
 - `in_docker_scripts`: This directory is mapped to the bro docker container as /root/built_in_scripts.  These represent the library of scripts we provide to be run in the docker container.
-- `kafka_output`: TODO
+- `kafka_output`: This directory will have output from running kafka client commands logged to it.
 - `logs`: A default log directory to use while running the scripts.
 - `scripts`: These are the scripts that are run on the host for creating the docker bits, running containers, running or executing commands against containers ( such as executing one of the built_in_scripts ), and cleaning up resources.
 
