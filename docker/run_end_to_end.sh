@@ -18,6 +18,7 @@
 #
 
 shopt -s nocasematch
+set -u # nounset
 
 SKIP_REBUILD_BRO=false
 

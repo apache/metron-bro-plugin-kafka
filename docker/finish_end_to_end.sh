@@ -23,6 +23,7 @@
 #
 
 shopt -s nocasematch
+set -u # nounset
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 

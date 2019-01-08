@@ -18,6 +18,7 @@
 #
 
 shopt -s nocasematch
+set -u # nounset
 
 #
 # Runs the zookeeper container

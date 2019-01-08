@@ -21,6 +21,9 @@
 # out reading kafka
 #
 
+shopt -s nocasematch
+set -u # nounset
+
 LAST_CMD=
 SKIP_EXCEPTION_TEXT=false
 while read -r CMD; do

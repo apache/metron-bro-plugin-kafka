@@ -18,6 +18,7 @@
 #
 
 shopt -s nocasematch
+set -u # nounset
 
 # Stops the Docker container with a given name
 

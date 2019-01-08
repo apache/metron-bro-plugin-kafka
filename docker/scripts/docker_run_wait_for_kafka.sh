@@ -18,6 +18,7 @@
 #
 
 shopt -s nocasematch
+set -u # nounset
 
 #
 # executes a wait script for kafka

@@ -18,6 +18,7 @@
 #
 
 shopt -s nocasematch
+set -u # nounset
 
 #
 # Downloads sample pcap files to the data directory
