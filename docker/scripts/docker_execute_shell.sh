@@ -26,7 +26,7 @@ shopt -s nocasematch
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --container-name                [OPTIONAL] The Docker container name default = bro"
+  echo "    --container-name                [OPTIONAL] The Docker container name. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "

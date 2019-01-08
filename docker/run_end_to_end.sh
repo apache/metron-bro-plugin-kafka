@@ -31,8 +31,8 @@ OUTPUT_PATH="${ROOT_DIR}"/kafka_output
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --skip-docker-build             Skip build of bro docker machine."
-  echo "    --data-path                     [OPTIONAL] The pcap data path, defaults to ./data"
+  echo "    --skip-docker-build             [OPTIONAL] Skip build of bro docker machine."
+  echo "    --data-path                     [OPTIONAL] The pcap data path. Default: ./data"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
@@ -85,8 +85,6 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-
-
 # run the zookeeper container
 bash "${SCRIPT_DIR}"/docker_run_zookeeper_container.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
@@ -117,11 +115,11 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-#build the bro container
+# build the bro container
 if [[ "$SKIP_REBUILD_BRO" = false ]]; then
   bash "${SCRIPT_DIR}"/build_container.sh \
- --container-directory="${CONTAINER_DIR}" \
- --container-name=metron-bro-docker-container:latest
+   --container-directory="${CONTAINER_DIR}" \
+   --container-name=metron-bro-docker-container:latest
 
   rc=$?; if [[ ${rc} != 0 ]]; then
     exit ${rc}
@@ -131,8 +129,8 @@ fi
 # download the pcaps
 bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
 
-#run the bro container
-#and optionally the passed script _IN_ the container
+# run the bro container
+# and optionally the passed script _IN_ the container
 bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
  --log-path="${LOG_PATH}" \
  --data-path="${DATA_PATH}" \
@@ -171,5 +169,4 @@ bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh | "${ROOT_DIR}"/remove_time
 echo "Run complete"
 echo "The kafka output can be found at ${KAFKA_OUTPUT_FILE}"
 echo "You may now work with the containers if you will.  You need to call finish_end_to_end.sh when you are done"
-
 
