@@ -27,7 +27,7 @@ shopt -s nocasematch
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --network-name                  [OPTIONAL] The Docker network name. Default bro-network"
+  echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
   echo "    -h/--help                       Usage information."
   echo " "
 }

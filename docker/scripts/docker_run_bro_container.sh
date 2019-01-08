@@ -26,10 +26,10 @@ shopt -s nocasematch
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --container-name                [OPTIONAL] The name to give the container. Default bro"
-  echo "    --network-name                  [OPTIONAL] The Docker network name. Default bro-network"
+  echo "    --container-name                [OPTIONAL] The Docker container name. Default: bro"
+  echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
   echo "    --scripts-path                  [OPTIONAL] The path with the scripts you may run in the container. These are your scripts, not the built in scripts"
-  echo "    --data-path                     [OPTIONAL] The name of the directory to map to /root/data"
+  echo "    --data-path                     [OPTIONAL] The name of the directory to map to /root/data in the container"
   echo "    --log-path                      [REQUIRED] The path to log to"
   echo "    --docker-parameter              [OPTIONAL, MULTIPLE] Each parameter with this name will be passed to docker run"
   echo "    -h/--help                       Usage information."

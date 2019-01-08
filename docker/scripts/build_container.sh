@@ -27,7 +27,7 @@ function help {
   echo " "
   echo "usage: ${0}"
   echo "    --container-directory           [REQUIRED] The directory with the Dockerfile"
-  echo "    --container-name                [REQUIRED] The name to give the container"
+  echo "    --container-name                [REQUIRED] The name to give the Docker container"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
