@@ -20,7 +20,7 @@
 shopt -s nocasematch
 
 #
-# run's docker build in a provided directory, with a provided name
+# Runs docker build in a provided directory, with a provided name
 #
 
 function help {
@@ -36,12 +36,13 @@ function help {
 CONTAINER_DIRECTORY=
 CONTAINER_NAME=
 
-# handle command line options
+# Handle command line options
 for i in "$@"; do
   case $i in
   #
   # CONTAINER_DIRECTORY
   #
+  #   --container-directory
   #
     --container-directory=*)
       CONTAINER_DIRECTORY="${i#*=}"
@@ -51,7 +52,7 @@ for i in "$@"; do
   #
   # CONTAINER_NAME
   #
-  #
+  #   --container-name
   #
     --container-name=*)
       CONTAINER_NAME="${i#*=}"
@@ -93,14 +94,15 @@ echo "CONTAINER_DIRECTORY = $CONTAINER_DIRECTORY"
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "==================================================="
 
-# move over to the docker area
+# Move over to the docker area
 cd "${CONTAINER_DIRECTORY}" || exit 1
-pwd
 echo "==================================================="
 echo "docker build of ${CONTAINER_NAME}"
 echo "==================================================="
+
 docker build . --no-cache --tag="${CONTAINER_NAME}"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
+

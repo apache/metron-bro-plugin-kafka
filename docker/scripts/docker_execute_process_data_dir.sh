@@ -34,13 +34,13 @@ function help {
 
 CONTAINER_NAME=bro
 
-# handle command line options
+# Handle command line options
 for i in "$@"; do
   case $i in
   #
   # CONTAINER_NAME
   #
-  #
+  #   --container-name
   #
     --container-name=*)
       CONTAINER_NAME="${i#*=}"
@@ -73,9 +73,11 @@ echo "==================================================="
 
 echo "executing process_data_dir.sh in the bro docker container"
 echo " "
+
 docker exec -w /root "${CONTAINER_NAME}" bash -c "bash built_in_scripts/process_data_dir.sh"
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
 echo " "
+

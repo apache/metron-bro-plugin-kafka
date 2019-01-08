@@ -38,12 +38,13 @@ function help {
 
 DATA_PATH=
 
-# handle command line options
+# Handle command line options
 for i in "$@"; do
   case $i in
   #
   # DATA_PATH
   #
+  #   --data-path
   #
     --data-path=*)
       DATA_PATH="${i#*=}"
@@ -88,18 +89,24 @@ done
 if [[ ! -f "${DATA_PATH}"/example-traffic/exercise-traffic.pcap ]]; then
   wget https://www.bro.org/static/traces/exercise-traffic.pcap -O "${DATA_PATH}"/example-traffic/exercise-traffic.pcap
 fi
+
 if [[ ! -f "${DATA_PATH}"/nitroba/nitroba.pcap ]]; then
   wget http://downloads.digitalcorpora.org/corpora/network-packet-dumps/2008-nitroba/nitroba.pcap -O "${DATA_PATH}"/nitroba/nitroba.pcap
 fi
+
 if [[ ! -f "${DATA_PATH}"/ssh/ssh.pcap ]]; then
   wget https://www.bro.org/static/traces/ssh.pcap -O "${DATA_PATH}"/ssh/ssh.pcap
 fi
+
 if [[ ! -f "${DATA_PATH}"/ftp/ftp.pcap ]]; then
   wget https://github.com/markofu/pcaps/blob/master/PracticalPacketAnalysis/ppa-capture-files/ftp.pcap?raw=true -O "${DATA_PATH}"/ftp/ftp.pcap
 fi
+
 if [[ ! -f "${DATA_PATH}"/radius/radius_localhost.pcapng ]]; then
   wget https://github.com/EmpowerSecurityAcademy/wireshark/blob/master/radius_localhost.pcapng?raw=true -O "${DATA_PATH}"/radius/radius_localhost.pcapng
 fi
+
 if [[ ! -f "${DATA_PATH}"/rfb/rfb.pcap ]]; then
   wget https://github.com/kholia/my-pcaps/blob/master/VNC/07-vnc-openwall-3.7.pcap?raw=true -O "${DATA_PATH}"/rfb/rfb.pcap
 fi
+

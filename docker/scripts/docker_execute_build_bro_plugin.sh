@@ -40,7 +40,7 @@ for i in "$@"; do
   #
   # CONTAINER_NAME
   #
-  #
+  #   --container-name
   #
     --container-name=*)
       CONTAINER_NAME="${i#*=}"
@@ -75,4 +75,6 @@ docker exec -w /root "${CONTAINER_NAME}" bash -c /root/built_in_scripts/build_br
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc};
 fi
+
 echo "Built the bro plugin"
+

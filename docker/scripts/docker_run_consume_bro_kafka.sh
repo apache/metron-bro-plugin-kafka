@@ -40,7 +40,7 @@ for i in "$@"; do
   #
   # NETWORK_NAME
   #
-  #
+  #   --network-name
   #
     --network-name=*)
       NETWORK_NAME="${i#*=}"
@@ -67,4 +67,5 @@ for i in "$@"; do
 done
 
 docker run --rm --network "${NETWORK_NAME}" ches/kafka \
- kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092 --timeout-ms 1000
+  kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092 --timeout-ms 1000
+

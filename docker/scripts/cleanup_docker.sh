@@ -23,12 +23,6 @@ shopt -s nocasematch
 # Stops the containers, and shuts down the NETWORK_NAME
 #
 
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
-
-CONTAINER_NAME=bro
-NETWORK_NAME=bro-network
-
 function help {
   echo " "
   echo "usage: ${0}"
@@ -38,6 +32,11 @@ function help {
   echo " "
   echo " "
 }
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
+
+CONTAINER_NAME=bro
+NETWORK_NAME=bro-network
 
 # handle command line options
 for i in "$@"; do
@@ -79,7 +78,6 @@ echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "NETWORK_NAME   = $NETWORK_NAME"
 echo "==================================================="
 
-
 "${SCRIPT_DIR}"/stop_container.sh --container-name="${CONTAINER_NAME}"
 
 "${SCRIPT_DIR}"/stop_container.sh --container-name=kafka
@@ -87,3 +85,4 @@ echo "==================================================="
 "${SCRIPT_DIR}"/stop_container.sh --container-name=zookeeper
 
 "${SCRIPT_DIR}"/destroy_docker_network.sh --network-name="${NETWORK_NAME}"
+

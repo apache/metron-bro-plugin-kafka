@@ -18,6 +18,7 @@
 #
 
 shopt -s nocasematch
+
 function help {
   echo " "
   echo "usage: ${0}"
@@ -34,7 +35,7 @@ for i in "$@"; do
   #
   # NETWORK_NAME
   #
-  #
+  #   --network-name
   #
     --network-name=*)
       NETWORK_NAME="${i#*=}"
@@ -68,3 +69,4 @@ docker network rm "${NETWORK_NAME}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
+

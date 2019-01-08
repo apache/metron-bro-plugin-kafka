@@ -37,5 +37,6 @@ echo "==========DATA_PATH=============="
 ls /root/data | grep -v 'afile'
 echo "================================="
 
-# process all pcaps in the data directory and sub directories
+# Process all pcaps in the data directory and sub directories
 find /root/data -type f -name "*.pcap*" -exec echo "processing" '{}' \; -exec bro -r '{}' /usr/local/bro/share/bro/site/local.bro -C \;
+

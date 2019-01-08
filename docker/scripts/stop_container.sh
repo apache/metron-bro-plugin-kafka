@@ -35,13 +35,13 @@ function help {
 
 CONTAINER_NAME=
 
-# handle command line options
+# Handle command line options
 for i in "$@"; do
   case $i in
   #
-  # NETWORK_NAME
+  # CONTAINER_NAME
   #
-  #
+  #   --container-name
   #
     --container-name=*)
       CONTAINER_NAME="${i#*=}"
@@ -77,9 +77,9 @@ echo "CONTAINER_NAME= $CONTAINER_NAME"
 echo "==================================================="
 
 docker stop "${CONTAINER_NAME}"
-
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
 docker rm "${CONTAINER_NAME}"
+

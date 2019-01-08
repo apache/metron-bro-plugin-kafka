@@ -23,15 +23,6 @@ set -e # errexit
 set -E # errtrap
 set -o pipefail
 
-SKIP_REBUILD_BRO=false
-
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
-SCRIPT_DIR="${ROOT_DIR}"/scripts
-CONTAINER_DIR="${ROOT_DIR}"/containers/bro-localbuild-container
-LOG_PATH="${ROOT_DIR}"/logs
-DATA_PATH="${ROOT_DIR}"/data
-OUTPUT_PATH="${ROOT_DIR}"/kafka_output
-
 function help {
   echo " "
   echo "usage: ${0}"
@@ -42,12 +33,21 @@ function help {
   echo " "
 }
 
-# handle command line options
+SKIP_REBUILD_BRO=false
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
+SCRIPT_DIR="${ROOT_DIR}"/scripts
+CONTAINER_DIR="${ROOT_DIR}"/containers/bro-localbuild-container
+LOG_PATH="${ROOT_DIR}"/logs
+DATA_PATH="${ROOT_DIR}"/data
+OUTPUT_PATH="${ROOT_DIR}"/kafka_output
+
+# Handle command line options
 for i in "$@"; do
   case $i in
 
   #
-  # FORCE_DOCKER_BUILD
+  # SKIP_REBUILD_BRO
   #
   #   --skip-docker-build
   #
@@ -58,8 +58,6 @@ for i in "$@"; do
 
   #
   # DATA_PATH
-  #
-  #
   #
     --data-path=*)
       DATA_PATH="${i#*=}"
@@ -83,43 +81,43 @@ echo "Running build_container with "
 echo "SKIP_REBUILD_BRO = $SKIP_REBUILD_BRO"
 echo "==================================================="
 
-# create the network
+# Create the network
 bash "${SCRIPT_DIR}"/create_docker_network.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# run the zookeeper container
+# Run the zookeeper container
 bash "${SCRIPT_DIR}"/docker_run_zookeeper_container.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# wait for zookeeper to be up
+# Wait for zookeeper to be up
 bash "${SCRIPT_DIR}"/docker_run_wait_for_zookeeper.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# run the kafka container
+# Run the kafka container
 bash "${SCRIPT_DIR}"/docker_run_kafka_container.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# wait for kafka to be up
+# Wait for kafka to be up
 bash "${SCRIPT_DIR}"/docker_run_wait_for_kafka.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# create the bro topic
+# Create the bro topic
 bash "${SCRIPT_DIR}"/docker_run_create_bro_topic_in_kafka.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# build the bro container
+# Build the bro container
 if [[ "$SKIP_REBUILD_BRO" = false ]]; then
   bash "${SCRIPT_DIR}"/build_container.sh \
    --container-directory="${CONTAINER_DIR}" \
@@ -130,29 +128,27 @@ if [[ "$SKIP_REBUILD_BRO" = false ]]; then
   fi
 fi
 
-# download the pcaps
+# Download the pcaps
 bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
 
-# run the bro container
-# and optionally the passed script _IN_ the container
+# Run the bro container and optionally the passed script _IN_ the container
 bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
- --log-path="${LOG_PATH}" \
- --data-path="${DATA_PATH}" \
- "$EXTRA_ARGS"
-
+  --log-path="${LOG_PATH}" \
+  --data-path="${DATA_PATH}" \
+  "$EXTRA_ARGS"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# build the bro plugin
+# Build the bro plugin
 bash "${SCRIPT_DIR}"/docker_execute_build_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO BUILD PLUGIN.  CHECK LOGS  ${rc}"
   exit ${rc}
 fi
 
-# configure it the bro plugin
+# Configure it the bro plugin
 bash "${SCRIPT_DIR}"/docker_execute_configure_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO CONFIGURE PLUGIN.  CHECK LOGS  ${rc}"

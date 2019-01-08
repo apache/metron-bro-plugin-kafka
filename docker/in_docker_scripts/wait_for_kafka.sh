@@ -32,3 +32,4 @@ fi
 
 cd /root/scripts || exit 1
 bash ./wait-for-it.sh kafka:9092
+
