@@ -21,6 +21,7 @@ shopt -s nocasematch
 set -u # nounset
 set -e # errexit
 set -E # errtrap
+set -o pipefail
 
 #
 # Runs the zookeeper container
