@@ -34,15 +34,6 @@ if [ ! -d /root/data ]; then
   exit 1
 fi
 
-echo "==========DATA_PATH=============="
-ls /root/data
-echo "================================="
-
-
-echo "==========OUTPUT_PATH=============="
-ls /root/bro_output
-echo "================================="
-
 
 for file in /root/data/**/*.pcap*
 do
