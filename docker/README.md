@@ -24,7 +24,8 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 #### Directories
 
 ```bash
-── containers 
+├── bro_output
+├── containers
 │   └── bro-localbuild-container
 ├── data
 ├── in_docker_scripts
@@ -32,7 +33,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 ├── logs
 └── scripts
 ```
-
+- `bro_output`: This directory will have the output of running the `bro -r` commands on the pcap data
 - `containers`: The parent of all of the containers that this project defines.  We use several containers, not all of them ours.
   - `bro-localbuild-container`: The docker container directory for our bro container, used for building bro, the librdkafka, and our plugin, as well as running bro.
 - `data`: The default path for pcap data to be used in tests.

@@ -31,6 +31,8 @@ function help {
   echo "    --scripts-path                  [OPTIONAL] The path with the scripts you may run in the container. These are your scripts, not the built in scripts"
   echo "    --data-path                     [OPTIONAL] The name of the directory to map to /root/data in the container"
   echo "    --log-path                      [REQUIRED] The path to log to"
+  echo "    --bro-output-path               [OPTIONAL] The path to log bro output to. Default: bro_output"
+  echo "    --log-date                      [OPTIONAL] The date to use in building log names. Default: will be generated"
   echo "    --docker-parameter              [OPTIONAL, MULTIPLE] Each parameter with this name will be passed to docker run"
   echo "    -h/--help                       Usage information."
   echo " "
@@ -43,6 +45,9 @@ OUR_SCRIPTS_PATH="${BRO_PLUGIN_PATH}/docker/in_docker_scripts"
 LOG_PATH=
 SCRIPTS_PATH=
 DATA_PATH=
+BRO_OUTPUT_PATH="${BRO_PLUGIN_PATH}/docker/bro_output"
+DATE=$(date)
+LOG_DATE=${DATE// /_}
 
 declare -a DOCKER_PARAMETERS
 
@@ -100,6 +105,27 @@ for i in "$@"; do
     ;;
 
   #
+  # BRO_OUTPUT_PATH
+  #
+  #   --bro-output-path
+  #
+    --bro-output-path=*)
+      BRO_OUTPUT_PATH="${i#*=}"
+      shift # past argument=value
+    ;;
+
+  #
+  # LOG_DATE
+  #
+  #   --log-date
+  #
+    --log-date=*)
+      LOG_DATE="${i#*=}"
+      shift # past argument=value
+    ;;
+
+
+  #
   # DOCKER_PARAMETERS
   #
   #   --docker-parameter
@@ -128,14 +154,13 @@ fi
 echo "Running docker_run_bro_container with "
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "NETWORK_NAME = ${NETWORK_NAME}"
-echo "SCRIPT_PATH = $SCRIPTS_PATH"
-echo "LOG_PATH = $LOG_PATH"
-echo "DATA_PATH = $DATA_PATH"
+echo "SCRIPT_PATH = ${SCRIPTS_PATH}"
+echo "LOG_PATH = ${LOG_PATH}"
+echo "DATA_PATH = ${DATA_PATH}"
+echo "BRO_OUTPUT_PATH = ${BRO_OUTPUT_PATH}"
 echo "DOCKER_PARAMETERS = " "${DOCKER_PARAMETERS[@]}"
 echo "==================================================="
 
-DATE=$(date)
-LOG_DATE=${DATE// /_}
 LOGNAME="bro-test-${LOG_DATE}.log"
 echo "Log will be found on host at ${LOG_PATH}/$LOGNAME"
 
@@ -147,13 +172,16 @@ DOCKER_CMD_BASE[1]="-e RUN_LOG_PATH=\"/root/logs/${LOGNAME}\" "
 DOCKER_CMD_BASE[2]="-v \"${LOG_PATH}:/root/logs\" "
 DOCKER_CMD_BASE[3]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
 DOCKER_CMD_BASE[4]="-v \"${BRO_PLUGIN_PATH}:/root/code\" "
-
+DOCKER_CMD_BASE[5]="-v \"${BRO_OUTPUT_PATH}:/root/bro_output\" "
+DOCKER_CMD_BASE[6]="-e LOG_DATE=\"${LOG_DATE}\" "
+OFFSET=7
 if [[ -n "$SCRIPTS_PATH" ]]; then
-  DOCKER_CMD_BASE[5]="-v \"${SCRIPTS_PATH}:/root/scripts\" "
+  DOCKER_CMD_BASE[$OFFSET]="-v \"${SCRIPTS_PATH}:/root/scripts\" "
+  OFFSET=8
 fi
 
 if [[ -n "$DATA_PATH" ]]; then
-  DOCKER_CMD_BASE[6]="-v \"${DATA_PATH}:/root/data\" "
+  DOCKER_CMD_BASE[$OFFSET]="-v \"${DATA_PATH}:/root/data\" "
 fi
 
 echo "===============Running Docker==============="

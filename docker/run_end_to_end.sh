@@ -41,7 +41,9 @@ CONTAINER_DIR="${ROOT_DIR}"/containers/bro-localbuild-container
 LOG_PATH="${ROOT_DIR}"/logs
 DATA_PATH="${ROOT_DIR}"/data
 OUTPUT_PATH="${ROOT_DIR}"/kafka_output
-
+BRO_OUTPUT_PATH="${ROOT_DIR}"/bro_output
+DATE=$(date)
+LOG_DATE=${DATE// /_}
 # Handle command line options
 for i in "$@"; do
   case $i in
@@ -135,6 +137,8 @@ bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
 bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
   --log-path="${LOG_PATH}" \
   --data-path="${DATA_PATH}" \
+  --bro-output-path="${BRO_OUTPUT_PATH}" \
+  --log-date="${LOG_DATE}" \
   "$EXTRA_ARGS"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
@@ -161,8 +165,7 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-DATE=$(date)
-LOG_DATE=${DATE// /_}
+
 KAFKA_OUTPUT_FILE="${OUTPUT_PATH}/kafka-output-${LOG_DATE}.log"
 bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
 

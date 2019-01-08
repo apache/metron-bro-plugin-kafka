@@ -20,6 +20,7 @@
 
 
 shopt -s nocasematch
+shopt -s globstar nullglob
 
 #
 # For each file in the data directory and sub-directories ( if mapped ), this script will
@@ -37,6 +38,31 @@ echo "==========DATA_PATH=============="
 ls /root/data
 echo "================================="
 
-# Process all pcaps in the data directory and sub directories
-find /root/data -type f -name "*.pcap*" -exec echo "processing" '{}' \; -exec bro -r '{}' /usr/local/bro/share/bro/site/local.bro -C \;
+
+echo "==========OUTPUT_PATH=============="
+ls /root/bro_output
+echo "================================="
+
+
+for file in /root/data/**/*.pcap*
+do
+  # get the file name
+  FILENAME=$(basename $file)
+  # replace the . with _
+  FILENAME=${FILENAME//\./_}
+
+  # create the directory name with the $LOG_DATE
+  LOG_DIR="/root/bro_output/${LOG_DATE}/${FILENAME}"
+
+  # create the directory
+  mkdir -p "${LOG_DIR}" || exit 1
+
+  # cd there
+  cd "${LOG_DIR}" || exit 1
+
+  # run bro
+  bro -r $file /usr/local/bro/share/bro/site/local.bro -C
+done
+
+cd /root || exit 1
 
