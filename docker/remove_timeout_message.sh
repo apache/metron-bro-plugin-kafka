@@ -17,7 +17,7 @@
 #
 
 #
-# remove the exception text from piped input when we have purposefully timed
+# Remove the exception text from piped input when we have purposefully timed
 # out reading kafka
 #
 
@@ -29,6 +29,7 @@ set -o pipefail
 
 LAST_CMD=
 SKIP_EXCEPTION_TEXT=false
+
 while read -r CMD; do
     if [[ ${CMD} =~ ('ERROR Error processing message') ]]; then
         LAST_CMD=${CMD}
@@ -47,3 +48,4 @@ while read -r CMD; do
         fi
     fi
 done
+

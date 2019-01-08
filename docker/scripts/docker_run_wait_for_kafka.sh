@@ -24,7 +24,7 @@ set -E # errtrap
 set -o pipefail
 
 #
-# executes a wait script for kafka
+# Executes a wait script for kafka
 #
 
 function help {
@@ -37,16 +37,15 @@ function help {
 
 DOCKER_SCRIPTS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && cd  .. > /dev/null && cd in_docker_scripts && pwd)"
 
-
 NETWORK_NAME=bro-network
 
-# handle command line options
+# Handle command line options
 for i in "$@"; do
   case $i in
   #
   # NETWORK_NAME
   #
-  #
+  #   --network-name
   #
     --network-name=*)
       NETWORK_NAME="${i#*=}"
@@ -76,9 +75,8 @@ echo "Running docker_run_wait_for_kakfa with"
 echo "NETWORK_NAME = $NETWORK_NAME"
 echo "==================================================="
 
-
 docker run --rm -i -t -w /root --network "${NETWORK_NAME}" -v "${DOCKER_SCRIPTS_PATH}":/root/scripts centos bash -c "bash /root/scripts/wait_for_kafka.sh"
-
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
+

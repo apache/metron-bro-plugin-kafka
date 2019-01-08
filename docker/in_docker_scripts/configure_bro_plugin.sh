@@ -37,5 +37,5 @@ echo "Configuring kafka plugin"
   echo "redef Software::asset_tracking = ALL_HOSTS;"
 } >> /usr/local/bro/share/bro/site/local.bro
 
-
 sed -i '86 a @load policy/protocols/dhcp/known-devices-and-hostnames.bro' /usr/local/bro/share/bro/site/local.bro
+

@@ -37,13 +37,13 @@ function help {
 
 NETWORK_NAME=bro-network
 
-# handle command line options
+# Handle command line options
 for i in "$@"; do
   case $i in
   #
   # NETWORK_NAME
   #
-  #
+  #   --network-name
   #
     --network-name=*)
       NETWORK_NAME="${i#*=}"
@@ -74,8 +74,9 @@ echo "NETWORK_NAME = $NETWORK_NAME"
 echo "==================================================="
 
 docker run -d --name kafka --network "${NETWORK_NAME}" --env ZOOKEEPER_IP=zookeeper ches/kafka
-
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
+
 echo "Started the kafka container with network ${NETWORK_NAME}"
+

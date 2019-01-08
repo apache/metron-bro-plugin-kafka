@@ -40,7 +40,7 @@ for i in "$@"; do
   #
   # CONTAINER_NAME
   #
-  #
+  #   --container-name
   #
     --container-name=*)
       CONTAINER_NAME="${i#*=}"
@@ -72,3 +72,4 @@ echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "==================================================="
 
 docker exec -w /root -i -t "${CONTAINER_NAME}" bash
+

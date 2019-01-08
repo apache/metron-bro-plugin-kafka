@@ -34,8 +34,8 @@ function help {
   echo "    -h/--help                       Usage information."
   echo " "
 }
-DOCKER_SCRIPTS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && cd  .. > /dev/null && cd in_docker_scripts && pwd)"
 
+DOCKER_SCRIPTS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && cd  .. > /dev/null && cd in_docker_scripts && pwd)"
 
 NETWORK_NAME=bro-network
 
@@ -45,7 +45,7 @@ for i in "$@"; do
   #
   # NETWORK_NAME
   #
-  #
+  #   --network-name
   #
     --network-name=*)
       NETWORK_NAME="${i#*=}"
@@ -76,7 +76,7 @@ echo "NETWORK_NAME = $NETWORK_NAME"
 echo "==================================================="
 
 docker run --rm -i -t -w /root --network "${NETWORK_NAME}" -v "${DOCKER_SCRIPTS_PATH}":/root/scripts centos bash -c "bash /root/scripts/wait_for_zk.sh"
-
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
+

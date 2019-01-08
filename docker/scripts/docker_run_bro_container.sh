@@ -46,13 +46,13 @@ DATA_PATH=
 
 declare -a DOCKER_PARAMETERS
 
-# handle command line options
+# Handle command line options
 for i in "$@"; do
   case $i in
   #
   # CONTAINER_NAME
   #
-  #
+  #   --container-name
   #
     --container-name=*)
       CONTAINER_NAME="${i#*=}"
@@ -62,7 +62,7 @@ for i in "$@"; do
   #
   # NETWORK_NAME
   #
-  #
+  #   --network-name
   #
     --network-name=*)
       NETWORK_NAME="${i#*=}"
@@ -72,7 +72,7 @@ for i in "$@"; do
   #
   # LOG_PATH
   #
-  #
+  #   --log-path
   #
     --log-path=*)
       LOG_PATH="${i#*=}"
@@ -82,7 +82,7 @@ for i in "$@"; do
   #
   # DATA_PATH
   #
-  #
+  #   --data-path
   #
     --data-path=*)
       DATA_PATH="${i#*=}"
@@ -92,6 +92,7 @@ for i in "$@"; do
   #
   # SCRIPTS_PATH
   #
+  #   --scripts-path
   #
     --scripts-path=*)
       SCRIPTS_PATH="${i#*=}"
@@ -101,6 +102,7 @@ for i in "$@"; do
   #
   # DOCKER_PARAMETERS
   #
+  #   --docker-parameter
   #
     --docker-parameter=*)
       DOCKER_PARAMETERS=( "${DOCKER_PARAMETERS[@]}" "${i#*=}" )
@@ -137,7 +139,7 @@ LOG_DATE=${DATE// /_}
 LOGNAME="bro-test-${LOG_DATE}.log"
 echo "Log will be found on host at ${LOG_PATH}/$LOGNAME"
 
-#build the docker command line
+# Build the docker command line
 declare -a DOCKER_CMD_BASE
 DOCKER_CMD="bash"
 DOCKER_CMD_BASE[0]="docker run -d -t --name ${CONTAINER_NAME} --network ${NETWORK_NAME} "
@@ -145,9 +147,11 @@ DOCKER_CMD_BASE[1]="-e RUN_LOG_PATH=\"/root/logs/${LOGNAME}\" "
 DOCKER_CMD_BASE[2]="-v \"${LOG_PATH}:/root/logs\" "
 DOCKER_CMD_BASE[3]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
 DOCKER_CMD_BASE[4]="-v \"${BRO_PLUGIN_PATH}:/root/code\" "
+
 if [[ -n "$SCRIPTS_PATH" ]]; then
   DOCKER_CMD_BASE[5]="-v \"${SCRIPTS_PATH}:/root/scripts\" "
 fi
+
 if [[ -n "$DATA_PATH" ]]; then
   DOCKER_CMD_BASE[6]="-v \"${DATA_PATH}:/root/data\" "
 fi
@@ -160,7 +164,6 @@ echo ""
 echo "============================================"
 echo ""
 eval "${DOCKER_CMD_BASE[@]}" "${DOCKER_PARAMETERS[@]}" metron-bro-docker-container:latest "${DOCKER_CMD}"
-
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
@@ -168,3 +171,4 @@ fi
 echo "Started bro container"
 echo " "
 echo " "
+

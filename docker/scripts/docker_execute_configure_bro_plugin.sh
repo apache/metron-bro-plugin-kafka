@@ -34,13 +34,13 @@ function help {
 
 CONTAINER_NAME=bro
 
-# handle command line options
+# Handle command line options
 for i in "$@"; do
   case $i in
   #
   # CONTAINER_NAME
   #
-  #
+  #   --container-name
   #
     --container-name=*)
       CONTAINER_NAME="${i#*=}"
@@ -71,9 +71,10 @@ echo "Running docker_execute_configure_bro_plugin with "
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "==================================================="
 
-
 docker exec -w /root "${CONTAINER_NAME}" bash -c /root/built_in_scripts/configure_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc};
 fi
+
 echo "configured the bro kafka plugin"
+

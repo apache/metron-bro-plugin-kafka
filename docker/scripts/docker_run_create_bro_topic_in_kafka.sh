@@ -39,7 +39,7 @@ for i in "$@"; do
   #
   # NETWORK_NAME
   #
-  #
+  #   --network-name
   #
     --network-name=*)
       NETWORK_NAME="${i#*=}"
@@ -70,4 +70,5 @@ echo "NETWORK_NAME = $NETWORK_NAME"
 echo "==================================================="
 
 docker run --rm --network "${NETWORK_NAME}" ches/kafka \
- kafka-topics.sh --create --topic bro --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
+  kafka-topics.sh --create --topic bro --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
+
