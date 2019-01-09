@@ -28,7 +28,6 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 │   └── bro-localbuild-container
 ├── data
 ├── in_docker_scripts
-├── logs
 ├── scripts
 └── test_output
 ```
@@ -36,7 +35,6 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   - `bro-localbuild-container`: The docker container directory for our bro container, used for building bro, the librdkafka, and our plugin, as well as running bro.
 - `data`: The default path for pcap data to be used in tests.
 - `in_docker_scripts`: This directory is mapped to the bro docker container as /root/built_in_scripts.  These represent the library of scripts we provide to be run in the docker container.
-- `logs`: A default log directory to use while running the scripts.
 - `scripts`: These are the scripts that are run on the host for creating the docker bits, running containers, running or executing commands against containers ( such as executing one of the built_in_scripts ), and cleaning up resources.
 - `test_output`: Directory where the bro logs and kafka logs per test/pcap are stored.
 
@@ -133,7 +131,6 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   --network-name                  [OPTIONAL] The Docker network name. Default: bro-network
   --scripts-path                  [OPTIONAL] The path with the scripts you may run in the container. These are your scripts, not the built in scripts
   --data-path                     [OPTIONAL] The name of the directory to map to /root/data in the container
-  --log-path                      [REQUIRED] The path to log to
   --docker-parameter              [OPTIONAL, MULTIPLE] Each parameter with this name will be passed to docker run
   ```
   
