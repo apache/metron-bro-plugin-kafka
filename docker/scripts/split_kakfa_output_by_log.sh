@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2143,SC1083
+# shellcheck disable=SC2143,SC1083,SC2002,SC2126
 
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
@@ -90,11 +90,12 @@ for log in "${LOG_DIRECTORY}"/*.log
 do
   BASE_LOG_FILE_NAME=$(basename "$log" .log)
   if [[ ! "$BASE_LOG_FILE_NAME" == "kafka-output.log" ]]; then
-    if [[ $(grep -q {\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log) ]]; then
+    echo "${BASE_LOG_FILE_NAME}"
+    if [[ $(grep {\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log) ]]; then
       grep {\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log > "${LOG_DIRECTORY}"/"${BASE_LOG_FILE_NAME}".kafka.log
 
-      KAKFA_COUNT=$( wc -l < "${LOG_DIRECTORY}/${BASE_LOG_FILE_NAME}.kafka.log")
-      BRO_COUNT=$(grep -c -v "#" "${log}")
+      KAKFA_COUNT=$(cat "${LOG_DIRECTORY}/${BASE_LOG_FILE_NAME}.kafka.log" | wc -l)
+      BRO_COUNT=$(grep -v "#" "${log}" | wc -l)
 
       echo "${BASE_LOG_FILE_NAME},${BRO_COUNT},${KAKFA_COUNT}" >> "${RESULTS_FILE}"
     fi

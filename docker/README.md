@@ -248,7 +248,11 @@ Tue_Jan__8_21_54_10_EST_2019
 │   └── stats.log
 ```
 
+14. Creates a results.csv for each pcap that has the line counts of the kafka and the bro output for each log
+15. Prints all the results.csv to the screen
+
 As we can see, the output is a folder named for the test run time, with a sub folder per pcap, containing all the bro logs and the kafka_output.log.
+
 
 At this point the containers are up and running in the background.
 
