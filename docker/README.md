@@ -24,23 +24,21 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 #### Directories
 
 ```bash
-├── bro_output
 ├── containers
 │   └── bro-localbuild-container
 ├── data
 ├── in_docker_scripts
-├── kafka_output
 ├── logs
-└── scripts
+├── scripts
+└── test_output
 ```
-- `bro_output`: This directory will have the output of running the `bro -r` commands on the pcap data
 - `containers`: The parent of all of the containers that this project defines.  We use several containers, not all of them ours.
   - `bro-localbuild-container`: The docker container directory for our bro container, used for building bro, the librdkafka, and our plugin, as well as running bro.
 - `data`: The default path for pcap data to be used in tests.
 - `in_docker_scripts`: This directory is mapped to the bro docker container as /root/built_in_scripts.  These represent the library of scripts we provide to be run in the docker container.
-- `kafka_output`: This directory will have output from running kafka client commands logged to it.
 - `logs`: A default log directory to use while running the scripts.
 - `scripts`: These are the scripts that are run on the host for creating the docker bits, running containers, running or executing commands against containers ( such as executing one of the built_in_scripts ), and cleaning up resources.
+- `test_output`: Directory where the bro logs and kafka logs per test/pcap are stored.
 
 
 #### Scripts that execute _in_ the docker container
@@ -48,7 +46,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 ```bash
 ├── build_bro_plugin.sh
 ├── configure_bro_plugin.sh
-├── process_data_dir.sh
+├── process_data_file.sh
 ├── wait-for-it.sh
 ├── wait_for_kafka.sh
 └── wait_for_zk.sh
@@ -56,7 +54,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 
 - `build_bro_plugin.sh`: Runs `bro-package` to build and install the plugin.
 - `configure_bro_plugin.sh`: Configures the plugin for the kafka container, and routes all traffic types.
-- `process_data_dir.sh`: Runs `bro -r` for each file in the `/root/data` directory and sub-directories.
+- `process_data_file.sh`: Runs `bro -r` on the passed file
 - `wait-for-it.sh`: Waits for a port to be open, so we know something is available.
 - `wait_for_kafka.sh`: Waits for the kafka to be available.
 - `wait_for_zk.sh`: Waits for zookeeper to be available.
@@ -210,9 +208,47 @@ This script does the following:
 
 9. Builds the bro plugin
 10. Configures the bro plugin
-11. Runs bro against all the pcap data
-12. Executes a kafka client to read the data from bro
-13. Stores the output kafka messages in the kafka_output directory for further analysis
+11. Runs bro against all the pcap data, one at a time
+12. Executes a kafka client to read the data from bro for each pcap file
+13. Stores the output kafka messages and the bro logs into the test_output directory
+
+```bash
+>tree Tue_Jan__8_21_54_10_EST_2019
+Tue_Jan__8_21_54_10_EST_2019
+├── exercise-traffic_pcap
+│   ├── capture_loss.log
+│   ├── conn.log
+│   ├── dhcp.log
+│   ├── dns.log
+│   ├── files.log
+│   ├── http.log
+│   ├── kafka-output.log
+│   ├── known_certs.log
+│   ├── known_devices.log
+│   ├── loaded_scripts.log
+│   ├── notice.log
+│   ├── packet_filter.log
+│   ├── reporter.log
+│   ├── smtp.log
+│   ├── software.log
+│   ├── ssl.log
+│   ├── stats.log
+│   ├── weird.log
+│   └── x509.log
+├── ftp_pcap
+│   ├── capture_loss.log
+│   ├── conn.log
+│   ├── files.log
+│   ├── ftp.log
+│   ├── kafka-output.log
+│   ├── loaded_scripts.log
+│   ├── packet_filter.log
+│   ├── reporter.log
+│   ├── software.log
+│   └── stats.log
+```
+
+As we can see, the output is a folder named for the test run time, with a sub folder per pcap, containing all the bro logs and the kafka_output.log.
 
 At this point the containers are up and running in the background.
 

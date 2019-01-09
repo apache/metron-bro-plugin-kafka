@@ -21,11 +21,51 @@
 
 shopt -s nocasematch
 shopt -s globstar nullglob
+shopt -s nocasematch
+set -u # nounset
+set -e # errexit
+set -E # errtrap
+set -o pipefail
 
-#
-# For each file in the data directory and sub-directories ( if mapped ), this script will
-# run bro -r with the local.bro configuration.
-#
+PCAP_FILE_NAME=
+OUTPUT_DIRECTORY_NAME=
+
+# Handle command line options
+for i in "$@"; do
+  case $i in
+  #
+  # PCAP_FILE_NAME
+  #
+  #   --pcap-file-name
+  #
+    --pcap-file-name=*)
+      PCAP_FILE_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
+
+  #
+  # OUTPUT_DIRECTORY_NAME
+  #
+  #   --output-directory-name
+  #
+    --output-directory-name=*)
+      OUTPUT_DIRECTORY_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
+
+  #
+  # Unknown option
+  #
+    *)
+      UNKNOWN_OPTION="${i#*=}"
+      echo "Error: unknown option: $UNKNOWN_OPTION"
+      help
+    ;;
+  esac
+done
+
+echo "PCAP_FILE_NAME = ${PCAP_FILE_NAME}"
+echo "OUTPUT_DIRECTORY_NAME = ${OUTPUT_DIRECTORY_NAME}"
 
 cd /root || exit 1
 echo "================================" >>"${RUN_LOG_PATH}" 2>&1
@@ -33,27 +73,6 @@ if [ ! -d /root/data ]; then
   echo "DATA_PATH has not been set and mapped" >>"${RUN_LOG_PATH}" 2>&1
   exit 1
 fi
-
-
-for file in /root/data/**/*.pcap*
-do
-  # get the file name
-  FILENAME=$(basename $file)
-  # replace the . with _
-  FILENAME=${FILENAME//\./_}
-
-  # create the directory name with the $LOG_DATE
-  LOG_DIR="/root/bro_output/${LOG_DATE}/${FILENAME}"
-
-  # create the directory
-  mkdir -p "${LOG_DIR}" || exit 1
-
-  # cd there
-  cd "${LOG_DIR}" || exit 1
-
-  # run bro
-  bro -r $file /usr/local/bro/share/bro/site/local.bro -C
-done
-
-cd /root || exit 1
-
+cd /root/test_output/"${OUTPUT_DIRECTORY_NAME}" || exit 1
+find /root/data -type f -name "${PCAP_FILE_NAME}" -exec echo "processing" '{}' \; -exec bro -r '{}' /usr/local/bro/share/bro/site/local.bro -C \;
+echo "done with ${PCAP_FILE_NAME}"

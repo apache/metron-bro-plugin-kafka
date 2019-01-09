@@ -31,8 +31,7 @@ function help {
   echo "    --scripts-path                  [OPTIONAL] The path with the scripts you may run in the container. These are your scripts, not the built in scripts"
   echo "    --data-path                     [OPTIONAL] The name of the directory to map to /root/data in the container"
   echo "    --log-path                      [REQUIRED] The path to log to"
-  echo "    --bro-output-path               [OPTIONAL] The path to log bro output to. Default: bro_output"
-  echo "    --log-date                      [OPTIONAL] The date to use in building log names. Default: will be generated"
+  echo "    --test-output-path              [REQUIRED] The path to log test data to"
   echo "    --docker-parameter              [OPTIONAL, MULTIPLE] Each parameter with this name will be passed to docker run"
   echo "    -h/--help                       Usage information."
   echo " "
@@ -45,9 +44,7 @@ OUR_SCRIPTS_PATH="${BRO_PLUGIN_PATH}/docker/in_docker_scripts"
 LOG_PATH=
 SCRIPTS_PATH=
 DATA_PATH=
-BRO_OUTPUT_PATH="${BRO_PLUGIN_PATH}/docker/bro_output"
-DATE=$(date)
-LOG_DATE=${DATE// /_}
+TEST_OUTPUT_PATH=
 
 declare -a DOCKER_PARAMETERS
 
@@ -105,12 +102,12 @@ for i in "$@"; do
     ;;
 
   #
-  # BRO_OUTPUT_PATH
+  # TEST_OUTPUT_PATH
   #
-  #   --bro-output-path
+  #   --test-output-path
   #
-    --bro-output-path=*)
-      BRO_OUTPUT_PATH="${i#*=}"
+    --test-output-path=*)
+      TEST_OUTPUT_PATH="${i#*=}"
       shift # past argument=value
     ;;
 
@@ -157,7 +154,7 @@ echo "NETWORK_NAME = ${NETWORK_NAME}"
 echo "SCRIPT_PATH = ${SCRIPTS_PATH}"
 echo "LOG_PATH = ${LOG_PATH}"
 echo "DATA_PATH = ${DATA_PATH}"
-echo "BRO_OUTPUT_PATH = ${BRO_OUTPUT_PATH}"
+echo "TEST_OUTPUT_PATH = ${TEST_OUTPUT_PATH}"
 echo "DOCKER_PARAMETERS = " "${DOCKER_PARAMETERS[@]}"
 echo "==================================================="
 
@@ -172,12 +169,11 @@ DOCKER_CMD_BASE[1]="-e RUN_LOG_PATH=\"/root/logs/${LOGNAME}\" "
 DOCKER_CMD_BASE[2]="-v \"${LOG_PATH}:/root/logs\" "
 DOCKER_CMD_BASE[3]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
 DOCKER_CMD_BASE[4]="-v \"${BRO_PLUGIN_PATH}:/root/code\" "
-DOCKER_CMD_BASE[5]="-v \"${BRO_OUTPUT_PATH}:/root/bro_output\" "
-DOCKER_CMD_BASE[6]="-e LOG_DATE=\"${LOG_DATE}\" "
-OFFSET=7
+DOCKER_CMD_BASE[5]="-v \"${TEST_OUTPUT_PATH}:/root/test_output\" "
+OFFSET=6
 if [[ -n "$SCRIPTS_PATH" ]]; then
   DOCKER_CMD_BASE[$OFFSET]="-v \"${SCRIPTS_PATH}:/root/scripts\" "
-  OFFSET=8
+  OFFSET=7
 fi
 
 if [[ -n "$DATA_PATH" ]]; then

@@ -40,10 +40,9 @@ SCRIPT_DIR="${ROOT_DIR}"/scripts
 CONTAINER_DIR="${ROOT_DIR}"/containers/bro-localbuild-container
 LOG_PATH="${ROOT_DIR}"/logs
 DATA_PATH="${ROOT_DIR}"/data
-OUTPUT_PATH="${ROOT_DIR}"/kafka_output
-BRO_OUTPUT_PATH="${ROOT_DIR}"/bro_output
 DATE=$(date)
 LOG_DATE=${DATE// /_}
+TEST_OUTPUT_PATH="${ROOT_DIR}/test_output/"${LOG_DATE//:/_}
 # Handle command line options
 for i in "$@"; do
   case $i in
@@ -133,12 +132,13 @@ fi
 # Download the pcaps
 bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
 
+mkdir "${TEST_OUTPUT_PATH}" || exit 1
+
 # Run the bro container and optionally the passed script _IN_ the container
 bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
   --log-path="${LOG_PATH}" \
   --data-path="${DATA_PATH}" \
-  --bro-output-path="${BRO_OUTPUT_PATH}" \
-  --log-date="${LOG_DATE}" \
+  --test-output-path="${TEST_OUTPUT_PATH}" \
   "$EXTRA_ARGS"
 
 rc=$?; if [[ ${rc} != 0 ]]; then
@@ -159,17 +159,39 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-bash "${SCRIPT_DIR}"/docker_execute_process_data_dir.sh
-rc=$?; if [[ ${rc} != 0 ]]; then
-  echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS  ${rc}, please run the finish_end_to_end.sh when you are done."
-  exit ${rc}
-fi
+
+# for each pcap in the data directory, we want to
+# run bro then read the output from kafka
+# and output both of them to the same directory named
+# for the date/pcap
 
 
-KAFKA_OUTPUT_FILE="${OUTPUT_PATH}/kafka-output-${LOG_DATE}.log"
-bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
+for file in "${DATA_PATH}"/**/*.pcap*
+do
+  # get the file name
+  BASE_FILE_NAME=$(basename "${file}")
+  DOCKER_DIRECTORY_NAME=${BASE_FILE_NAME//\./_}
+
+  mkdir "${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}" || exit 1
+  echo "MADE ${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
+  bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
+
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> FAILED TO PROCESS ${file} DATA.  CHECK LOGS  ${rc}, please run the finish_end_to_end.sh when you are done."
+    exit ${rc}
+  fi
+
+  KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
+  bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
+
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"
+  fi
+done
+
+
 
 echo "Run complete"
-echo "The kafka output can be found at ${KAFKA_OUTPUT_FILE}"
+echo "The kafka and bro output can be found at ${TEST_OUTPUT_PATH}"
 echo "You may now work with the containers if you will.  You need to call finish_end_to_end.sh when you are done"
 
