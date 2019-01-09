@@ -19,6 +19,9 @@
 #
 
 shopt -s nocasematch
+set -e # errexit
+set -E # errtrap
+set -o pipefail
 
 #
 # For a given directory, finds all the bro log output, and splits the kafka output file
