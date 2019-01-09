@@ -64,12 +64,12 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 
 ```bash
 ├── build_container.sh
-├── cleanup_containers.sh
+├── cleanup_docker.sh
 ├── create_docker_network.sh
 ├── destroy_docker_network.sh
 ├── docker_execute_build_bro_plugin.sh
 ├── docker_execute_configure_bro_plugin.sh
-├── docker_execute_process_data_dir.sh
+├── docker_execute_process_data_file.sh
 ├── docker_execute_shell.sh
 ├── docker_run_bro_container.sh
 ├── docker_run_consume_bro_kafka.sh
@@ -79,6 +79,8 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 ├── docker_run_wait_for_zookeeper.sh
 ├── docker_run_zookeeper_container.sh
 ├── download_sample_pcaps.sh
+├── print_results.sh
+├── split_kakfa_output_by_log.sh
 └── stop_container.sh
 ```
 
@@ -183,6 +185,16 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ###### Parameters
   ```bash
   --data-path                    [REQURIED] The pcap data path
+  ```
+- `print_results.sh` : Prints the `results.csv` for all the pcaps processed in the given directory to console
+  ###### Parameters
+  ```bash
+  --test-directory               [REQUIRED] The directory for the tests"
+  ```
+- `split_kafka_output_by_log.sh` : For a pcap result directory, will create a LOG.kafka.log for each LOG.log's entry in the kafka-output.log
+  ###### Parameters
+  ```bash
+  --log-directory                [REQUIRED] The directory with the logs"
   ```
 - `stop_container.sh`: Stops and removes a Docker container with a given name
   ###### Parameters
