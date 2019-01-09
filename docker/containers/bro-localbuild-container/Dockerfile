@@ -19,7 +19,7 @@ WORKDIR /root
 
 # install development tools
 RUN yum -y groupinstall "Development Tools"
-RUN yum -y install cmake make gcc gcc-c++ flex bison libpcap libpcap-devel openssl-devel python-devel swig zlib-devel perl cyrus-sasl cyrus-sasl-devel cyrus-sasl-gssapi git
+RUN yum -y install cmake make gcc gcc-c++ flex bison libpcap libpcap-devel openssl-devel python-devel swig zlib-devel perl cyrus-sasl cyrus-sasl-devel cyrus-sasl-gssapi git jq
 
 # install bro
 RUN curl -L https://www.bro.org/downloads/bro-2.5.5.tar.gz | tar xvz
