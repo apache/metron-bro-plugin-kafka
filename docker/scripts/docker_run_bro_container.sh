@@ -33,7 +33,6 @@ function help {
   echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
   echo "    --scripts-path                  [OPTIONAL] The path with the scripts you may run in the container. These are your scripts, not the built in scripts"
   echo "    --data-path                     [OPTIONAL] The name of the directory to map to /root/data in the container"
-  echo "    --log-path                      [REQUIRED] The path to log to"
   echo "    --test-output-path              [REQUIRED] The path to log test data to"
   echo "    --docker-parameter              [OPTIONAL, MULTIPLE] Each parameter with this name will be passed to docker run"
   echo "    -h/--help                       Usage information."
@@ -44,7 +43,6 @@ BRO_PLUGIN_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && cd ../.. &
 CONTAINER_NAME=bro
 NETWORK_NAME=bro-network
 OUR_SCRIPTS_PATH="${BRO_PLUGIN_PATH}/docker/in_docker_scripts"
-LOG_PATH=
 SCRIPTS_PATH=
 DATA_PATH=
 TEST_OUTPUT_PATH=
@@ -71,16 +69,6 @@ for i in "$@"; do
   #
     --network-name=*)
       NETWORK_NAME="${i#*=}"
-      shift # past argument=value
-    ;;
-
-  #
-  # LOG_PATH
-  #
-  #   --log-path
-  #
-    --log-path=*)
-      LOG_PATH="${i#*=}"
       shift # past argument=value
     ;;
 
@@ -115,17 +103,6 @@ for i in "$@"; do
     ;;
 
   #
-  # LOG_DATE
-  #
-  #   --log-date
-  #
-    --log-date=*)
-      LOG_DATE="${i#*=}"
-      shift # past argument=value
-    ;;
-
-
-  #
   # DOCKER_PARAMETERS
   #
   #   --docker-parameter
@@ -146,37 +123,27 @@ for i in "$@"; do
   esac
 done
 
-if [[ -z "$LOG_PATH" ]]; then
-  echo "LOG_PATH must be passed"
-  exit 1
-fi
-
 echo "Running docker_run_bro_container with "
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "NETWORK_NAME = ${NETWORK_NAME}"
 echo "SCRIPT_PATH = ${SCRIPTS_PATH}"
-echo "LOG_PATH = ${LOG_PATH}"
 echo "DATA_PATH = ${DATA_PATH}"
 echo "TEST_OUTPUT_PATH = ${TEST_OUTPUT_PATH}"
 echo "DOCKER_PARAMETERS = " "${DOCKER_PARAMETERS[@]}"
 echo "==================================================="
 
-LOGNAME="bro-test-${LOG_DATE}.log"
-echo "Log will be found on host at ${LOG_PATH}/$LOGNAME"
 
 # Build the docker command line
 declare -a DOCKER_CMD_BASE
 DOCKER_CMD="bash"
 DOCKER_CMD_BASE[0]="docker run -d -t --name ${CONTAINER_NAME} --network ${NETWORK_NAME} "
-DOCKER_CMD_BASE[1]="-e RUN_LOG_PATH=\"/root/logs/${LOGNAME}\" "
-DOCKER_CMD_BASE[2]="-v \"${LOG_PATH}:/root/logs\" "
-DOCKER_CMD_BASE[3]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
-DOCKER_CMD_BASE[4]="-v \"${BRO_PLUGIN_PATH}:/root/code\" "
-DOCKER_CMD_BASE[5]="-v \"${TEST_OUTPUT_PATH}:/root/test_output\" "
-OFFSET=6
+DOCKER_CMD_BASE[2]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
+DOCKER_CMD_BASE[3]="-v \"${BRO_PLUGIN_PATH}:/root/code\" "
+DOCKER_CMD_BASE[4]="-v \"${TEST_OUTPUT_PATH}:/root/test_output\" "
+OFFSET=5
 if [[ -n "$SCRIPTS_PATH" ]]; then
   DOCKER_CMD_BASE[$OFFSET]="-v \"${SCRIPTS_PATH}:/root/scripts\" "
-  OFFSET=7
+  OFFSET=6
 fi
 
 if [[ -n "$DATA_PATH" ]]; then

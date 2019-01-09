@@ -38,7 +38,6 @@ SKIP_REBUILD_BRO=false
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 SCRIPT_DIR="${ROOT_DIR}"/scripts
 CONTAINER_DIR="${ROOT_DIR}"/containers/bro-localbuild-container
-LOG_PATH="${ROOT_DIR}"/logs
 DATA_PATH="${ROOT_DIR}"/data
 DATE=$(date)
 LOG_DATE=${DATE// /_}
@@ -136,7 +135,6 @@ mkdir "${TEST_OUTPUT_PATH}" || exit 1
 
 # Run the bro container and optionally the passed script _IN_ the container
 bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
-  --log-path="${LOG_PATH}" \
   --data-path="${DATA_PATH}" \
   --test-output-path="${TEST_OUTPUT_PATH}" \
   "$EXTRA_ARGS"

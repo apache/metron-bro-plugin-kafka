@@ -68,9 +68,9 @@ echo "PCAP_FILE_NAME = ${PCAP_FILE_NAME}"
 echo "OUTPUT_DIRECTORY_NAME = ${OUTPUT_DIRECTORY_NAME}"
 
 cd /root || exit 1
-echo "================================" >>"${RUN_LOG_PATH}" 2>&1
+echo "================================"
 if [ ! -d /root/data ]; then
-  echo "DATA_PATH has not been set and mapped" >>"${RUN_LOG_PATH}" 2>&1
+  echo "DATA_PATH has not been set and mapped"
   exit 1
 fi
 cd /root/test_output/"${OUTPUT_DIRECTORY_NAME}" || exit 1

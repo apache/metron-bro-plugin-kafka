@@ -25,19 +25,19 @@ shopt -s nocasematch
 
 cd /root || exit 1
 
-echo "================================" >>"${RUN_LOG_PATH}" 2>&1
+echo "================================"
 
-bro-pkg install code --force | tee "${RUN_LOG_PATH}"
+bro-pkg install code --force
 rc=$?; if [[ ${rc} != 0 ]]; then
-  echo "ERROR running bro-pkg install ${rc}" >>"${RUN_LOG_PATH}"
+  echo "ERROR running bro-pkg install ${rc}"
   exit ${rc}
 fi
 
-echo "================================" >>"${RUN_LOG_PATH}" 2>&1
+echo "================================"
+echo ""
 
-echo "================================" >>"${RUN_LOG_PATH}" 2>&1
+bro -N Apache::Kafka
 
-bro -N Apache::Kafka | tee "${RUN_LOG_PATH}"
-
-echo "================================" >>"${RUN_LOG_PATH}" 2>&1
+echo "================================"
+echo ""
 
