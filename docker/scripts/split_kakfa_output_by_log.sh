@@ -90,7 +90,6 @@ for log in "${LOG_DIRECTORY}"/*.log
 do
   BASE_LOG_FILE_NAME=$(basename "$log" .log)
   if [[ ! "$BASE_LOG_FILE_NAME" == "kafka-output.log" ]]; then
-    echo "${BASE_LOG_FILE_NAME}"
     if [[ $(grep {\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log) ]]; then
       grep {\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log > "${LOG_DIRECTORY}"/"${BASE_LOG_FILE_NAME}".kafka.log
 
