@@ -187,11 +187,13 @@ do
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"
   fi
+
+  "${SCRIPT_DIR}"/split_kakfa_output_by_log.sh --log-directory="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
 done
 
+"${SCRIPT_DIR}"/print_results.sh --test-directory="${TEST_OUTPUT_PATH}"
 
-
+echo ""
 echo "Run complete"
 echo "The kafka and bro output can be found at ${TEST_OUTPUT_PATH}"
 echo "You may now work with the containers if you will.  You need to call finish_end_to_end.sh when you are done"
-

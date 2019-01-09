@@ -18,6 +18,10 @@
 #
 
 shopt -s nocasematch
+set -u # nounset
+set -e # errexit
+set -E # errtrap
+set -o pipefail
 
 function help {
   echo " "

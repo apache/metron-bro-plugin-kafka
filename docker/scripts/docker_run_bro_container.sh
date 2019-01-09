@@ -18,6 +18,9 @@
 #
 
 shopt -s nocasematch
+set -e # errexit
+set -E # errtrap
+set -o pipefail
 
 #
 # Runs the bro container

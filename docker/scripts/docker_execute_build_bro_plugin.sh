@@ -18,6 +18,10 @@
 #
 
 shopt -s nocasematch
+set -u # nounset
+set -e # errexit
+set -E # errtrap
+set -o pipefail
 
 #
 # Executes the build_bro_plugin.sh script in the container

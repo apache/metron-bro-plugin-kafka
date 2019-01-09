@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2143,SC1083
 
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
@@ -18,47 +19,33 @@
 #
 
 shopt -s nocasematch
-set -u # nounset
-set -e # errexit
-set -E # errtrap
-set -o pipefail
+
 #
-# Runs docker build in a provided directory, with a provided name
+# For a given directory, finds all the bro log output, and splits the kafka output file
+# by bro log, such that there is a bro log -> bro log kafka log
 #
 
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --container-directory           [REQUIRED] The directory with the Dockerfile"
-  echo "    --container-name                [REQUIRED] The name to give the Docker container"
+  echo "    --log-directory                 [REQUIRED] The directory with the logs"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
 }
 
-CONTAINER_DIRECTORY=
-CONTAINER_NAME=
+LOG_DIRECTORY=
 
 # Handle command line options
 for i in "$@"; do
   case $i in
   #
-  # CONTAINER_DIRECTORY
+  # LOG_DIRECTORY
   #
-  #   --container-directory
+  #   --log-directory
   #
-    --container-directory=*)
-      CONTAINER_DIRECTORY="${i#*=}"
-      shift # past argument=value
-    ;;
-
-  #
-  # CONTAINER_NAME
-  #
-  #   --container-name
-  #
-    --container-name=*)
-      CONTAINER_NAME="${i#*=}"
+    --log-directory=*)
+      LOG_DIRECTORY="${i#*=}"
       shift # past argument=value
     ;;
 
@@ -82,30 +69,35 @@ for i in "$@"; do
   esac
 done
 
-if [[ -z "$CONTAINER_DIRECTORY" ]]; then
-  echo "CONTAINER_DIRECTORY must be passed"
-  exit 1
-fi
-
-if [[ -z "$CONTAINER_NAME" ]]; then
-  echo "CONTAINER_NAME must be passed"
+if [[ -z "$LOG_DIRECTORY" ]]; then
+  echo "$LOG_DIRECTORY must be passed"
   exit 1
 fi
 
 echo "Running with "
-echo "CONTAINER_DIRECTORY = $CONTAINER_DIRECTORY"
-echo "CONTAINER_NAME = $CONTAINER_NAME"
+echo "$LOG_DIRECTORY = $LOG_DIRECTORY"
 echo "==================================================="
 
 # Move over to the docker area
-cd "${CONTAINER_DIRECTORY}" || exit 1
-echo "==================================================="
-echo "docker build of ${CONTAINER_NAME}"
-echo "==================================================="
+cd "${LOG_DIRECTORY}" || exit 1
 
-docker build . --no-cache --tag="${CONTAINER_NAME}"
+# for each log file, that is NOT KAFKA_OUTPUT_FILE we want to get the name
+# and extract the start
+# then we want to grep that name > name.kafka.log from the KAFKA_OUTPUT_FILE
+RESULTS_FILE="${LOG_DIRECTORY}/results.csv"
+echo "LOG,BRO_COUNT,KAFKA_COUNT" >> "${RESULTS_FILE}"
+for log in "${LOG_DIRECTORY}"/*.log
+do
+  BASE_LOG_FILE_NAME=$(basename "$log" .log)
+  if [[ ! "$BASE_LOG_FILE_NAME" == "kafka-output.log" ]]; then
+    if [[ $(grep -q {\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log) ]]; then
+      grep {\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log > "${LOG_DIRECTORY}"/"${BASE_LOG_FILE_NAME}".kafka.log
 
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc}
-fi
+      KAKFA_COUNT=$( wc -l < "${LOG_DIRECTORY}/${BASE_LOG_FILE_NAME}.kafka.log")
+      BRO_COUNT=$(grep -c -v "#" "${log}")
+
+      echo "${BASE_LOG_FILE_NAME},${BRO_COUNT},${KAKFA_COUNT}" >> "${RESULTS_FILE}"
+    fi
+  fi
+done
 

@@ -18,6 +18,10 @@
 #
 
 shopt -s nocasematch
+set -u # nounset
+set -e # errexit
+set -E # errtrap
+set -o pipefail
 
 #
 # Runs a kafka container with the console consumer for the bro topic.  The consumer should quit when it has read

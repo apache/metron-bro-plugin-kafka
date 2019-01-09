@@ -18,6 +18,10 @@
 #
 
 shopt -s nocasematch
+set -u # nounset
+set -e # errexit
+set -E # errtrap
+set -o pipefail
 
 #
 # Executes the configure_bro_plugin.sh in the docker container

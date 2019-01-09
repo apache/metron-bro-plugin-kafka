@@ -23,28 +23,34 @@ set -e # errexit
 set -E # errtrap
 set -o pipefail
 
+#
+# Prints all the results.csv files
+#
+
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
-  echo "    -h/--help                       Usage information"
+  echo "    --test-directory           [REQUIRED] The directory for the tests"
+  echo "    -h/--help                   Usage information."
+  echo " "
   echo " "
 }
 
-NETWORK_NAME=bro-network
+TEST_DIRECTORY=
 
-# handle command line options
+# Handle command line options
 for i in "$@"; do
   case $i in
   #
-  # NETWORK_NAME
+  # TEST_DIRECTORY
   #
-  #   --network-name
+  #   --test-directory
   #
-    --network-name=*)
-      NETWORK_NAME="${i#*=}"
+    --test-directory=*)
+      TEST_DIRECTORY="${i#*=}"
       shift # past argument=value
     ;;
+
   #
   # -h/--help
   #
@@ -65,12 +71,21 @@ for i in "$@"; do
   esac
 done
 
-echo "Running destroy_docker_network with "
-echo "NETWORK_NAME = $NETWORK_NAME"
+if [[ -z "$TEST_DIRECTORY" ]]; then
+  echo "$TEST_DIRECTORY must be passed"
+  exit 1
+fi
+
+
+echo "Running with "
+echo "TEST_DIRECTORY = $TEST_DIRECTORY"
 echo "==================================================="
 
-docker network rm "${NETWORK_NAME}"
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc}
-fi
+# Move over to the docker area
+cd "${TEST_DIRECTORY}" || exit 1
+find "${TEST_DIRECTORY}" -name "results.csv" \
+  -exec echo "-->" '{}' \; \
+  -exec column -t -s ',' '{}' \; \
+  -exec echo "========================================================" \; \
+  -exec echo "" \;
 
