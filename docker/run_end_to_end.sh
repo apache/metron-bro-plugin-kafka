@@ -172,15 +172,20 @@ do
 
   mkdir "${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}" || exit 1
   echo "MADE ${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
+
+  # get the current offset in kafka
+  # this is where we are going to _start_
+  OFFSET=$(bash "${SCRIPT_DIR}"/docker_run_get_offset_bro_kafka.sh | sed 's/^bro:0:\(.*\)$/\1/')
+  echo "OFFSET------------------> ${OFFSET}"
+
   bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
 
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO PROCESS ${file} DATA.  CHECK LOGS, please run the finish_end_to_end.sh when you are done."
     exit ${rc}
   fi
-
   KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
-  bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
+  bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh --offset=$OFFSET | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
 
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"

@@ -72,6 +72,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 ├── docker_run_bro_container.sh
 ├── docker_run_consume_bro_kafka.sh
 ├── docker_run_create_bro_topic_in_kafka.sh
+├── docker_run_get_offset_bro_topic_in_kafka.sh
 ├── docker_run_kafka_container.sh
 ├── docker_run_wait_for_kafka.sh
 ├── docker_run_wait_for_zookeeper.sh
@@ -139,10 +140,17 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   > You can then execute these scripts or use them together as part of testing etc. by creating `docker execute` scripts like those here.
   > The goal is to allow an individual to use and maintain their own library of scripts to use instead of, or in concert with the scripts maintained by this project.
   
-- `docker_run_consume_bro_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic bro --from-beginning --bootstrap-server kafka:9092`
+- `docker_run_consume_bro_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic bro --offset $OFFSET --partition 0 --bootstrap-server kafka:9092`
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: bro-network
+  --offset                       [OPTIONAL] The kafka offset. Default: -1
+  ```
+- `docker_run_get_offset_bro_kafka.sh`: Runs an instance of the kafka container and gets the current offset for the bro topic
+  ###### Parameters
+  ```bash
+  --network-name                 [OPTIONAL] The Docker network name. Default: bro-network
+  --offset                       [OPTIONAL] The kafka offset. Default: -1
   ```
 - `docker_run_create_bro_topic_in_kafka.sh`: Runs an instance of the kafka container, creating the `bro` topic
   ###### Parameters
