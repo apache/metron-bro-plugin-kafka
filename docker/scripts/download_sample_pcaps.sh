@@ -30,7 +30,7 @@ set -o pipefail
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --data-path                    [REQURIED] The pcap data path"
+  echo "    --data-path                    [REQUIRED] The pcap data path"
   echo "    -h/--help                      Usage information."
   echo " "
   echo " "

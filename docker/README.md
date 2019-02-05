@@ -50,7 +50,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 └── wait_for_zk.sh
 ```
 
-- `build_bro_plugin.sh`: Runs `bro-package` to build and install the plugin.
+- `build_bro_plugin.sh`: Runs `bro-pkg` to build and install the plugin.
 - `configure_bro_plugin.sh`: Configures the plugin for the kafka container, and routes all traffic types.
 - `process_data_file.sh`: Runs `bro -r` on the passed file
 - `wait-for-it.sh`: Waits for a port to be open, so we know something is available.
@@ -181,17 +181,17 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 
   ###### Parameters
   ```bash
-  --data-path                    [REQURIED] The pcap data path
+  --data-path                    [REQUIRED] The pcap data path
   ```
 - `print_results.sh` : Prints the `results.csv` for all the pcaps processed in the given directory to console
   ###### Parameters
   ```bash
-  --test-directory               [REQUIRED] The directory for the tests"
+  --test-directory               [REQUIRED] The directory for the tests
   ```
 - `split_kafka_output_by_log.sh` : For a pcap result directory, will create a LOG.kafka.log for each LOG.log's entry in the kafka-output.log
   ###### Parameters
   ```bash
-  --log-directory                [REQUIRED] The directory with the logs"
+  --log-directory                [REQUIRED] The directory with the logs
   ```
 - `stop_container.sh`: Stops and removes a Docker container with a given name
   ###### Parameters

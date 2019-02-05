@@ -175,7 +175,7 @@ do
   bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
 
   rc=$?; if [[ ${rc} != 0 ]]; then
-    echo "ERROR> FAILED TO PROCESS ${file} DATA.  CHECK LOGS  ${rc}, please run the finish_end_to_end.sh when you are done."
+    echo "ERROR> FAILED TO PROCESS ${file} DATA.  CHECK LOGS, please run the finish_end_to_end.sh when you are done."
     exit ${rc}
   fi
 

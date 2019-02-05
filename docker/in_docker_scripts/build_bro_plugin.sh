@@ -20,7 +20,7 @@
 shopt -s nocasematch
 
 #
-# Runs bro-package to build and install the plugin
+# Runs bro-pkg to build and install the plugin
 #
 
 cd /root || exit 1
