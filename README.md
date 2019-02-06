@@ -114,7 +114,7 @@ redef Kafka::kafka_conf = table(
 
 ### Example 2 - Send all active logs
 
-This plugin has the ability send all active logs to kafka with the following configuration.
+This plugin has the ability send all active logs to the "bro" kafka topic with the following configuration.
 
 ```
 @load packages/metron-bro-plugin-kafka/Apache/Kafka
@@ -138,7 +138,7 @@ redef Kafka::kafka_conf = table(
 );
 ```
 
-### Example 4 - Send logs to unique topics
+### Example 4 - Send each bro log to a unique topic
 
 It is also possible to send each log stream to a uniquely named topic.  The goal in this example is to send all HTTP records to a Kafka topic named `http` and all DNS records to a separate Kafka topic named `dns`.
  * The `topic_name` value must be set to an empty string.
@@ -221,6 +221,32 @@ event bro_init() &priority=-10
     ]);
 }
 ```
+
+### Example 6 - Sending a log to multiple topics
+
+In order to send a single bro log to multiple topics, you need to create a custom filter.  In this example, the RADIUS and DNS logs are sent to the bro topic (the default topic), and the RADIUS log is also sent to the shew_bro_radius topic of the same kafka cluster.
+
+```
+@load packages/metron-bro-plugin-kafka/Apache/Kafka
+redef Kafka::logs_to_send = set(RADIUS::LOG, DNS::LOG);
+redef Kafka::kafka_conf = table(
+    ["metadata.broker.list"] = "server1.example.com:9092,server2.example.com:9092"
+);
+redef Kafka::tag_json = T;
+
+event bro_init() &priority=-10
+{
+    # Also send RADIUS to the shew_bro_radius topic
+    local shew_radius_filter: Log::Filter = [
+        $name = "kafka-radius-shew",
+        $writer = Log::WRITER_KAFKAWRITER,
+        $path = "shew_bro_radius"
+    ];
+    Log::add_filter(RADIUS::LOG, shew_radius_filter);
+}
+```
+
+Note:  If you were to add a log filter with the same `$path` as an existing filter, Bro will append "-N", where N is an integer starting at 2, to the end of the log path so that each filter has its own unique log path.
 
 #### Notes
  * `logs_to_send` is mutually exclusive with `$pred`, thus for each log you want to set `$pred` on, you must individually setup a `Log::add_filter` and refrain from including that log in `logs_to_send`.
