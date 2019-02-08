@@ -66,16 +66,7 @@ KafkaWriter::KafkaWriter(WriterFrontend* frontend):
 }
 
 KafkaWriter::~KafkaWriter()
-{
-
-    // Cleanup all the things
-    delete topic;
-    delete producer;
-    delete formatter;
-    delete conf;
-    delete topic_conf;
-
-}
+{}
 
 string KafkaWriter::GetConfigValue(const WriterInfo& info, const string name) const
 {
@@ -219,6 +210,8 @@ bool KafkaWriter::DoFinish(double network_time)
     delete topic;
     delete producer;
     delete formatter;
+    delete conf;
+    delete topic_conf;
 
     return success;
 }
