@@ -77,6 +77,15 @@ KafkaWriter::~KafkaWriter()
 
 }
 
+string KafkaWriter::GetConfigValue(const WriterInfo& info, const string name) const
+{
+    map<const char*, const char*>::const_iterator it = info.config.find(name.c_str());
+    if (it == info.config.end())
+        return string();
+    else
+        return it->second;
+}
+
 bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading::Field* const* fields)
 {
     // Timeformat object, default to TS_EPOCH
@@ -85,6 +94,14 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     // if no global 'topic_name' is defined, use the log stream's 'path'
     if(topic_name.empty()) {
         topic_name = info.path;
+    }
+
+    // Allow overriding of the kafka topic via the Bro script constant "kafka_topic"
+    // which can be applied when adding a new Bro log filter.
+    topic_name_override = GetConfigValue(info, "kafka_topic");
+
+    if(!topic_name_override.empty()) {
+        topic_name = topic_name_override;
     }
 
     // format timestamps

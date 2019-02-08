@@ -240,7 +240,7 @@ event bro_init() &priority=-10
     local shew_radius_filter: Log::Filter = [
         $name = "kafka-radius-shew",
         $writer = Log::WRITER_KAFKAWRITER,
-        $path = "shew_bro_radius"
+        $kafka_topic = "shew_bro_radius"
     ];
     Log::add_filter(RADIUS::LOG, shew_radius_filter);
 }
