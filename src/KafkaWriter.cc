@@ -87,9 +87,9 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
         topic_name = info.path;
     }
 
-    // Allow overriding of the kafka topic via the Bro script constant "kafka_topic"
+    // Allow overriding of the kafka topic via the Bro script constant "topic_name"
     // which can be applied when adding a new Bro log filter.
-    topic_name_override = GetConfigValue(info, "kafka_topic");
+    topic_name_override = GetConfigValue(info, "topic_name");
 
     if(!topic_name_override.empty()) {
         topic_name = topic_name_override;
