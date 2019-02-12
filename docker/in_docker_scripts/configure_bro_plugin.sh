@@ -38,4 +38,5 @@ echo "Configuring kafka plugin"
 } >> /usr/local/bro/share/bro/site/local.bro
 
 sed -i '86 a @load policy/protocols/dhcp/known-devices-and-hostnames.bro' /usr/local/bro/share/bro/site/local.bro
+sed -i 's%^@load protocols/ssl/log-hostcerts-only%#&%' /usr/local/bro/share/bro/site/local.bro
 
