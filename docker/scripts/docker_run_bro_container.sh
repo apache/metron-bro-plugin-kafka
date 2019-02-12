@@ -137,13 +137,13 @@ echo "==================================================="
 declare -a DOCKER_CMD_BASE
 DOCKER_CMD="bash"
 DOCKER_CMD_BASE[0]="docker run -d -t --name ${CONTAINER_NAME} --network ${NETWORK_NAME} "
-DOCKER_CMD_BASE[2]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
-DOCKER_CMD_BASE[3]="-v \"${BRO_PLUGIN_PATH}:/root/code\" "
-DOCKER_CMD_BASE[4]="-v \"${TEST_OUTPUT_PATH}:/root/test_output\" "
-OFFSET=5
+DOCKER_CMD_BASE[1]="-v \"${OUR_SCRIPTS_PATH}:/root/built_in_scripts\" "
+DOCKER_CMD_BASE[2]="-v \"${BRO_PLUGIN_PATH}:/root/code\" "
+DOCKER_CMD_BASE[3]="-v \"${TEST_OUTPUT_PATH}:/root/test_output\" "
+OFFSET=4
 if [[ -n "$SCRIPTS_PATH" ]]; then
   DOCKER_CMD_BASE[$OFFSET]="-v \"${SCRIPTS_PATH}:/root/scripts\" "
-  OFFSET=6
+  OFFSET=5
 fi
 
 if [[ -n "$DATA_PATH" ]]; then
