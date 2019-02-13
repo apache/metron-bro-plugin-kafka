@@ -91,11 +91,6 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     // Timeformat object, default to TS_EPOCH
     threading::formatter::JSON::TimeFormat tf = threading::formatter::JSON::TS_EPOCH;
 
-    // if no global 'topic_name' is defined, use the log stream's 'path'
-    if(topic_name.empty()) {
-        topic_name = info.path;
-    }
-
     // Allow overriding of the kafka topic via the Bro script constant "topic_name"
     // which can be applied when adding a new Bro log filter.
     topic_name_override = GetConfigValue(info, "topic_name");
