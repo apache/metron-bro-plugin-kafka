@@ -222,13 +222,20 @@ event bro_init() &priority=-10
 }
 ```
 
+#### Notes
+ * `logs_to_send` is mutually exclusive with `$pred`, thus for each log you want to set `$pred` on, you must individually setup a `Log::add_filter` and refrain from including that log in `logs_to_send`.
+ * In Bro 2.5.x the bro project introduced a [logger function](https://www.bro.org/sphinx/cluster/index.html#logger) which removes the logging functions from the manager thread, and taking advantage of that is highly recommended.  If you are running this plugin on Bro 2.4.x, you may encounter issues where the manager thread is taking on too much responsibility and pinning a single CPU core without the ability to spread the load across additional cores.  In this case, it may be in your best interest to prefer using a bro logging predicate over filtering in your Metron cluster [using Stellar](https://github.com/apache/metron/tree/master/metron-stellar/stellar-common) in order to lessen the load of that thread.
+ * You can also filter IPv6 logs from within your Metron cluster [using Stellar](https://github.com/apache/metron/tree/master/metron-stellar/stellar-common#is_ip).  In that case, you wouldn't apply a predicate in your bro configuration, and instead Stellar would filter the logs out before they were processed by the enrichment layer of Metron.
+ * It is also possible to use the `is_v6_subnet()` bro function in your predicate, as of their [2.5 release](https://www.bro.org/sphinx-git/install/release-notes.html#bro-2-5), however the above example should work on [bro 2.4](https://www.bro.org/sphinx-git/install/release-notes.html#bro-2-4) and newer, which has been the focus of the kafka plugin.
+
 ### Example 6 - Sending a log to multiple topics
 
-In order to send a single bro log to multiple topics, you need to create a custom filter.  In this example, the RADIUS and DNS logs are sent to the bro topic (the default topic), and the RADIUS log is also sent to the shew_bro_radius topic of the same kafka cluster.
+You are able to send a single bro log to multiple different kafka topics in the same kafka cluster by overriding the default topic (configured with `Kafka::topic_name`) by creating a custom bro `Log::Filter`.  In this example, the DHCP, RADIUS, and DNS logs are sent to the "bro" topic; the RADIUS log is duplicated to the "shew_bro_radius" topic; and the DHCP log is duplicated to the "shew_bro_dhcp" topic.
 
 ```
 @load packages/metron-bro-plugin-kafka/Apache/Kafka
-redef Kafka::logs_to_send = set(RADIUS::LOG, DNS::LOG);
+redef Kafka::logs_to_send = set(DHCP::LOG, RADIUS::LOG, DNS::LOG);
+redef Kafka::topic_name = "bro";
 redef Kafka::kafka_conf = table(
     ["metadata.broker.list"] = "server1.example.com:9092,server2.example.com:9092"
 );
@@ -236,23 +243,27 @@ redef Kafka::tag_json = T;
 
 event bro_init() &priority=-10
 {
-    # Also send RADIUS to the shew_bro_radius topic
+    # Send RADIUS to the shew_bro_radius topic
     local shew_radius_filter: Log::Filter = [
         $name = "kafka-radius-shew",
         $writer = Log::WRITER_KAFKAWRITER,
-        $config = table(["topic_name"] = "shew_bro_radius"
+        $path = "shew_bro_radius"
+        $config = table(["topic_name"] = "shew_bro_radius")
     ];
     Log::add_filter(RADIUS::LOG, shew_radius_filter);
+
+    # Send DHCP to the shew_bro_dhcp topic
+    local shew_dhcp_filter: Log::Filter = [
+        $name = "kafka-dhcp-shew",
+        $writer = Log::WRITER_KAFKAWRITER,
+        $path = "shew_bro_dhcp"
+        $config = table(["topic_name"] = "shew_bro_dhcp")
+    ];
+    Log::add_filter(DHCP::LOG, shew_dhcp_filter);
 }
 ```
 
-Note:  If you were to add a log filter with the same `$path` as an existing filter, Bro will append "-N", where N is an integer starting at 2, to the end of the log path so that each filter has its own unique log path.
-
-#### Notes
- * `logs_to_send` is mutually exclusive with `$pred`, thus for each log you want to set `$pred` on, you must individually setup a `Log::add_filter` and refrain from including that log in `logs_to_send`.
- * In Bro 2.5.x the bro project introduced a [logger function](https://www.bro.org/sphinx/cluster/index.html#logger) which removes the logging functions from the manager thread, and taking advantage of that is highly recommended.  If you are running this plugin on Bro 2.4.x, you may encounter issues where the manager thread is taking on too much responsibility and pinning a single CPU core without the ability to spread the load across additional cores.  In this case, it may be in your best interest to prefer using a bro logging predicate over filtering in your Metron cluster [using Stellar](https://github.com/apache/metron/tree/master/metron-stellar/stellar-common) in order to lessen the load of that thread.
- * You can also filter IPv6 logs from within your Metron cluster [using Stellar](https://github.com/apache/metron/tree/master/metron-stellar/stellar-common#is_ip).  In that case, you wouldn't apply a predicate in your bro configuration, and instead Stellar would filter the logs out before they were processed by the enrichment layer of Metron.
- * It is also possible to use the `is_v6_subnet()` bro function in your predicate, as of their [2.5 release](https://www.bro.org/sphinx-git/install/release-notes.html#bro-2-5), however the above example should work on [bro 2.4](https://www.bro.org/sphinx-git/install/release-notes.html#bro-2-4) and newer, which has been the focus of the kafka plugin.
+_Note_:  Because `Kafka::tag_json` is set to True in this example, the value of `$path` is used as the tag for each `Log::Filter`. If you were to add a log filter with the same `$path` as an existing filter, Bro will append "-N", where N is an integer starting at 2, to the end of the log path so that each filter has its own unique log path. For instance, the second instance of `conn` would become `conn-2`.
 
 ## Settings
 
