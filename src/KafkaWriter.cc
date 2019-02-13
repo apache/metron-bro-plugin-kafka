@@ -20,15 +20,18 @@
 using namespace logging;
 using namespace writer;
 
+// The Constructor is called once for each log filter that uses this log writer.
 KafkaWriter::KafkaWriter(WriterFrontend* frontend):
     WriterBackend(frontend),
     formatter(NULL),
     producer(NULL),
     topic(NULL)
 {
-  // need thread-local copies of all user-defined settings coming from
-  // bro scripting land.  accessing these is not thread-safe and 'DoInit'
-  // is potentially accessed from multiple threads.
+  /**
+   * We need thread-local copies of all user-defined settings coming from bro
+   * scripting land.  accessing these is not thread-safe and 'DoInit' is
+   * potentially accessed from multiple threads.
+   */
 
   // tag_json - thread local copy
   tag_json = BifConst::Kafka::tag_json;
@@ -66,7 +69,9 @@ KafkaWriter::KafkaWriter(WriterFrontend* frontend):
 }
 
 KafkaWriter::~KafkaWriter()
-{}
+{
+  // Cleanup must happen in DoFinish, not in the destructor
+}
 
 string KafkaWriter::GetConfigValue(const WriterInfo& info, const string name) const
 {
@@ -77,6 +82,10 @@ string KafkaWriter::GetConfigValue(const WriterInfo& info, const string name) co
         return it->second;
 }
 
+/**
+ * DoInit is called once for each call to the constructor, but in a separate
+ * thread
+ */
 bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading::Field* const* fields)
 {
     // Timeformat object, default to TS_EPOCH
@@ -95,11 +104,13 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
         topic_name = topic_name_override;
     }
 
-    // format timestamps
-    // NOTE: This string comparision implementation is currently the necessary
-    // way to do it, as there isn't a way to pass the Bro enum into C++ enum.
-    // This makes the user interface consistent with the existing Bro Logging
-    // configuration for the ASCII log output.
+    /**
+     * Format the timestamps
+     * NOTE: This string comparision implementation is currently the necessary
+     * way to do it, as there isn't a way to pass the Bro enum into C++ enum.
+     * This makes the user interface consistent with the existing Bro Logging
+     * configuration for the ASCII log output.
+     */
     if ( strcmp(json_timestamps.c_str(), "JSON::TS_EPOCH") == 0 ) {
       tf = threading::formatter::JSON::TS_EPOCH;
     }
@@ -185,7 +196,8 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
 /**
  * Writer-specific method called just before the threading system is
  * going to shutdown. It is assumed that once this messages returns,
- * the thread can be safely terminated.
+ * the thread can be safely terminated. As such, all resources created must be
+ * removed here.
  */
 bool KafkaWriter::DoFinish(double network_time)
 {
