@@ -37,5 +37,11 @@ echo "Configuring kafka plugin"
   echo "redef Software::asset_tracking = ALL_HOSTS;"
 } >> /usr/local/bro/share/bro/site/local.bro
 
+# Load "known-devices-and-hostnames.bro" which is necessary in bro 2.5.5 to
+# create the log Known::DEVICES_LOG
 sed -i '86 a @load policy/protocols/dhcp/known-devices-and-hostnames.bro' /usr/local/bro/share/bro/site/local.bro
+
+# Comment out the load statement for "log-hostcerts-only.bro" in bro 2.5.5's
+# default local.bro in order to log all certificates to x509.log
+sed -i 's%^@load protocols/ssl/log-hostcerts-only%#&%' /usr/local/bro/share/bro/site/local.bro
 
