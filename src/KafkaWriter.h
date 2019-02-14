@@ -65,12 +65,14 @@ protected:
     virtual bool DoHeartbeat(double network_time, double current_time);
 
 private:
+    string GetConfigValue(const WriterInfo& info, const string name) const;
     static const string default_topic_key;
     string stream_id;
     bool tag_json;
     string json_timestamps;
     map<string, string> kafka_conf;
     string topic_name;
+    string topic_name_override;
     threading::formatter::Formatter *formatter;
     RdKafka::Producer* producer;
     RdKafka::Topic* topic;
