@@ -75,5 +75,5 @@ echo "Running build_bro_plugin_docker with "
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "==================================================="
 
-docker exec -w /root -i -t "${CONTAINER_NAME}" bash
+docker exec -i -t "${CONTAINER_NAME}" bash
 
