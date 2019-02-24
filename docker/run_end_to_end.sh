@@ -120,7 +120,7 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# Create the bro topic
+# Create the kafka topic
 bash "${SCRIPT_DIR}"/docker_run_create_topic_in_kafka.sh --kafka-topic=${KAFKA_TOPIC}
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}

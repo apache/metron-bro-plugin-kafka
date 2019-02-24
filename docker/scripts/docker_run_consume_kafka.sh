@@ -24,8 +24,8 @@ set -E # errtrap
 set -o pipefail
 
 #
-# Runs a kafka container with the console consumer for the bro topic.  The consumer should quit when it has read
-# all of the messages available
+# Runs a kafka container with the console consumer for the appropriate topic.
+# The consumer should quit when it has read all of the messages available.
 #
 
 function help {
