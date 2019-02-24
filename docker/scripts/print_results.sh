@@ -83,9 +83,15 @@ echo "==================================================="
 
 # Move over to the docker area
 cd "${TEST_DIRECTORY}" || exit 1
-find "${TEST_DIRECTORY}" -name "results.csv" \
-  -exec echo "-->" '{}' \; \
-  -exec column -t -s ',' '{}' \; \
-  -exec echo "========================================================" \; \
-  -exec echo "" \;
+RESULTS_FILES=$(find "${TEST_DIRECTORY}" -name "results.csv")
+for file in $RESULTS_FILES; do
+  echo "-->" "${file}"
+  cat "${file}" | sed 1d | awk -F\, '$2 != $3 {exit 1}'
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> COUNTS DO NOT MATCH IN FILE ${file}"
+    exit ${rc}
+  fi
+  column -t -s ',' "$file"
+  echo -e "========================================================\n"
+done
 

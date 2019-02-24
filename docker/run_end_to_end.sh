@@ -179,22 +179,28 @@ do
   echo "OFFSET------------------> ${OFFSET}"
 
   bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
-
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO PROCESS ${file} DATA.  CHECK LOGS, please run the finish_end_to_end.sh when you are done."
     exit ${rc}
   fi
+
   KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
   bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh --offset=$OFFSET | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
-
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"
   fi
 
   "${SCRIPT_DIR}"/split_kakfa_output_by_log.sh --log-directory="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> ISSUE ENCOUNTERED WHEN SPLITTING KAFKA OUTPUT LOGS"
+  fi
 done
 
 "${SCRIPT_DIR}"/print_results.sh --test-directory="${TEST_OUTPUT_PATH}"
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR> ISSUE ENCOUNTERED WHEN PRINTING RESULTS"
+  exit ${rc}
+fi
 
 echo ""
 echo "Run complete"
