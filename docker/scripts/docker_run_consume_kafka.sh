@@ -33,11 +33,13 @@ function help {
   echo "usage: ${0}"
   echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
   echo "    --offset                        [OPTIONAL] The kafka offset to read from. Default: -1"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
 }
 
 NETWORK_NAME=bro-network
+KAFKA_TOPIC=bro
 OFFSET=-1
 
 # handle command line options
@@ -62,6 +64,15 @@ for i in "$@"; do
       shift # past argument=value
     ;;
   #
+  # KAFKA_TOPIC
+  #
+  #   --kafka-topic
+  #
+    --kafka-topic=*)
+      KAFKA_TOPIC="${i#*=}"
+      shift # past argument=value
+    ;;
+  #
   # -h/--help
   #
     -h | --help)
@@ -82,5 +93,5 @@ for i in "$@"; do
 done
 
 docker run --rm --network "${NETWORK_NAME}" ches/kafka \
-  kafka-console-consumer.sh --topic bro --offset "${OFFSET}" --partition 0 --bootstrap-server kafka:9092 --timeout-ms 1000
+  kafka-console-consumer.sh --topic "${KAFKA_TOPIC}" --offset "${OFFSET}" --partition 0 --bootstrap-server kafka:9092 --timeout-ms 1000
 

@@ -24,19 +24,21 @@ set -E # errtrap
 set -o pipefail
 
 #
-# Runs a kafka container with the console consumer for the bro topic.  The consumer should quit when it has read
-# all of the messages available
+# Runs a kafka container with the console consumer for the provided topic.  The
+# consumer should quit when it has read all of the messages available.
 #
 
 function help {
   echo " "
   echo "usage: ${0}"
   echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to theee the offset from. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
 }
 
 NETWORK_NAME=bro-network
+KAFKA_TOPIC=bro
 
 # handle command line options
 for i in "$@"; do
@@ -48,6 +50,15 @@ for i in "$@"; do
   #
     --network-name=*)
       NETWORK_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
+  #
+  # KAFKA_TOPIC
+  #
+  #   --kafka-topic
+  #
+    --kafka-topic=*)
+      KAFKA_TOPIC="${i#*=}"
       shift # past argument=value
     ;;
   #
@@ -71,5 +82,5 @@ for i in "$@"; do
 done
 
 docker run --rm --network "${NETWORK_NAME}" ches/kafka \
-  kafka-run-class.sh kafka.tools.GetOffsetShell --topic bro --broker-list kafka:9092
+  kafka-run-class.sh kafka.tools.GetOffsetShell --topic "${KAFKA_TOPIC}" --broker-list kafka:9092
 

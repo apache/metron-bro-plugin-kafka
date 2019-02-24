@@ -28,6 +28,7 @@ function help {
   echo "usage: ${0}"
   echo "    --skip-docker-build             [OPTIONAL] Skip build of bro docker machine."
   echo "    --data-path                     [OPTIONAL] The pcap data path. Default: ./data"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
@@ -42,10 +43,11 @@ DATA_PATH="${ROOT_DIR}"/data
 DATE=$(date)
 LOG_DATE=${DATE// /_}
 TEST_OUTPUT_PATH="${ROOT_DIR}/test_output/"${LOG_DATE//:/_}
+KAFKA_TOPIC="bro"
+
 # Handle command line options
 for i in "$@"; do
   case $i in
-
   #
   # SKIP_REBUILD_BRO
   #
@@ -55,7 +57,6 @@ for i in "$@"; do
       SKIP_REBUILD_BRO=true
       shift # past argument
     ;;
-
   #
   # DATA_PATH
   #
@@ -63,7 +64,15 @@ for i in "$@"; do
       DATA_PATH="${i#*=}"
       shift # past argument=value
     ;;
-
+  #
+  # KAFKA_TOPIC
+  #
+  #   --kafka-topic
+  #
+    --kafka-topic=*)
+      KAFKA_TOPIC="${i#*=}"
+      shift # past argument=value
+    ;;
   #
   # -h/--help
   #
@@ -112,7 +121,7 @@ rc=$?; if [[ ${rc} != 0 ]]; then
 fi
 
 # Create the bro topic
-bash "${SCRIPT_DIR}"/docker_run_create_bro_topic_in_kafka.sh
+bash "${SCRIPT_DIR}"/docker_run_create_topic_in_kafka.sh --kafka-topic=${KAFKA_TOPIC}
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
@@ -175,7 +184,7 @@ do
 
   # get the current offset in kafka
   # this is where we are going to _start_
-  OFFSET=$(bash "${SCRIPT_DIR}"/docker_run_get_offset_bro_kafka.sh | sed 's/^bro:0:\(.*\)$/\1/')
+  OFFSET=$(bash "${SCRIPT_DIR}"/docker_run_get_offset_kafka.sh --kafka-topic=${KAFKA_TOPIC} | sed "s/^${KAFKA_TOPIC}:0:\(.*\)$/\1/")
   echo "OFFSET------------------> ${OFFSET}"
 
   bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
@@ -185,7 +194,7 @@ do
     exit ${rc}
   fi
   KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
-  bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh --offset=$OFFSET | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
+  bash "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset=${OFFSET} --kafka-topic=${KAFKA_TOPIC} | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
 
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"
