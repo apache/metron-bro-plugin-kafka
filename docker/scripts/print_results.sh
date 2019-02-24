@@ -86,12 +86,8 @@ cd "${TEST_DIRECTORY}" || exit 1
 RESULTS_FILES=$(find "${TEST_DIRECTORY}" -name "results.csv")
 for file in $RESULTS_FILES; do
   echo "-->" "${file}"
-  cat "${file}" | sed 1d | awk -F\, '$2 != $3 {exit 1}'
-  rc=$?; if [[ ${rc} != 0 ]]; then
-    echo "ERROR> COUNTS DO NOT MATCH IN FILE ${file}"
-    exit ${rc}
-  fi
   column -t -s ',' "$file"
   echo -e "========================================================\n"
+  awk -F\, 'FNR > 1 && $2 != $3 {print "ERROR> The " $1 " bro and kafka log counts do not match for " FILENAME; exit 1}' "${file}"
 done
 
