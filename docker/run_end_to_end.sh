@@ -150,7 +150,7 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# Configure it the bro plugin
+# Configure the bro plugin
 bash "${SCRIPT_DIR}"/docker_execute_configure_bro_plugin.sh
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO CONFIGURE PLUGIN.  CHECK LOGS  ${rc}"

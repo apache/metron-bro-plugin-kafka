@@ -32,13 +32,13 @@ function help {
   echo " "
   echo "usage: ${0}"
   echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
-  echo "    --offset                        [OPTIONAL] The kafka offset to read from. Default: -1"
+  echo "    --offset                        [OPTIONAL] The kafka offset to read from. Default: 0"
   echo "    -h/--help                       Usage information."
   echo " "
 }
 
 NETWORK_NAME=bro-network
-OFFSET=-1
+OFFSET=0
 
 # handle command line options
 for i in "$@"; do
