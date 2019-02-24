@@ -32,7 +32,7 @@ function help {
   echo " "
   echo "usage: ${0}"
   echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
-  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to theee the offset from. Default: bro"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to pull the offset from. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
 }
