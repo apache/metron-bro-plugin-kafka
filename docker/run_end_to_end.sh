@@ -131,6 +131,9 @@ fi
 # Download the pcaps
 bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
 
+# By not catching $? here we are accepting that a failed pcap download will not
+# exit the script
+
 mkdir "${TEST_OUTPUT_PATH}" || exit 1
 
 # Run the bro container and optionally the passed script _IN_ the container
