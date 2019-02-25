@@ -88,6 +88,8 @@ EXTRA_ARGS="$*"
 
 echo "Running build_container with "
 echo "SKIP_REBUILD_BRO = $SKIP_REBUILD_BRO"
+echo "DATA_PATH        = $DATA_PATH"
+echo "KAFKA_TOPIC      = $KAFKA_TOPIC"
 echo "==================================================="
 
 # Create the network
