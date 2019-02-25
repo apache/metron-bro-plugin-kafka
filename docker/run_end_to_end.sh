@@ -202,6 +202,12 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
+"${SCRIPT_DIR}"/analyze_results.sh --test-directory="${TEST_OUTPUT_PATH}"
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR> ISSUE ENCOUNTERED WHEN ANALYZING RESULTS"
+  exit ${rc}
+fi
+
 echo ""
 echo "Run complete"
 echo "The kafka and bro output can be found at ${TEST_OUTPUT_PATH}"
