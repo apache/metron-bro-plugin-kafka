@@ -170,9 +170,9 @@ function print_log_comparison_insights
   # For example, if count_occurrences_of_each_log_file identified that there
   # were 10 instances of http logs across all of the `results.csv` files,
   # ${LOG_OCCURRENCE[http]} should equal 10. If check_for_unequal_log_counts
-  # also found 10 instances where the http bro and kafka log counts were
-  # imbalanced, ${UNIQ_UNEQUAL_RESULTS[http]} would also have 10 entries,
-  # causing us to warn the user of that insight.
+  # independently found 10 instances where the http bro and kafka log counts
+  # from the `results.csv` files were not equal, ${UNIQ_UNEQUAL_RESULTS[http]}
+  # would also have 10 entries, causing us to warn the user of that insight.
   for KEY in "${!UNIQ_UNEQUAL_RESULTS[@]}"; do
     if [[ "${UNIQ_UNEQUAL_RESULTS[${KEY}]}" == "${LOG_OCCURRENCE[${KEY}]}" ]]; then
       _echo WARN "None of the ${KEY} log counts were the same between bro and kafka."
