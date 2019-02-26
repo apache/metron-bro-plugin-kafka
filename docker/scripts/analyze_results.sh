@@ -189,7 +189,7 @@ for file in $RESULTS_FILES; do
 done
 
 if [[ "${#UNEQUAL_RESULTS[@]}" -gt 0 ]]; then
-  _echo ERROR "UNEQUALITY FOUND IN BRO AND KAFKA LOG COUNTS"
+  _echo ERROR "INEQUALITY FOUND IN BRO AND KAFKA LOG COUNTS"
   echo ""
 
   print_unequal_results
