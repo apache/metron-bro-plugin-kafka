@@ -83,4 +83,7 @@ done
 
 docker run --rm --network "${NETWORK_NAME}" ches/kafka \
   kafka-console-consumer.sh --topic bro --offset "${OFFSET}" --partition 0 --bootstrap-server kafka:9092 --timeout-ms 1000
+rc=$?; if [[ ${rc} != 0 ]]; then
+  exit ${rc}
+fi
 
