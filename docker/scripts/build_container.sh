@@ -22,6 +22,7 @@ set -u # nounset
 set -e # errexit
 set -E # errtrap
 set -o pipefail
+
 #
 # Runs docker build in a provided directory, with a provided name
 #
@@ -36,6 +37,7 @@ function help {
   echo " "
 }
 
+SCRIPT_NAME=$(basename -- "$0")
 CONTAINER_DIRECTORY=
 CONTAINER_NAME=
 
@@ -92,7 +94,7 @@ if [[ -z "$CONTAINER_NAME" ]]; then
   exit 1
 fi
 
-echo "Running with "
+echo "Running ${SCRIPT_NAME} with"
 echo "CONTAINER_DIRECTORY = $CONTAINER_DIRECTORY"
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "==================================================="
