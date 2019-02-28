@@ -35,7 +35,7 @@ function help {
 
 # Require bash >= 4
 if (( BASH_VERSINFO[0] < 4 )); then
-  echo "ERROR> bash >= 4.0 is required"
+  >&2 echo "ERROR> bash >= 4.0 is required" >&2
   exit 1
 fi
 
