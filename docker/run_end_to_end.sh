@@ -25,13 +25,23 @@ set -o pipefail
 
 function help {
   echo " "
-  echo "usage: ${0}"
+  echo "USAGE"
   echo "    --skip-docker-build             [OPTIONAL] Skip build of bro docker machine."
   echo "    --data-path                     [OPTIONAL] The pcap data path. Default: ./data"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
+  echo "COMPATABILITY"
+  echo "     bash >= 4.0 is required."
   echo " "
 }
+
+# Require bash >= 4
+if (( BASH_VERSINFO[0] < 4 )); then
+  >&2 echo "ERROR> bash >= 4.0 is required" >&2
+  help
+  exit 1
+fi
 
 SKIP_REBUILD_BRO=false
 
@@ -42,10 +52,11 @@ DATA_PATH="${ROOT_DIR}"/data
 DATE=$(date)
 LOG_DATE=${DATE// /_}
 TEST_OUTPUT_PATH="${ROOT_DIR}/test_output/"${LOG_DATE//:/_}
+KAFKA_TOPIC="bro"
+
 # Handle command line options
 for i in "$@"; do
   case $i in
-
   #
   # SKIP_REBUILD_BRO
   #
@@ -55,7 +66,6 @@ for i in "$@"; do
       SKIP_REBUILD_BRO=true
       shift # past argument
     ;;
-
   #
   # DATA_PATH
   #
@@ -63,7 +73,15 @@ for i in "$@"; do
       DATA_PATH="${i#*=}"
       shift # past argument=value
     ;;
-
+  #
+  # KAFKA_TOPIC
+  #
+  #   --kafka-topic
+  #
+    --kafka-topic=*)
+      KAFKA_TOPIC="${i#*=}"
+      shift # past argument=value
+    ;;
   #
   # -h/--help
   #
@@ -79,6 +97,8 @@ EXTRA_ARGS="$*"
 
 echo "Running build_container with "
 echo "SKIP_REBUILD_BRO = $SKIP_REBUILD_BRO"
+echo "DATA_PATH        = $DATA_PATH"
+echo "KAFKA_TOPIC      = $KAFKA_TOPIC"
 echo "==================================================="
 
 # Create the network
@@ -111,8 +131,8 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# Create the bro topic
-bash "${SCRIPT_DIR}"/docker_run_create_bro_topic_in_kafka.sh
+# Create the kafka topic
+bash "${SCRIPT_DIR}"/docker_run_create_topic_in_kafka.sh --kafka-topic=${KAFKA_TOPIC}
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
@@ -130,6 +150,9 @@ fi
 
 # Download the pcaps
 bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
+
+# By not catching $? here we are accepting that a failed pcap download will not
+# exit the script
 
 mkdir "${TEST_OUTPUT_PATH}" || exit 1
 
@@ -175,26 +198,39 @@ do
 
   # get the current offset in kafka
   # this is where we are going to _start_
-  OFFSET=$(bash "${SCRIPT_DIR}"/docker_run_get_offset_bro_kafka.sh | sed 's/^bro:0:\(.*\)$/\1/')
+  OFFSET=$(bash "${SCRIPT_DIR}"/docker_run_get_offset_kafka.sh --kafka-topic=${KAFKA_TOPIC} | sed "s/^${KAFKA_TOPIC}:0:\(.*\)$/\1/")
   echo "OFFSET------------------> ${OFFSET}"
 
   bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
-
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO PROCESS ${file} DATA.  CHECK LOGS, please run the finish_end_to_end.sh when you are done."
     exit ${rc}
   fi
+
   KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
-  bash "${SCRIPT_DIR}"/docker_run_consume_bro_kafka.sh --offset=$OFFSET | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
+  bash "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset=${OFFSET} --kafka-topic=${KAFKA_TOPIC} | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
 
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"
   fi
 
   "${SCRIPT_DIR}"/split_kakfa_output_by_log.sh --log-directory="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> ISSUE ENCOUNTERED WHEN SPLITTING KAFKA OUTPUT LOGS"
+  fi
 done
 
 "${SCRIPT_DIR}"/print_results.sh --test-directory="${TEST_OUTPUT_PATH}"
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR> ISSUE ENCOUNTERED WHEN PRINTING RESULTS"
+  exit ${rc}
+fi
+
+"${SCRIPT_DIR}"/analyze_results.sh --test-directory="${TEST_OUTPUT_PATH}"
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR> ISSUE ENCOUNTERED WHEN ANALYZING RESULTS"
+  exit ${rc}
+fi
 
 echo ""
 echo "Run complete"

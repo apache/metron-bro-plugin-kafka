@@ -23,20 +23,17 @@ set -e # errexit
 set -E # errtrap
 set -o pipefail
 
-#
-# Runs a kafka container with the console consumer for the bro topic.  The consumer should quit when it has read
-# all of the messages available
-#
-
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
+  echo "    --network-name                  [OPTIONAL] The Docker network name.  Default: bro-network"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
 }
 
 NETWORK_NAME=bro-network
+KAFKA_TOPIC=bro
 
 # handle command line options
 for i in "$@"; do
@@ -48,6 +45,15 @@ for i in "$@"; do
   #
     --network-name=*)
       NETWORK_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
+  #
+  # KAFKA_TOPIC
+  #
+  #   --kafka-topic
+  #
+    --kafka-topic=*)
+      KAFKA_TOPIC="${i#*=}"
       shift # past argument=value
     ;;
   #
@@ -70,6 +76,13 @@ for i in "$@"; do
   esac
 done
 
+echo "Running docker_run_create_topic_in_kafka with "
+echo "NETWORK_NAME = $NETWORK_NAME"
+echo "==================================================="
+
 docker run --rm --network "${NETWORK_NAME}" ches/kafka \
-  kafka-run-class.sh kafka.tools.GetOffsetShell --topic bro --broker-list kafka:9092
+  kafka-topics.sh --create --topic "${KAFKA_TOPIC}" --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
+rc=$?; if [[ ${rc} != 0 ]]; then
+  exit ${rc}
+fi
 

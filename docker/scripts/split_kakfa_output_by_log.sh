@@ -37,6 +37,7 @@ function help {
   echo " "
 }
 
+SCRIPT_NAME=$(basename -- "$0")
 LOG_DIRECTORY=
 
 # Handle command line options
@@ -77,7 +78,7 @@ if [[ -z "$LOG_DIRECTORY" ]]; then
   exit 1
 fi
 
-echo "Running with "
+echo "Running ${SCRIPT_NAME} with"
 echo "$LOG_DIRECTORY = $LOG_DIRECTORY"
 echo "==================================================="
 

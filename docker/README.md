@@ -61,6 +61,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 #### Scripts executed on the host to setup and interact with the docker containers
 
 ```bash
+├── analyze_results.sh
 ├── build_container.sh
 ├── cleanup_docker.sh
 ├── create_docker_network.sh
@@ -70,9 +71,9 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 ├── docker_execute_process_data_file.sh
 ├── docker_execute_shell.sh
 ├── docker_run_bro_container.sh
-├── docker_run_consume_bro_kafka.sh
-├── docker_run_create_bro_topic_in_kafka.sh
-├── docker_run_get_offset_bro_topic_in_kafka.sh
+├── docker_run_consume_kafka.sh
+├── docker_run_create_topic_in_kafka.sh
+├── docker_run_get_offset_kafka.sh
 ├── docker_run_kafka_container.sh
 ├── docker_run_wait_for_kafka.sh
 ├── docker_run_wait_for_zookeeper.sh
@@ -83,6 +84,11 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 └── stop_container.sh
 ```
 
+- `analyze_results.sh`: Analyzes the `results.csv` files for any issues
+  ###### Parameters
+  ```bash
+  --test-directory               [REQUIRED] The directory for the tests
+  ```
 - `build_container.sh`: Runs docker build in the passed directory, and names the results
   ###### Parameters
   ```bash
@@ -140,21 +146,24 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   > You can then execute these scripts or use them together as part of testing etc. by creating `docker execute` scripts like those here.
   > The goal is to allow an individual to use and maintain their own library of scripts to use instead of, or in concert with the scripts maintained by this project.
   
-- `docker_run_consume_bro_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic bro --offset $OFFSET --partition 0 --bootstrap-server kafka:9092`
+- `docker_run_consume_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic $KAFKA_TOPIC --offset $OFFSET --partition 0 --bootstrap-server kafka:9092`
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: bro-network
   --offset                       [OPTIONAL] The kafka offset. Default: 0
+  --kafka-topic                  [OPTIONAL] The kafka topic to consume from. Default: bro
   ```
-- `docker_run_get_offset_bro_kafka.sh`: Runs an instance of the kafka container and gets the current offset for the bro topic
+- `docker_run_get_offset_kafka.sh`: Runs an instance of the kafka container and gets the current offset for the specified topic
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: bro-network
+  --kafka-topic                  [OPTIONAL] The kafka topic to get the offset from. Default: bro
   ```
-- `docker_run_create_bro_topic_in_kafka.sh`: Runs an instance of the kafka container, creating the `bro` topic
+- `docker_run_create_topic_in_kafka.sh`: Runs an instance of the kafka container, creating the specified topic
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: bro-network
+  --kafka-topic                  [OPTIONAL] The kafka topic to create. Default: bro
   ```
 - `docker_run_kafka_container.sh`: Runs the main instance of the kafka container in the background
   ###### Parameters
@@ -190,12 +199,12 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --data-path                    [REQUIRED] The pcap data path
   ```
-- `print_results.sh` : Prints the `results.csv` for all the pcaps processed in the given directory to console
+- `print_results.sh`: Prints the `results.csv` for all the pcaps processed in the given directory to console
   ###### Parameters
   ```bash
   --test-directory               [REQUIRED] The directory for the tests
   ```
-- `split_kafka_output_by_log.sh` : For a pcap result directory, will create a LOG.kafka.log for each LOG.log's entry in the kafka-output.log
+- `split_kafka_output_by_log.sh`: For a pcap result directory, will create a LOG.kafka.log for each LOG.log's entry in the kafka-output.log
   ###### Parameters
   ```bash
   --log-directory                [REQUIRED] The directory with the logs
@@ -216,7 +225,7 @@ This script does the following:
 3. Waits for zookeeper to be available
 4. Runs the kafka container
 5. Waits for kafka to be available
-6. Creates the bro topic
+6. Creates the specified topic
 7. Downloads sample PCAP data
 8. Runs the bro container in the background
 
@@ -287,4 +296,5 @@ Other scripts may then be used to do your testing, for example running:
 ```bash
 --skip-docker-build            [OPTIONAL] Skip build of bro docker machine.
 --data-path                    [OPTIONAL] The pcap data path. Default: ./data
+--kafka-topic                  [OPTIONAL] The kafka topic name to use. Default: bro
 ```
