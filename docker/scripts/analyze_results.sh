@@ -38,10 +38,10 @@ function help {
 
 SCRIPT_NAME=$(basename -- "$0")
 TEST_DIRECTORY=
-declare -A UNEQUAL_RESULTS
+declare -A LOGS_WITH_UNEQUAL_RESULTS
 declare -a LOG_NAMES
-declare -A LOG_OCCURRENCE
-declare -A UNIQ_UNEQUAL_RESULTS
+declare -A OVERALL_LOG_CARDINALITY
+declare -A LOG_ISSUE_COUNT
 declare -r txtDEFAULT='\033[0m'
 # shellcheck disable=SC2034
 declare -r txtERROR='\033[0;31m'
@@ -110,7 +110,7 @@ function count_occurrences_of_each_log_file
 {
   # Count the number of occurences of each log name
   for LOG_NAME in "${LOG_NAMES[@]}"; do
-    (( ++LOG_OCCURRENCE["${LOG_NAME}"] ))
+    (( ++OVERALL_LOG_CARDINALITY["${LOG_NAME}"] ))
   done
 }
 
@@ -130,10 +130,10 @@ function check_for_unequal_log_counts
     # Create a space separated list of unequal logs to simulate a
     # multidimensional array
     if [[ -n "${UNEQUAL_LOG}" ]]; then
-      if [[ "${#UNEQUAL_RESULTS[${PCAP_FOLDER}]}" -eq 0 ]]; then
-        UNEQUAL_RESULTS["${PCAP_FOLDER}"]="${UNEQUAL_LOG}"
+      if [[ "${#LOGS_WITH_UNEQUAL_RESULTS[${PCAP_FOLDER}]}" -eq 0 ]]; then
+        LOGS_WITH_UNEQUAL_RESULTS["${PCAP_FOLDER}"]="${UNEQUAL_LOG}"
       else
-        UNEQUAL_RESULTS["${PCAP_FOLDER}"]+=" ${UNEQUAL_LOG}"
+        LOGS_WITH_UNEQUAL_RESULTS["${PCAP_FOLDER}"]+=" ${UNEQUAL_LOG}"
       fi
     fi
   done
@@ -146,10 +146,10 @@ function print_unequal_results
   {
   echo "PCAP FOLDER,LOG NAME"
 
-  for KEY in "${!UNEQUAL_RESULTS[@]}"; do
+  for KEY in "${!LOGS_WITH_UNEQUAL_RESULTS[@]}"; do
     # This must be done because we are simulating multidimensional arrays due to
     # the lack of native bash support
-    for VALUE in ${UNEQUAL_RESULTS[${KEY}]}; do
+    for VALUE in ${LOGS_WITH_UNEQUAL_RESULTS[${KEY}]}; do
       echo "${KEY},${VALUE}"
     done
   done
@@ -158,10 +158,10 @@ function print_unequal_results
 
 function print_log_comparison_insights
 {
-  # Load the log to instance count mapping from UNEQUAL_RESULTS into a new
+  # Load the log to instance count mapping from LOGS_WITH_UNEQUAL_RESULTS into a new
   # associative array
   # shellcheck disable=SC2046
-  declare -A $(echo "${UNEQUAL_RESULTS[@]}" | tr ' ' '\n' | sort | uniq -c | awk '{print "UNIQ_UNEQUAL_RESULTS["$2"]="$1}')
+  declare -A $(echo "${LOGS_WITH_UNEQUAL_RESULTS[@]}" | tr ' ' '\n' | sort | uniq -c | awk '{print "LOG_ISSUE_COUNT["$2"]="$1}')
 
   # Compare each log type's instances of inequality to the total number of
   # instances of each log.  If they are equal, this indicates that there may be
@@ -169,12 +169,12 @@ function print_log_comparison_insights
   #
   # For example, if count_occurrences_of_each_log_file identified that there
   # were 10 instances of http logs across all of the `results.csv` files,
-  # ${LOG_OCCURRENCE[http]} should equal 10. If check_for_unequal_log_counts
+  # ${OVERALL_LOG_CARDINALITY[http]} should equal 10. If check_for_unequal_log_counts
   # independently found 10 instances where the http bro and kafka log counts
-  # from the `results.csv` files were not equal, ${UNIQ_UNEQUAL_RESULTS[http]}
+  # from the `results.csv` files were not equal, ${LOG_ISSUE_COUNT[http]}
   # would also have 10 entries, causing us to warn the user of that insight.
-  for KEY in "${!UNIQ_UNEQUAL_RESULTS[@]}"; do
-    if [[ "${UNIQ_UNEQUAL_RESULTS[${KEY}]}" == "${LOG_OCCURRENCE[${KEY}]}" ]]; then
+  for KEY in "${!LOG_ISSUE_COUNT[@]}"; do
+    if [[ "${LOG_ISSUE_COUNT[${KEY}]}" == "${OVERALL_LOG_CARDINALITY[${KEY}]}" ]]; then
       _echo WARN "None of the ${KEY} log counts were the same between bro and kafka."
     fi
   done
@@ -195,8 +195,8 @@ for file in $RESULTS_FILES; do
   check_for_unequal_log_counts "${file}"
 done
 
-if [[ "${#UNEQUAL_RESULTS[@]}" -gt 0 ]]; then
-  _echo ERROR "INEQUALITY FOUND IN BRO AND KAFKA LOG COUNTS"
+if [[ "${#LOGS_WITH_UNEQUAL_RESULTS[@]}" -gt 0 ]]; then
+  _echo ERROR "UNEQUALITY FOUND IN BRO AND KAFKA LOG COUNTS"
   echo ""
 
   print_unequal_results
