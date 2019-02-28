@@ -52,7 +52,7 @@ function _echo() {
 }
 
 # Require bash >= 4
-if (( ${BASH_VERSINFO[0]} < 4 )); then
+if (( BASH_VERSINFO[0] < 4 )); then
   _echo ERROR "bash >= 4.0 is required"
   exit 1
 fi
