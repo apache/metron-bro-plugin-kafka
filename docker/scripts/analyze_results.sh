@@ -175,7 +175,7 @@ function print_log_comparison_insights
   # would also have 10 entries, causing us to warn the user of that insight.
   for KEY in "${!LOG_ISSUE_COUNT[@]}"; do
     if [[ "${LOG_ISSUE_COUNT[${KEY}]}" == "${OVERALL_LOG_CARDINALITY[${KEY}]}" ]]; then
-      _echo WARN "None of the ${KEY} log counts were the same between bro and kafka."
+      _echo WARN "None of the ${KEY} log counts were the same between bro and kafka.  This may indicate an issue specific to that log."
     fi
   done
 }
