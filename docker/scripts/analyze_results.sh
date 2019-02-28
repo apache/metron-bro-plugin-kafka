@@ -36,6 +36,21 @@ function help {
   echo " "
 }
 
+function _echo() {
+  color="txt${1:-DEFAULT}"
+  case "${1}" in
+    ERROR)
+      >&2 echo -e "${!color}${1}> ${2}${txtDEFAULT}"
+      ;;
+    WARN)
+      echo -e "${!color}${1}> ${2}${txtDEFAULT}"
+      ;;
+    *)
+      echo -e "${!color}${1}> ${2}${txtDEFAULT}"
+      ;;
+  esac
+}
+
 SCRIPT_NAME=$(basename -- "$0")
 TEST_DIRECTORY=
 declare -A LOGS_WITH_UNEQUAL_RESULTS
@@ -91,21 +106,6 @@ echo "TEST_DIRECTORY = $TEST_DIRECTORY"
 echo "==================================================="
 
 ## Main functions
-function _echo() {
-  color="txt${1:-DEFAULT}"
-  case "${1}" in
-    ERROR)
-      >&2 echo -e "${!color}${1}> ${2}${txtDEFAULT}"
-      ;;
-    WARN)
-      echo -e "${!color}${1}> ${2}${txtDEFAULT}"
-      ;;
-    *)
-      echo -e "${!color}${1}> ${2}${txtDEFAULT}"
-      ;;
-  esac
-}
-
 function count_occurrences_of_each_log_file
 {
   # Count the number of occurences of each log name
