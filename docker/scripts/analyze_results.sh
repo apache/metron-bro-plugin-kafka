@@ -23,6 +23,12 @@ set -e # errexit
 set -E # errtrap
 set -o pipefail
 
+declare -r txtDEFAULT='\033[0m'
+# shellcheck disable=SC2034
+declare -r txtERROR='\033[0;31m'
+# shellcheck disable=SC2034
+declare -r txtWARN='\033[0;33m'
+
 #
 # Analyzes the results.csv files to identify issues
 #
@@ -51,17 +57,18 @@ function _echo() {
   esac
 }
 
+# Require bash >= 4
+if (( BASH_VERSINFO[0] < 4 )); then
+  _echo ERROR "bash >= 4.0 is required"
+  exit 1
+fi
+
 SCRIPT_NAME=$(basename -- "$0")
 TEST_DIRECTORY=
 declare -A LOGS_WITH_UNEQUAL_RESULTS
 declare -a LOG_NAMES
 declare -A OVERALL_LOG_CARDINALITY
 declare -A LOG_ISSUE_COUNT
-declare -r txtDEFAULT='\033[0m'
-# shellcheck disable=SC2034
-declare -r txtERROR='\033[0;31m'
-# shellcheck disable=SC2034
-declare -r txtWARN='\033[0;33m'
 
 # Handle command line options
 for i in "$@"; do
