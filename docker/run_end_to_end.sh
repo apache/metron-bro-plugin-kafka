@@ -25,14 +25,23 @@ set -o pipefail
 
 function help {
   echo " "
-  echo "usage: ${0}"
+  echo "USAGE"
   echo "    --skip-docker-build             [OPTIONAL] Skip build of bro docker machine."
   echo "    --data-path                     [OPTIONAL] The pcap data path. Default: ./data"
   echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
+  echo "COMPATABILITY"
+  echo "     bash >= 4.0 is required."
   echo " "
 }
+
+# Require bash >= 4
+if (( BASH_VERSINFO[0] < 4 )); then
+  >&2 echo "ERROR> bash >= 4.0 is required" >&2
+  help
+  exit 1
+fi
 
 SKIP_REBUILD_BRO=false
 
@@ -142,6 +151,9 @@ fi
 # Download the pcaps
 bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
 
+# By not catching $? here we are accepting that a failed pcap download will not
+# exit the script
+
 mkdir "${TEST_OUTPUT_PATH}" || exit 1
 
 # Run the bro container and optionally the passed script _IN_ the container
@@ -190,11 +202,11 @@ do
   echo "OFFSET------------------> ${OFFSET}"
 
   bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
-
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO PROCESS ${file} DATA.  CHECK LOGS, please run the finish_end_to_end.sh when you are done."
     exit ${rc}
   fi
+
   KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
   bash "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset=${OFFSET} --kafka-topic=${KAFKA_TOPIC} | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
 
@@ -203,9 +215,22 @@ do
   fi
 
   "${SCRIPT_DIR}"/split_kakfa_output_by_log.sh --log-directory="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> ISSUE ENCOUNTERED WHEN SPLITTING KAFKA OUTPUT LOGS"
+  fi
 done
 
 "${SCRIPT_DIR}"/print_results.sh --test-directory="${TEST_OUTPUT_PATH}"
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR> ISSUE ENCOUNTERED WHEN PRINTING RESULTS"
+  exit ${rc}
+fi
+
+"${SCRIPT_DIR}"/analyze_results.sh --test-directory="${TEST_OUTPUT_PATH}"
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR> ISSUE ENCOUNTERED WHEN ANALYZING RESULTS"
+  exit ${rc}
+fi
 
 echo ""
 echo "Run complete"

@@ -83,4 +83,7 @@ done
 
 docker run --rm --network "${NETWORK_NAME}" ches/kafka \
   kafka-run-class.sh kafka.tools.GetOffsetShell --topic "${KAFKA_TOPIC}" --broker-list kafka:9092
+rc=$?; if [[ ${rc} != 0 ]]; then
+  exit ${rc}
+fi
 

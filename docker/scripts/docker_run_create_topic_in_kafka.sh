@@ -82,4 +82,7 @@ echo "==================================================="
 
 docker run --rm --network "${NETWORK_NAME}" ches/kafka \
   kafka-topics.sh --create --topic "${KAFKA_TOPIC}" --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
+rc=$?; if [[ ${rc} != 0 ]]; then
+  exit ${rc}
+fi
 

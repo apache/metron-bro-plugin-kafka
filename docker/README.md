@@ -61,6 +61,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 #### Scripts executed on the host to setup and interact with the docker containers
 
 ```bash
+├── analyze_results.sh
 ├── build_container.sh
 ├── cleanup_docker.sh
 ├── create_docker_network.sh
@@ -83,6 +84,11 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 └── stop_container.sh
 ```
 
+- `analyze_results.sh`: Analyzes the `results.csv` files for any issues
+  ###### Parameters
+  ```bash
+  --test-directory               [REQUIRED] The directory for the tests
+  ```
 - `build_container.sh`: Runs docker build in the passed directory, and names the results
   ###### Parameters
   ```bash
@@ -194,12 +200,12 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --data-path                    [REQUIRED] The pcap data path
   ```
-- `print_results.sh` : Prints the `results.csv` for all the pcaps processed in the given directory to console
+- `print_results.sh`: Prints the `results.csv` for all the pcaps processed in the given directory to console
   ###### Parameters
   ```bash
   --test-directory               [REQUIRED] The directory for the tests
   ```
-- `split_kafka_output_by_log.sh` : For a pcap result directory, will create a LOG.kafka.log for each LOG.log's entry in the kafka-output.log
+- `split_kafka_output_by_log.sh`: For a pcap result directory, will create a LOG.kafka.log for each LOG.log's entry in the kafka-output.log
   ###### Parameters
   ```bash
   --log-directory                [REQUIRED] The directory with the logs

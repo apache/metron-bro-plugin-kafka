@@ -31,11 +31,12 @@ function help {
   echo " "
   echo "usage: ${0}"
   echo "    --test-directory           [REQUIRED] The directory for the tests"
-  echo "    -h/--help                   Usage information."
+  echo "    -h/--help                  Usage information."
   echo " "
   echo " "
 }
 
+SCRIPT_NAME=$(basename -- "$0")
 TEST_DIRECTORY=
 
 # Handle command line options
@@ -77,7 +78,7 @@ if [[ -z "$TEST_DIRECTORY" ]]; then
 fi
 
 
-echo "Running with "
+echo "Running ${SCRIPT_NAME} with"
 echo "TEST_DIRECTORY = $TEST_DIRECTORY"
 echo "==================================================="
 
