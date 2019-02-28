@@ -74,7 +74,7 @@ if [ ! -d /root/data ]; then
   exit 1
 fi
 cd /root/test_output/"${OUTPUT_DIRECTORY_NAME}" || exit 1
-find /root/data -type f -name "${PCAP_FILE_NAME}" -print0 | xargs -0 bro -r {} /usr/local/bro/share/bro/site/local.bro -C
+find /root/data -type f -name "${PCAP_FILE_NAME}" -print0 | xargs -0 bro /usr/local/bro/share/bro/site/local.bro -C -r
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
