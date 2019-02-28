@@ -51,6 +51,12 @@ function _echo() {
   esac
 }
 
+# Require bash >= 4
+if ((BASH_VERSINFO[0] < 4 )); then
+  _echo ERROR "bash >= 4.0 is required"
+  exit 1
+fi
+
 SCRIPT_NAME=$(basename -- "$0")
 TEST_DIRECTORY=
 declare -A LOGS_WITH_UNEQUAL_RESULTS
