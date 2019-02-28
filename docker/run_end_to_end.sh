@@ -25,11 +25,13 @@ set -o pipefail
 
 function help {
   echo " "
-  echo "usage: ${0}"
+  echo "USAGE"
   echo "    --skip-docker-build             [OPTIONAL] Skip build of bro docker machine."
   echo "    --data-path                     [OPTIONAL] The pcap data path. Default: ./data"
   echo "    -h/--help                       Usage information."
   echo " "
+  echo "COMPATABILITY"
+  echo "     bash >= 4.0 is required."
   echo " "
 }
 
