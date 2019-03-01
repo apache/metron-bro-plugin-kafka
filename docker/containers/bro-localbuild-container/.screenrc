@@ -1,8 +1,10 @@
 # terminfo and termcap for nice 256 color terminal
 # allow bold colors - necessary for some reason
 attrcolor b ".I"
+
 # tell screen how to set colors. AB = background, AF=foreground
 termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+
 # erase background with current bg color
 defbce "on"
 
@@ -16,7 +18,5 @@ startup_message off
 #i want to see all screen messages for a longer time
 msgwait 86400
 
-
-
-
-
+# Set scrollback to 20k
+defscrollback 20000
