@@ -36,17 +36,16 @@ RUN ./configure
 RUN make
 RUN make install
 ENV PATH="${PATH}:/usr/local/bro/bin"
+ENV PATH="${PATH}:/usr/bin"
 
 # install pip
-RUN yum -y update
-RUN yum -y install epel-release
-RUN yum -y install python-pip
-RUN pip install --upgrade pip
-
-# install bro-pkg
-RUN pip install bro-pkg
-ENV PATH="${PATH}:/usr/bin"
-RUN bro-pkg autoconfig
+RUN yum -y update && \
+    yum -y install epel-release && \
+    yum -y install python-pip && \
+    yum clean all && \
+    pip install --upgrade pip && \
+    pip install bro-pkg && \
+    bro-pkg autoconfig
 
 # install librdkafka
 RUN curl -L https://github.com/edenhill/librdkafka/archive/v0.11.5.tar.gz | tar xvz
