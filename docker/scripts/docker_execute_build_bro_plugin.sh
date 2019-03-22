@@ -31,12 +31,14 @@ function help {
   echo " "
   echo "usage: ${0}"
   echo "    --container-name                [OPTIONAL] The Docker container name. Default: bro"
+  echo "    --plugin-version                [REQUIRED] The plugin version."
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
 }
 
-CONTAINER_NAME=bro
+CONTAINER_NAME="bro"
+PLUGIN_VERSION=
 
 # handle command line options
 for i in "$@"; do
@@ -48,6 +50,16 @@ for i in "$@"; do
   #
     --container-name=*)
       CONTAINER_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
+
+  #
+  # PLUGIN_VERSION
+  #
+  #   --plugin-version
+  #
+    --plugin-version=*)
+      PLUGIN_VERSION="${i#*=}"
       shift # past argument=value
     ;;
 
@@ -71,11 +83,16 @@ for i in "$@"; do
   esac
 done
 
-echo "Running build_bro_plugin_docker with "
+if [[ -z "${PLUGIN_VERSION}" ]]; then
+  echo "PLUGIN_VERSION must be passed"
+  exit 1
+fi
+
+echo "Running build_bro_plugin with "
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "==================================================="
 
-docker exec -w /root "${CONTAINER_NAME}" bash -c /root/built_in_scripts/build_bro_plugin.sh
+docker exec -w /root "${CONTAINER_NAME}" bash -c "/root/built_in_scripts/build_bro_plugin.sh --plugin-version=${PLUGIN_VERSION}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc};
 fi

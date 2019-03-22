@@ -50,7 +50,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 └── wait_for_zk.sh
 ```
 
-- `build_bro_plugin.sh`: Runs `bro-pkg` to build and install the plugin.
+- `build_bro_plugin.sh`: Runs `bro-pkg` to build and install the provided version of the plugin.
 - `configure_bro_plugin.sh`: Configures the plugin for the kafka container, and routes all traffic types.
 - `process_data_file.sh`: Runs `bro -r` on the passed file
 - `wait-for-it.sh`: Waits for a port to be open, so we know something is available.
