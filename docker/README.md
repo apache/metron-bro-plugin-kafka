@@ -150,14 +150,13 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: bro-network
-  --offset                       [OPTIONAL] The kafka offset. Default: -1
+  --offset                       [OPTIONAL] The kafka offset. Default: 0
   --kafka-topic                  [OPTIONAL] The kafka topic to consume from. Default: bro
   ```
 - `docker_run_get_offset_kafka.sh`: Runs an instance of the kafka container and gets the current offset for the specified topic
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: bro-network
-  --offset                       [OPTIONAL] The kafka offset. Default: -1
   --kafka-topic                  [OPTIONAL] The kafka topic to get the offset from. Default: bro
   ```
 - `docker_run_create_topic_in_kafka.sh`: Runs an instance of the kafka container, creating the specified topic
