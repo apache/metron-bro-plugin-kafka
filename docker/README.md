@@ -300,3 +300,6 @@ Other scripts may then be used to do your testing, for example running:
 --kafka-topic                   [OPTIONAL] The kafka topic name to use. Default: bro
 --plugin-version                [OPTIONAL] The plugin version. Default: the current branch name
 ```
+
+> NOTE: The provided `--plugin-version` is passed to the [`bro-pkg install`](https://docs.zeek.org/projects/package-manager/en/stable/bro-pkg.html#install-command) command within the container, which allows you to specify a version tag, branch name, or commit hash.  However, that tag, branch, or commit *must* be available in the currently checked out plugin repository.
+
