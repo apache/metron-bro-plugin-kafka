@@ -71,7 +71,7 @@ for i in "$@"; do
   esac
 done
 
-echo "Running build_bro_plugin_docker with "
+echo "Running bash on "
 echo "CONTAINER_NAME = $CONTAINER_NAME"
 echo "==================================================="
 

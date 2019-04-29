@@ -50,7 +50,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 └── wait_for_zk.sh
 ```
 
-- `build_bro_plugin.sh`: Runs `bro-pkg` to build and install the plugin.
+- `build_bro_plugin.sh`: Runs `bro-pkg` to build and install the provided version of the plugin.
 - `configure_bro_plugin.sh`: Configures the plugin for the kafka container, and routes all traffic types.
 - `process_data_file.sh`: Runs `bro -r` on the passed file
 - `wait-for-it.sh`: Waits for a port to be open, so we know something is available.
@@ -294,7 +294,11 @@ Other scripts may then be used to do your testing, for example running:
 ##### `run_end_to_end.sh`
 ###### Parameters
 ```bash
---skip-docker-build            [OPTIONAL] Skip build of bro docker machine.
---data-path                    [OPTIONAL] The pcap data path. Default: ./data
---kafka-topic                  [OPTIONAL] The kafka topic name to use. Default: bro
+--skip-docker-build             [OPTIONAL] Skip build of bro docker machine.
+--data-path                     [OPTIONAL] The pcap data path. Default: ./data
+--kafka-topic                   [OPTIONAL] The kafka topic name to use. Default: bro
+--plugin-version                [OPTIONAL] The plugin version. Default: the current branch name
 ```
+
+> NOTE: The provided `--plugin-version` is passed to the [`bro-pkg install`](https://docs.zeek.org/projects/package-manager/en/stable/bro-pkg.html#install-command) command within the container, which allows you to specify a version tag, branch name, or commit hash.  However, that tag, branch, or commit *must* be available in the currently checked out plugin repository.
+

@@ -29,6 +29,7 @@ function help {
   echo "    --skip-docker-build             [OPTIONAL] Skip build of bro docker machine."
   echo "    --data-path                     [OPTIONAL] The pcap data path. Default: ./data"
   echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: bro"
+  echo "    --plugin-version                [OPTIONAL] The plugin version. Default: the current branch name"
   echo "    -h/--help                       Usage information."
   echo " "
   echo "COMPATABILITY"
@@ -53,6 +54,7 @@ DATE=$(date)
 LOG_DATE=${DATE// /_}
 TEST_OUTPUT_PATH="${ROOT_DIR}/test_output/"${LOG_DATE//:/_}
 KAFKA_TOPIC="bro"
+PLUGIN_VERSION=$(cd "${ROOT_DIR}" && git rev-parse --symbolic-full-name --abbrev-ref HEAD)
 
 # Handle command line options
 for i in "$@"; do
@@ -66,6 +68,7 @@ for i in "$@"; do
       SKIP_REBUILD_BRO=true
       shift # past argument
     ;;
+
   #
   # DATA_PATH
   #
@@ -73,6 +76,7 @@ for i in "$@"; do
       DATA_PATH="${i#*=}"
       shift # past argument=value
     ;;
+
   #
   # KAFKA_TOPIC
   #
@@ -82,6 +86,17 @@ for i in "$@"; do
       KAFKA_TOPIC="${i#*=}"
       shift # past argument=value
     ;;
+
+  #
+  # PLUGIN_VERSION
+  #
+  #   --plugin-version
+  #
+    --plugin-version=*)
+      PLUGIN_VERSION="${i#*=}"
+      shift # past argument=value
+    ;;
+
   #
   # -h/--help
   #
@@ -96,9 +111,10 @@ done
 EXTRA_ARGS="$*"
 
 echo "Running build_container with "
-echo "SKIP_REBUILD_BRO = $SKIP_REBUILD_BRO"
-echo "DATA_PATH        = $DATA_PATH"
-echo "KAFKA_TOPIC      = $KAFKA_TOPIC"
+echo "SKIP_REBUILD_BRO = ${SKIP_REBUILD_BRO}"
+echo "DATA_PATH        = ${DATA_PATH}"
+echo "KAFKA_TOPIC      = ${KAFKA_TOPIC}"
+echo "PLUGIN_VERSION   = ${PLUGIN_VERSION}"
 echo "==================================================="
 
 # Create the network
@@ -132,7 +148,7 @@ rc=$?; if [[ ${rc} != 0 ]]; then
 fi
 
 # Create the kafka topic
-bash "${SCRIPT_DIR}"/docker_run_create_topic_in_kafka.sh --kafka-topic=${KAFKA_TOPIC}
+bash "${SCRIPT_DIR}"/docker_run_create_topic_in_kafka.sh --kafka-topic="${KAFKA_TOPIC}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
@@ -167,7 +183,7 @@ rc=$?; if [[ ${rc} != 0 ]]; then
 fi
 
 # Build the bro plugin
-bash "${SCRIPT_DIR}"/docker_execute_build_bro_plugin.sh
+bash "${SCRIPT_DIR}"/docker_execute_build_bro_plugin.sh --plugin-version="${PLUGIN_VERSION}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO BUILD PLUGIN.  CHECK LOGS  ${rc}"
   exit ${rc}
@@ -198,7 +214,7 @@ do
 
   # get the current offset in kafka
   # this is where we are going to _start_
-  OFFSET=$(bash "${SCRIPT_DIR}"/docker_run_get_offset_kafka.sh --kafka-topic=${KAFKA_TOPIC} | sed "s/^${KAFKA_TOPIC}:0:\(.*\)$/\1/")
+  OFFSET=$(bash "${SCRIPT_DIR}"/docker_run_get_offset_kafka.sh --kafka-topic="${KAFKA_TOPIC}" | sed "s/^${KAFKA_TOPIC}:0:\(.*\)$/\1/")
   echo "OFFSET------------------> ${OFFSET}"
 
   bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
@@ -208,7 +224,7 @@ do
   fi
 
   KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
-  bash "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset=${OFFSET} --kafka-topic=${KAFKA_TOPIC} | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
+  bash "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset="${OFFSET}" --kafka-topic="${KAFKA_TOPIC}" | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
 
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"
