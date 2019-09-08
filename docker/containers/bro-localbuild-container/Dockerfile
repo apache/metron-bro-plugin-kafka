@@ -24,7 +24,7 @@ RUN yum -y groupinstall "Development Tools" && \
    openssl-devel python-devel swig \
    zlib-devel perl \
    cyrus-sasl cyrus-sasl-devel cyrus-sasl-gssapi \
-   git jq screen
+   git jq screen tree vim
 
 # copy in the screen -rc
 COPY .screenrc /root

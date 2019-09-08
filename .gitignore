@@ -3,7 +3,7 @@
 *.iml
 *.iws
 .DS_Store
-
+/cmake-build-*
 .state
 build
 
@@ -39,5 +39,5 @@ build
 # Log files
 *.log
 # pcap files
-*.pcap
-*.pcapng
+#*.pcap
+#*.pcapng

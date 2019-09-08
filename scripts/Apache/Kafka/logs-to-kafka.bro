@@ -19,6 +19,7 @@
 
 module Kafka;
 
+
 function send_to_kafka(id: Log::ID): bool
 {
         if (|logs_to_send| == 0 && send_all_active_logs == F)
@@ -50,4 +51,8 @@ event bro_init() &priority=-10
                         Log::add_filter(stream_id, filter);
                 }
         }
+}
+
+event kafka_topic_resolved_event(topic: string) {
+    print(fmt("Kafka topic set to %s",topic));
 }

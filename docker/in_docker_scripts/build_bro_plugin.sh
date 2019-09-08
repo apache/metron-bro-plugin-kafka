@@ -82,19 +82,26 @@ echo "PLUGIN_VERSION = ${PLUGIN_VERSION}"
 
 cd /root || exit 1
 
-echo "================================"
+echo "==================================================="
 
-bro-pkg install code --version "${PLUGIN_VERSION}" --force
+bro-pkg -vvv install code --version "${PLUGIN_VERSION}" --force
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR running bro-pkg install ${rc}"
   exit ${rc}
 fi
-
-echo "================================"
+echo "==================================================="
+echo "ERR"
+cat /root/.zkg/testing/code/clones/code/zkg.test_command.stderr
+echo "==================================================="
+echo "OUT"
+cat /root/.zkg/testing/code/clones/code/zkg.test_command.stdout
+echo "==================================================="
+echo ""
+echo "==================================================="
 echo ""
 
-bro -N Apache::Kafka
+bro -NN Apache::Kafka
 
-echo "================================"
+echo "==================================================="
 echo ""
 
