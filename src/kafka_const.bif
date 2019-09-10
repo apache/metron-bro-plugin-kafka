@@ -18,4 +18,3 @@
 module Kafka;
 
 type config : table[string] of string;
-type topic_record : record;
