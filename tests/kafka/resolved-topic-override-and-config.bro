@@ -30,7 +30,7 @@ event bro_init() &priority=-10
     local xxx_filter: Log::Filter = [
         $name = "kafka-xxx",
         $writer = Log::WRITER_KAFKAWRITER,
-        $path = "kakfa_xxx",
+        $path = "kafka_xxx",
         $config = table(["topic_name"] = "xxx-topic")
     ];
     Log::add_filter(Conn::LOG, xxx_filter);

@@ -72,7 +72,7 @@ for i in "$@"; do
   #
   # NO_PCAP
   #
-  #   --skip-docker-build
+  #   --no-pcap
   #
     --no-pcap)
       NO_PCAP=true
@@ -240,7 +240,7 @@ if [[ "$NO_PCAP" = false ]]; then
       echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"
     fi
 
-    "${SCRIPT_DIR}"/split_kakfa_output_by_log.sh --log-directory="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
+    "${SCRIPT_DIR}"/split_kafka_output_by_log.sh --log-directory="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
     rc=$?; if [[ ${rc} != 0 ]]; then
       echo "ERROR> ISSUE ENCOUNTERED WHEN SPLITTING KAFKA OUTPUT LOGS"
     fi
