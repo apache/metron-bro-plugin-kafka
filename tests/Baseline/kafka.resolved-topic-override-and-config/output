@@ -1,2 +1,2 @@
-Kafka topic set to test-topic
-Kafka topic set to xxx-topic
+Kafka topic set to const-variable-topic
+Kafka topic set to configuration-table-topic

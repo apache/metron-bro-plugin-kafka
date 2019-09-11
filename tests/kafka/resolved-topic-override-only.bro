@@ -28,7 +28,7 @@ event bro_init() &priority=-10
         $name = "kafka-xxx",
         $writer = Log::WRITER_KAFKAWRITER,
         $path = "kafka_xxx",
-        $config = table(["topic_name"] = "xxx-topic")
+        $config = table(["topic_name"] = "configuration-table-topic")
     ];
     Log::add_filter(Conn::LOG, xxx_filter);
 }

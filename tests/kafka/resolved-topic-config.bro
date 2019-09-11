@@ -22,5 +22,5 @@ module Kafka;
 
 
 redef Kafka::logs_to_send = set(Conn::LOG);
-redef Kafka::topic_name = "test-topic";
+redef Kafka::topic_name = "const-variable-topic";
 redef Kafka::mock = T;
