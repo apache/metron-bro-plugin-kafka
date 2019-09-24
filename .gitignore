@@ -38,6 +38,3 @@ build
 
 # Log files
 *.log
-# pcap files
-#*.pcap
-#*.pcapng
