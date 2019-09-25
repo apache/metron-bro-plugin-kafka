@@ -66,9 +66,11 @@ protected:
 
 private:
     string GetConfigValue(const WriterInfo& info, const string name) const;
+    void raise_topic_resolved_event(const string topic);
     static const string default_topic_key;
     string stream_id;
     bool tag_json;
+    bool mocking;
     string json_timestamps;
     map<string, string> kafka_conf;
     string topic_name;

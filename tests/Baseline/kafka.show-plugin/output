@@ -6,4 +6,6 @@ Apache::Kafka - Writes logs to Kafka (dynamic)
     [Constant] Kafka::tag_json
     [Constant] Kafka::json_timestamps
     [Constant] Kafka::debug
+    [Constant] Kafka::mock
+    [Event] kafka_topic_resolved_event
 

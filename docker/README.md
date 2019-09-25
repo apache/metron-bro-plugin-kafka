@@ -295,6 +295,7 @@ Other scripts may then be used to do your testing, for example running:
 ###### Parameters
 ```bash
 --skip-docker-build             [OPTIONAL] Skip build of bro docker machine.
+--no-pcaps                      [OPTIONAL] Do not run pcaps.
 --data-path                     [OPTIONAL] The pcap data path. Default: ./data
 --kafka-topic                   [OPTIONAL] The kafka topic name to use. Default: bro
 --plugin-version                [OPTIONAL] The plugin version. Default: the current branch name

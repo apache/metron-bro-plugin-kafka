@@ -16,6 +16,7 @@
  */
 
 #include "KafkaWriter.h"
+#include "events.bif.h"
 
 using namespace logging;
 using namespace writer;
@@ -35,6 +36,7 @@ KafkaWriter::KafkaWriter(WriterFrontend* frontend):
 
   // tag_json - thread local copy
   tag_json = BifConst::Kafka::tag_json;
+  mocking = BifConst::Kafka::mock;
 
   // json_timestamps
   ODesc tsfmt;
@@ -88,6 +90,7 @@ string KafkaWriter::GetConfigValue(const WriterInfo& info, const string name) co
  */
 bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading::Field* const* fields)
 {
+
     // Timeformat object, default to TS_EPOCH
     threading::formatter::JSON::TimeFormat tf = threading::formatter::JSON::TS_EPOCH;
 
@@ -102,6 +105,10 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     } else if(topic_name.empty()) {
       // If no global 'topic_name' is defined, use the log stream's 'path'
       topic_name = info.path;
+    }
+
+    if (mocking) {
+       raise_topic_resolved_event(topic_name);
     }
 
     /**
@@ -171,25 +178,26 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
         }
     }
 
-    // create kafka producer
-    producer = RdKafka::Producer::create(conf, err);
-    if (!producer) {
-        Error(Fmt("Failed to create producer: %s", err.c_str()));
-        return false;
-    }
+    if (!mocking) {
+        // create kafka producer
+        producer = RdKafka::Producer::create(conf, err);
+        if (!producer) {
+            Error(Fmt("Failed to create producer: %s", err.c_str()));
+            return false;
+        }
 
-    // create handle to topic
-    topic_conf = RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC);
-    topic = RdKafka::Topic::create(producer, topic_name, topic_conf, err);
-    if (!topic) {
-        Error(Fmt("Failed to create topic handle: %s", err.c_str()));
-        return false;
-    }
+        // create handle to topic
+        topic_conf = RdKafka::Conf::create(RdKafka::Conf::CONF_TOPIC);
+        topic = RdKafka::Topic::create(producer, topic_name, topic_conf, err);
+        if (!topic) {
+            Error(Fmt("Failed to create topic handle: %s", err.c_str()));
+            return false;
+        }
 
-    if(is_debug) {
-        MsgThread::Info(Fmt("Successfully created producer."));
+        if (is_debug) {
+            MsgThread::Info(Fmt("Successfully created producer."));
+        }
     }
-
     return true;
 }
 
@@ -206,21 +214,23 @@ bool KafkaWriter::DoFinish(double network_time)
     int waited = 0;
     int max_wait = BifConst::Kafka::max_wait_on_shutdown;
 
-    // wait a bit for queued messages to be delivered
-    while (producer->outq_len() > 0 && waited <= max_wait) {
-        producer->poll(poll_interval);
-        waited += poll_interval;
-    }
+    if (!mocking) {
+        // wait a bit for queued messages to be delivered
+        while (producer->outq_len() > 0 && waited <= max_wait) {
+            producer->poll(poll_interval);
+            waited += poll_interval;
+        }
 
-    // successful only if all messages delivered
-    if (producer->outq_len() == 0) {
-        success = true;
-    } else {
-        Error(Fmt("Unable to deliver %0d message(s)", producer->outq_len()));
-    }
+        // successful only if all messages delivered
+        if (producer->outq_len() == 0) {
+            success = true;
+        } else {
+            Error(Fmt("Unable to deliver %0d message(s)", producer->outq_len()));
+        }
 
-    delete topic;
-    delete producer;
+        delete topic;
+        delete producer;
+    }
     delete formatter;
     delete conf;
     delete topic_conf;
@@ -234,26 +244,26 @@ bool KafkaWriter::DoFinish(double network_time)
  */
 bool KafkaWriter::DoWrite(int num_fields, const threading::Field* const* fields, threading::Value** vals)
 {
-    ODesc buff;
-    buff.Clear();
+    if (!mocking) {
+        ODesc buff;
+        buff.Clear();
 
-    // format the log entry
-    formatter->Describe(&buff, num_fields, fields, vals);
+        // format the log entry
+        formatter->Describe(&buff, num_fields, fields, vals);
 
-    // send the formatted log entry to kafka
-    const char* raw = (const char*)buff.Bytes();
-    RdKafka::ErrorCode resp = producer->produce(
-        topic, RdKafka::Topic::PARTITION_UA, RdKafka::Producer::RK_MSG_COPY,
-        const_cast<char*>(raw), strlen(raw), NULL, NULL);
+        // send the formatted log entry to kafka
+        const char *raw = (const char *) buff.Bytes();
+        RdKafka::ErrorCode resp = producer->produce(
+                topic, RdKafka::Topic::PARTITION_UA, RdKafka::Producer::RK_MSG_COPY,
+                const_cast<char *>(raw), strlen(raw), NULL, NULL);
 
-    if (RdKafka::ERR_NO_ERROR == resp) {
-        producer->poll(0);
+        if (RdKafka::ERR_NO_ERROR == resp) {
+            producer->poll(0);
+        } else {
+            string err = RdKafka::err2str(resp);
+            Error(Fmt("Kafka send failed: %s", err.c_str()));
+        }
     }
-    else {
-        string err = RdKafka::err2str(resp);
-        Error(Fmt("Kafka send failed: %s", err.c_str()));
-    }
-
     return true;
 }
 
@@ -279,7 +289,9 @@ bool KafkaWriter::DoSetBuf(bool enabled)
  */
 bool KafkaWriter::DoFlush(double network_time)
 {
-    producer->poll(0);
+    if (!mocking) {
+        producer->poll(0);
+    }
     return true;
 }
 
@@ -303,6 +315,20 @@ bool KafkaWriter::DoRotate(const char* rotated_path, double open, double close, 
  */
 bool KafkaWriter::DoHeartbeat(double network_time, double current_time)
 {
-    producer->poll(0);
+    if (!mocking) {
+        producer->poll(0);
+    }
     return true;
+}
+
+/**
+ * Triggered when the topic is resolved from the configuration, when mocking/testing
+ * @param topic
+ */
+void KafkaWriter::raise_topic_resolved_event(const string topic) {
+    if (kafka_topic_resolved_event) {
+        val_list *vl = new val_list;
+        vl->append(new StringVal(topic.c_str()));
+        mgr.QueueEvent(kafka_topic_resolved_event, vl);
+    }
 }

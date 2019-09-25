@@ -55,5 +55,7 @@ export {
 
         ## A comma separated list of librdkafka debug contexts
         const debug: string = "" &redef;
+
+        const mock: bool = F &redef;
 }
 
