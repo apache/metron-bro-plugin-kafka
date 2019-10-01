@@ -19,7 +19,6 @@
 
 shopt -s nocasematch
 set -u # nounset
-set -e # errexit
 set -E # errtrap
 set -o pipefail
 
@@ -55,7 +54,36 @@ DATE=$(date)
 LOG_DATE=${DATE// /_}
 TEST_OUTPUT_PATH="${ROOT_DIR}/test_output/"${LOG_DATE//:/_}
 KAFKA_TOPIC="bro"
-PLUGIN_VERSION=$(cd "${ROOT_DIR}" && git rev-parse --symbolic-full-name --abbrev-ref HEAD)
+
+cd "${ROOT_DIR}" || { echo "NO ROOT" ; exit 1; }
+# we may not be checked out from git, check and make it so that we are since
+# bro-pkg requires it
+
+git status 2&>1
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "bro-pkg requires the plugin to be a git repo, creating..."
+  git init .
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> FAILED TO INITIALIZE GIT IN PLUGIN DIRECTORY. ${rc}"
+  exit ${rc}
+  fi
+  git add .
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> FAILED TO ADD ALL TO GIT PLUGIN DIRECTORY. ${rc}"
+  exit ${rc}
+  fi
+  git commit -m 'docker run'
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    echo "ERROR> FAILED TO COMMIT TO GIT MASTER IN PLUGIN DIRECTORY. ${rc}"
+  exit ${rc}
+  fi
+  echo "git repo created"
+fi
+
+# set errexit for the rest of the run
+set -e
+
+PLUGIN_VERSION=$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)
 
 # Handle command line options
 for i in "$@"; do
