@@ -47,6 +47,7 @@ fi
 SKIP_REBUILD_BRO=false
 NO_PCAP=false
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
+PLUGIN_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. > /dev/null && pwd)"
 SCRIPT_DIR="${ROOT_DIR}"/scripts
 CONTAINER_DIR="${ROOT_DIR}"/containers/bro-localbuild-container
 DATA_PATH="${ROOT_DIR}"/data
@@ -55,7 +56,7 @@ LOG_DATE=${DATE// /_}
 TEST_OUTPUT_PATH="${ROOT_DIR}/test_output/"${LOG_DATE//:/_}
 KAFKA_TOPIC="bro"
 
-cd "${ROOT_DIR}" || { echo "NO ROOT" ; exit 1; }
+cd "${PLUGIN_ROOT_DIR}" || { echo "NO PLUGIN ROOT" ; exit 1; }
 # we may not be checked out from git, check and make it so that we are since
 # bro-pkg requires it
 
@@ -147,7 +148,7 @@ for i in "$@"; do
 done
 
 EXTRA_ARGS="$*"
-
+cd "${ROOT_DIR}" || { echo "NO ROOT" ; exit 1; }
 echo "Running build_container with "
 echo "SKIP_REBUILD_BRO = ${SKIP_REBUILD_BRO}"
 echo "DATA_PATH        = ${DATA_PATH}"
