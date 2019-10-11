@@ -1,0 +1,224 @@
+#!/usr/bin/env bash
+#
+#  Licensed to the Apache Software Foundation (ASF) under one or more
+#  contributor license agreements.  See the NOTICE file distributed with
+#  this work for additional information regarding copyright ownership.
+#  The ASF licenses this file to You under the Apache License, Version 2.0
+#  (the "License"); you may not use this file except in compliance with
+#  the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+shopt -s nocasematch
+
+function help {
+  echo " "
+  echo "usage: ${0}"
+  echo "    -v/--version=<version>   The version of the metron bro plugin kafka release. [Required]"
+  echo "    -c/--candidate=<RC#>      Defines the Release Candidate. [Required]"
+  echo "    -h/--help                Usage information."
+  echo " "
+  echo "example: "
+  echo "    metron-bro-kafka-rc-check --version=0.3.0 --candidate=RC2"
+  echo " "
+}
+
+APACHE_REPO="https://dist.apache.org/repos/dist/"
+METRON_DIST=${APACHE_REPO}"dev/metron/metron-bro-plugin-kafka/"
+METRON_KEYS=${APACHE_REPO}"release/metron/KEYS"
+
+#
+#  runs the bro kafka plugin's docker based tests
+#
+function run_bro_docker {
+    cd docker &> /dev/null || { echo "failed to change directory to docker" ; exit 1; }
+    ./run_end_to_end.sh
+
+    rc=$?; if [[ ${rc} != 0 ]]; then
+        echo "ERROR> FAILED run_end_to_end"
+        # do NOT exit here
+    fi
+    cd .. &> /dev/null || { echo "failed to change directory to plugin root"; exit 1; }
+}
+
+#
+#   runs the finish bro docker script to cleanup
+#
+function finish_bro_docker {
+    cd docker &> /dev/null || { echo "failed to change directory to docker"; exit 1; }
+    ./finish_end_to_end.sh
+
+    rc=$?; if [[ ${rc} != 0 ]]; then
+        echo "ERROR> FAILED finish_end_to_end"
+        exit ${rc}
+    fi
+    cd .. &> /dev/null || { echo "failed to change directory to plugin root";
+        exit 1; }
+}
+
+# print help, if the user just runs this without any args
+if [ "$#" -eq 0 ]; then
+    help
+    exit 1
+fi
+
+# handle command line options
+for i in "$@"; do
+  case $i in
+    #
+    # VERSION: The release version of Metron to validate.
+    #
+    #
+    -v=*|--version=*)
+    VERSION="${i#*=}"
+    shift # past argument=value
+    ;;
+
+    #
+    # RC: Defines the RC# to use
+    #
+    #   -c=RC2
+    #   --candidate=RC2
+    #
+    -c=*|--candidate=*)
+    CANDIDATE="${i#*=}"
+    shift # past argument=value
+    ;;
+
+    #
+    # -h/--help
+    #
+    -h|--help)
+    help
+    exit 0
+    shift # past argument with no value
+    ;;
+
+    #
+    # Unknown option
+    #
+    *)
+    UNKNOWN_OPTION="${i#*=}"
+    echo "Error: unknown option: $UNKNOWN_OPTION"
+    help
+    ;;
+  esac
+done
+
+# validation
+if [ -z "$VERSION" ]; then
+	echo "Missing -v/--version is is required"
+	exit 1
+fi
+if [[ "$VERSION" =~ ^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2} ]]; then
+  PLUGIN_VERSION="$VERSION"
+else
+  echo "[ERROR] "$VERSION" may not be a valid version number"
+  exit 1
+fi
+
+if [ -z "$CANDIDATE" ]; then
+	echo "Missing -c/--candidate which is required"
+	exit 1
+fi
+
+if [[ "$CANDIDATE" =~ ^RC[0-9]+ ]]; then
+  RC=$(echo "$CANDIDATE" | tr '[:upper:]' '[:lower:]')
+  UPPER_RC=$(echo "$CANDIDATE" | tr '[:lower:]' '[:upper:]')
+elif [[ "$CANDIDATE" =~ ^[0-9]+ ]]; then
+  RC=rc"$CANDIDATE"
+  UPPER_RC=RC"$CANDIDATE"
+else
+  echo "[ERROR] invalid RC, valid is RC# or just #"
+  exit 1
+fi
+
+echo "Metron Bro Plugin Kafka Version $PLUGIN_VERSION"
+echo "Release Candidate $RC"
+
+PLUGIN_RC_DIST="$METRON_DIST$PLUGIN_VERSION-$UPPER_RC"
+echo "Metron Bro Plugin Kafka RC Distribution Root is $PLUGIN_RC_DIST"
+
+# working directory
+WORK="$HOME/tmp/metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC"
+
+# handle tilde expansion
+WORK="${WORK/#\~/$HOME}"
+
+# warn the user if the working directory exists
+if [ -d "$WORK" ]; then
+  echo "[ERROR] Directory $WORK exists, please rename it and start over"
+  exit 1
+fi
+
+if [ ! -d "$WORK" ]; then
+  mkdir -p "$WORK"
+fi
+echo "Working directory $WORK"
+
+PLUGIN_ASSEMBLY="$PLUGIN_RC_DIST/apache-metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC.tar.gz"
+PLUGIN_ASSEMBLY_SIG="$PLUGIN_ASSEMBLY.asc"
+
+
+echo "Downloading $METRON_KEYS"
+if ! wget -P "$WORK" "$METRON_KEYS" ; then
+  echo "[ERROR] Failed to download $METRON_KEYS"
+  exit 1
+fi
+
+echo "Downloading $PLUGIN_ASSEMBLY"
+if ! wget -P "$WORK" "$PLUGIN_ASSEMBLY" ; then
+  echo "[ERROR] Failed to download $PLUGIN_ASSEMBLY"
+  exit 1
+fi
+
+echo "Downloading $PLUGIN_ASSEMBLY_SIG"
+if ! wget -P "$WORK" "$PLUGIN_ASSEMBLY_SIG" ; then
+  echo "[ERROR] Failed to download $PLUGIN_ASSEMBLY_SIG"
+  exit 1
+fi
+
+cd "$WORK" || exit 1
+echo "importing metron keys"
+
+if ! gpg --import KEYS ; then
+  echo "[ERROR] failed to import KEYS"
+  exit 1
+fi
+
+echo "Verifying Metron Bro Plugin Kafka Assembly"
+if ! gpg --verify ./"apache-metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC.tar.gz.asc" "apache-metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC.tar.gz" ; then
+  echo "[ERROR] failed to verify Metron Bro Plugin Kafka Assembly"
+  exit 1
+fi
+
+echo "Unpacking Assemblies"
+if ! tar -xzf "apache-metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC.tar.gz" ; then
+  echo "[ERROR] failed to unpack Metron Bro Plugin Kafka Assembly"
+  exit 1
+fi
+
+echo ""
+echo ""
+read -p "  run test suite [yN] " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  echo "  please verify that no bro docker containers are running before continuing,"
+        read -p "  no bro docker containers are running, ready to proceed [yN] " -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            cd apache-metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC || exit 1
+            run_bro_docker
+            finish_bro_docker
+        else
+            echo "  when you are ready and the containers are stopped, please cd into the docker"
+            echo "  directory and execute the run_end_to_end.sh script"
+        fi
+  cd .. || exit 1
+fi
+
