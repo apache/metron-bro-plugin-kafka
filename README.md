@@ -300,6 +300,14 @@ The name of the topic in Kafka where all Bro logs will be sent to.
 redef Kafka::topic_name = "bro";
 ```
 
+### `sensor_name`
+
+The name of the sensor to be use for all the tagged logs.
+
+```
+redef Kafka::sensor_name = "sensor_name";
+```
+
 ### `kafka_conf`
 
 The global configuration settings for Kafka.  These values are passed through
@@ -398,6 +406,7 @@ The following is how the `${BRO_HOME}/share/bro/site/local.bro` looks:
 @load packages/metron-bro-plugin-kafka/Apache/Kafka
 redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG);
 redef Kafka::topic_name = "bro";
+redef Kafka::sensor_name = "bro";
 redef Kafka::tag_json = T;
 redef Kafka::kafka_conf = table( ["metadata.broker.list"] = "node1:6667"
                                , ["security.protocol"] = "SASL_PLAINTEXT"
