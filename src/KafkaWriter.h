@@ -74,6 +74,7 @@ private:
     string json_timestamps;
     map<string, string> kafka_conf;
     string topic_name;
+    string sensor_name;
     string topic_name_override;
     threading::formatter::Formatter *formatter;
     RdKafka::Producer* producer;

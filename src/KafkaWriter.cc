@@ -51,6 +51,11 @@ KafkaWriter::KafkaWriter(WriterFrontend* frontend):
     (const char*)BifConst::Kafka::topic_name->Bytes(),
     BifConst::Kafka::topic_name->Len());
 
+  // sensor name - thread local copy
+  sensor_name.assign(
+    (const char*)BifConst::Kafka::sensor_name->Bytes(),
+    BifConst::Kafka::sensor_name->Len());
+
   // kafka_conf - thread local copy
   Val* val = BifConst::Kafka::kafka_conf->AsTableVal();
   IterCookie* c = val->AsTable()->InitForIteration();
@@ -135,7 +140,7 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
 
     // initialize the formatter
     if(BifConst::Kafka::tag_json) {
-      formatter = new threading::formatter::TaggedJSON(info.path, this, tf);
+      formatter = new threading::formatter::TaggedJSON(sensor_name, info.path, this, tf);
     } 
     else {
       formatter = new threading::formatter::JSON(this, tf);

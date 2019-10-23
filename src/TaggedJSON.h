@@ -38,11 +38,12 @@ namespace threading { namespace formatter {
 class TaggedJSON : public JSON {
 
 public:
-    TaggedJSON(string stream_name, MsgThread* t, JSON::TimeFormat tf);
+    TaggedJSON(string sensor_name, string stream_name, MsgThread* t, JSON::TimeFormat tf);
     virtual ~TaggedJSON();
     virtual bool Describe(ODesc* desc, int num_fields, const Field* const* fields, Value** vals) const;
 
 private:
+    string sensor_name;
     string stream_name;
 };
 
