@@ -75,6 +75,7 @@ private:
     map<string, string> kafka_conf;
     string topic_name;
     string topic_name_override;
+    string metadata_broker_list_override;
     threading::formatter::Formatter *formatter;
     RdKafka::Producer* producer;
     RdKafka::Topic* topic;

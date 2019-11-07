@@ -169,6 +169,18 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
       }
     }
 
+     // Allow overriding of the kafka list of brokers via the Bro script constant 'metadata.broker.list'
+     // which can be applied when adding a new Bro log filter as $config = table(["metadata.broker.list"] = "host:port").
+     metadata_broker_list_override = GetConfigValue(info, "metadata.broker.list");
+     if ( !metadata_broker_list_override.empty() ) {
+        MsgThread::Info(Fmt("Overriding default metadata.broker.list with %s for writer %s.", metadata_broker_list_override.c_str(), info.path));
+       // apply overriding setting metadata.broker.list to kafka
+       if (RdKafka::Conf::CONF_OK != conf->set("metadata.broker.list", metadata_broker_list_override, err)) {
+           Error(Fmt("Failed to set '%s'='%s': %s", "metadata.broker.list", metadata_broker_list_override.c_str(), err.c_str()));
+           return false;
+       }
+     }
+
     if(is_debug) {
         string key("debug");
         string val(debug);
