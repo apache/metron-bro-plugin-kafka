@@ -87,7 +87,7 @@ for folder in nitroba example-traffic ssh ftp radius rfb; do
 done
 
 if [[ ! -f "${DATA_PATH}"/example-traffic/exercise-traffic.pcap ]]; then
-  wget https://www.bro.org/static/traces/exercise-traffic.pcap -O "${DATA_PATH}"/example-traffic/exercise-traffic.pcap
+  wget https://github.com/bro/try-bro/raw/master/manager/static/pcaps/exercise_traffic.pcap -O "${DATA_PATH}"/example-traffic/exercise-traffic.pcap
 fi
 
 if [[ ! -f "${DATA_PATH}"/nitroba/nitroba.pcap ]]; then
@@ -95,7 +95,7 @@ if [[ ! -f "${DATA_PATH}"/nitroba/nitroba.pcap ]]; then
 fi
 
 if [[ ! -f "${DATA_PATH}"/ssh/ssh.pcap ]]; then
-  wget https://www.bro.org/static/traces/ssh.pcap -O "${DATA_PATH}"/ssh/ssh.pcap
+  wget https://github.com/bro/try-bro/raw/master/manager/static/pcaps/ssh.pcap -O "${DATA_PATH}"/ssh/ssh.pcap
 fi
 
 if [[ ! -f "${DATA_PATH}"/ftp/ftp.pcap ]]; then
