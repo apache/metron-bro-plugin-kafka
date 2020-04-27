@@ -30,8 +30,10 @@ RUN yum -y groupinstall "Development Tools" && \
 COPY .screenrc /root
 
 # install bro
-RUN curl -L https://www.bro.org/downloads/bro-2.5.5.tar.gz | tar xvz
-WORKDIR bro-2.5.5/
+RUN git clone https://github.com/bro/bro
+WORKDIR bro/
+RUN git checkout v2.5.5
+RUN git submodule update --init --recursive
 RUN ./configure
 RUN make
 RUN make install

@@ -188,9 +188,9 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 - `download_sample_pcaps.sh`: Downloads the sample pcaps to a specified directory. If they exist, it is a no-op
   
    > The sample pcaps are:
-   >  -  https://www.bro.org/static/traces/exercise-traffic.pcap 
+   >  -  https://github.com/bro/try-bro/blob/master/manager/static/pcaps/exercise_traffic.pcap
    >  -  http://downloads.digitalcorpora.org/corpora/network-packet-dumps/2008-nitroba/nitroba.pcap 
-   >  -  https://www.bro.org/static/traces/ssh.pcap 
+   >  -  https://github.com/bro/try-bro/raw/master/manager/static/pcaps/ssh.pcap
    >  -  https://github.com/markofu/pcaps/blob/master/PracticalPacketAnalysis/ppa-capture-files/ftp.pcap?raw=true 
    >  -  https://github.com/EmpowerSecurityAcademy/wireshark/blob/master/radius_localhost.pcapng?raw=true 
    >  -  https://github.com/kholia/my-pcaps/blob/master/VNC/07-vnc
