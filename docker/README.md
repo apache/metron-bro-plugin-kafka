@@ -26,6 +26,8 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 ```bash
 ├── containers
 │   └── bro
+│   └── kafka
+│   └── zookeeper
 ├── data
 ├── in_docker_scripts
 ├── scripts
@@ -33,6 +35,8 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 ```
 - `containers`: The parent of all of the containers that this project defines.  We use several containers, not all of them ours.
   - `bro`: The directory for our bro container, used for building bro, the librdkafka, and our plugin, as well as running bro.
+  - `kafka`: The directory for our kafka container.
+  - `zookeeper`: The directory for our zookeeper container.
 - `data`: The default path for pcap data to be used in tests.
 - `in_docker_scripts`: This directory is mapped to the bro docker container as /root/built_in_scripts.  These represent the library of scripts we provide to be run in the docker container.
 - `scripts`: These are the scripts that are run on the host for creating the docker bits, running containers, running or executing commands against containers ( such as executing one of the built_in_scripts ), and cleaning up resources.
@@ -66,7 +70,6 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 ├── download_sample_pcaps.sh
 ├── print_results.sh
 ├── split_kakfa_output_by_log.sh
-└── stop_container.sh
 ```
 
 - `analyze_results.sh`: Analyzes the `results.csv` files for any issues
@@ -137,33 +140,21 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --log-directory                [REQUIRED] The directory with the logs
   ```
-- `stop_container.sh`: Stops and removes a Docker container with a given name
-  ###### Parameters
-  ```bash
-  --container-name               [REQUIRED] The Docker container name
-  ```
 
 #### The example end to end test script
 
 `run_end_to_end.sh` is provided as an example of a testing script.  Specific or extended scripts can be created similar to this script to use the containers.
 This script does the following:
 
-1. Creates the Docker network
-2. Runs the zookeeper container
-3. Waits for zookeeper to be available
-4. Runs the kafka container
-5. Waits for kafka to be available
-6. Creates the specified topic
-7. Downloads sample PCAP data
-8. Runs the bro container in the background
-
-> Note that all parameters passed to this script are passed to `docker-compose`
-
-9. Builds the bro plugin
-10. Configures the bro plugin
-11. Runs bro against all the pcap data, one at a time
-12. Executes a kafka client to read the data from bro for each pcap file
-13. Stores the output kafka messages and the bro logs into the test_output directory
+1. Runs docker compose
+1. Creates the specified topic
+1. Downloads sample PCAP data
+1. Runs the bro container in the background
+1. Builds the bro plugin
+1. Configures the bro plugin
+1. Runs bro against all the pcap data, one at a time
+1. Executes a kafka client to read the data from bro for each pcap file
+1. Stores the output kafka messages and the bro logs into the test_output directory
 
 ```bash
 >tree Tue_Jan__8_21_54_10_EST_2019
@@ -201,10 +192,10 @@ Tue_Jan__8_21_54_10_EST_2019
 │   └── stats.log
 ```
 
-14. Creates a results.csv for each pcap that has the line counts of the kafka and the bro output for each log
-15. Prints all the results.csv to the screen
+1. Creates a results.csv for each pcap that has the line counts of the kafka and the bro output for each log
+1. Prints all the results.csv to the screen
 
-As we can see, the output is a folder named for the test run time, with a sub folder per pcap, containing all the bro logs and the kafka_output.log.
+As we can see, the output is a folder named for the test run time, with a sub folder per pcap, containing all the bro logs and the `kafka_output.log`.
 
 
 At this point the containers are up and running in the background.
@@ -214,7 +205,7 @@ Other scripts may then be used to do your testing, for example running:
 ./scripts/docker_execute_shell.sh
 ```
 
-> NOTE: If the scripts are run repeatedly, and there is no change in bro or the librdkafka, the line `./run_end_to_end.sh` can be replaced by `./run_end_to_end.sh --skip-docker-build`, which uses the `--skip-docker-build` flag to not rebuild the bro container, saving the time of rebuilding bro and librdkafka.
+> NOTE: If the scripts are run repeatedly, and there is no change in bro or the librdkafka, the line `./run_end_to_end.sh` can be replaced by `./run_end_to_end.sh --skip-docker-build`, which uses the `--skip-docker-build` flag to not rebuild the containers, saving the significant time of rebuilding bro and librdkafka.
 
 > NOTE: After you are done, you must call the `finish_end_to_end.sh` script to cleanup.
 
