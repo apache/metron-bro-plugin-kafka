@@ -155,43 +155,41 @@ This script does the following:
 1. Runs bro against all the pcap data, one at a time
 1. Executes a kafka client to read the data from bro for each pcap file
 1. Stores the output kafka messages and the bro logs into the test_output directory
-
-```bash
->tree Tue_Jan__8_21_54_10_EST_2019
-Tue_Jan__8_21_54_10_EST_2019
-├── exercise-traffic_pcap
-│   ├── capture_loss.log
-│   ├── conn.log
-│   ├── dhcp.log
-│   ├── dns.log
-│   ├── files.log
-│   ├── http.log
-│   ├── kafka-output.log
-│   ├── known_certs.log
-│   ├── known_devices.log
-│   ├── loaded_scripts.log
-│   ├── notice.log
-│   ├── packet_filter.log
-│   ├── reporter.log
-│   ├── smtp.log
-│   ├── software.log
-│   ├── ssl.log
-│   ├── stats.log
-│   ├── weird.log
-│   └── x509.log
-├── ftp_pcap
-│   ├── capture_loss.log
-│   ├── conn.log
-│   ├── files.log
-│   ├── ftp.log
-│   ├── kafka-output.log
-│   ├── loaded_scripts.log
-│   ├── packet_filter.log
-│   ├── reporter.log
-│   ├── software.log
-│   └── stats.log
-```
-
+    ```bash
+    >tree Tue_Jan__8_21_54_10_EST_2019
+    Tue_Jan__8_21_54_10_EST_2019
+    ├── exercise-traffic_pcap
+    │   ├── capture_loss.log
+    │   ├── conn.log
+    │   ├── dhcp.log
+    │   ├── dns.log
+    │   ├── files.log
+    │   ├── http.log
+    │   ├── kafka-output.log
+    │   ├── known_certs.log
+    │   ├── known_devices.log
+    │   ├── loaded_scripts.log
+    │   ├── notice.log
+    │   ├── packet_filter.log
+    │   ├── reporter.log
+    │   ├── smtp.log
+    │   ├── software.log
+    │   ├── ssl.log
+    │   ├── stats.log
+    │   ├── weird.log
+    │   └── x509.log
+    ├── ftp_pcap
+    │   ├── capture_loss.log
+    │   ├── conn.log
+    │   ├── files.log
+    │   ├── ftp.log
+    │   ├── kafka-output.log
+    │   ├── loaded_scripts.log
+    │   ├── packet_filter.log
+    │   ├── reporter.log
+    │   ├── software.log
+    │   └── stats.log
+    ```
 1. Creates a results.csv for each pcap that has the line counts of the kafka and the bro output for each log
 1. Prints all the results.csv to the screen
 
