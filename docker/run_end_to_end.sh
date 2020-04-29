@@ -198,7 +198,7 @@ rc=$?; if [[ ${rc} != 0 ]]; then
 fi
 
 # Configure the bro plugin
-bash "${SCRIPT_DIR}"/docker_execute_configure_bro_plugin.sh
+bash "${SCRIPT_DIR}"/docker_execute_configure_bro_plugin.sh --kafka-topic="${KAFKA_TOPIC}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO CONFIGURE PLUGIN.  CHECK LOGS  ${rc}"
   exit ${rc}
