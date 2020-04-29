@@ -1,4 +1,4 @@
-version: '3'
+version: '2.4'
 services:
   zookeeper:
     build: containers/zookeeper
@@ -9,7 +9,8 @@ services:
     build: containers/kafka
     image: metron-bro-plugin-kafka_kafka:latest
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
     environment:
       - ZOOKEEPER_IP=zookeeper
     ports:
@@ -22,8 +23,10 @@ services:
         LIBRDKAFKA_VERSION: "0.11.5"
     image: metron-bro-plugin-kafka_bro:latest
     depends_on:
-      - zookeeper
-      - kafka
+      zookeeper:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     volumes:
       - "${DATA_PATH}:/root/data"
       - "${TEST_OUTPUT_PATH}:/root/test_output"

@@ -15,3 +15,5 @@
 #  limitations under the License.
 #
 FROM zookeeper:3.4
+HEALTHCHECK --interval=2s --timeout=1s --start-period=.5s --retries=4 \
+  CMD echo ruok | nc localhost 2181 && echo stat | nc localhost 2181 | grep Mode || exit 1

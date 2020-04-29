@@ -15,3 +15,5 @@
 #  limitations under the License.
 #
 FROM ches/kafka:0.10.2.1
+HEALTHCHECK --interval=5s --timeout=10s --start-period=2s --retries=2 \
+  CMD JMX_PORT= /kafka/bin/kafka-configs.sh --describe --zookeeper zookeeper:2181 --entity-type brokers || exit 1

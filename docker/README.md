@@ -62,10 +62,10 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 ├── analyze_results.sh
 ├── docker_execute_build_bro_plugin.sh
 ├── docker_execute_configure_bro_plugin.sh
+├── docker_execute_create_topic_in_kafka.sh
 ├── docker_execute_process_data_file.sh
 ├── docker_execute_shell.sh
 ├── docker_run_consume_kafka.sh
-├── docker_run_create_topic_in_kafka.sh
 ├── docker_run_get_offset_kafka.sh
 ├── download_sample_pcaps.sh
 ├── print_results.sh
@@ -80,22 +80,28 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 - `docker_execute_build_bro_plugin.sh`: Executes `build_bro_plugin.sh` in the bro container
   ###### Parameters
   ```bash
-   --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
+   --container-name              [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
   ```
 - `docker_execute_configure_bro_plugin.sh`: Executes `configure_bro_plugin.sh` in the bro container
   ###### Parameters
   ```bash
-  --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
+  --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
+  ```
+- `docker_execute_create_topic_in_kafka.sh`: Creates the specified kafka topic in the kafka container
+  ###### Parameters
+  ```bash
+  --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_kafka_1
+  --kafka-topic                  [OPTIONAL] The kafka topic to create. Default: bro
   ```
 - `docker_execute_process_data_file.sh`: Executes `process_data_file.sh` in the bro container
   ###### Parameters
    ```bash
-   --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
+   --container-name              [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
    ```
 - `docker_execute_shell.sh`: `docker execute -i -t bash` to get a shell in a given container
   ###### Parameters
   ```bash
-  --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
+  --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
   ```
 - `docker_run_consume_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic $KAFKA_TOPIC --offset $OFFSET --partition 0 --bootstrap-server kafka:9092`
   ###### Parameters
@@ -109,12 +115,6 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default
   --kafka-topic                  [OPTIONAL] The kafka topic to get the offset from. Default: bro
-  ```
-- `docker_run_create_topic_in_kafka.sh`: Runs an instance of the kafka container, creating the specified topic
-  ###### Parameters
-  ```bash
-  --network-name                 [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default
-  --kafka-topic                  [OPTIONAL] The kafka topic to create. Default: bro
   ```
 - `download_sample_pcaps.sh`: Downloads the sample pcaps to a specified directory. If they exist, it is a no-op
   

@@ -26,25 +26,25 @@ set -o pipefail
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --network-name                  [OPTIONAL] The Docker network name.  Default: metron-bro-plugin-kafka_default"
+  echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_kafka_1"
   echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
 }
 
-NETWORK_NAME=metron-bro-plugin-kafka_default
+CONTAINER_NAME="metron-bro-plugin-kafka_kafka_1"
 KAFKA_TOPIC=bro
 
 # handle command line options
 for i in "$@"; do
   case $i in
   #
-  # NETWORK_NAME
+  # CONTAINER_NAME
   #
-  #   --network-name
+  #   --container-name
   #
-    --network-name=*)
-      NETWORK_NAME="${i#*=}"
+    --container-name=*)
+      CONTAINER_NAME="${i#*=}"
       shift # past argument=value
     ;;
   #
@@ -76,16 +76,13 @@ for i in "$@"; do
   esac
 done
 
-echo "Running docker_run_create_topic_in_kafka with "
-echo "NETWORK_NAME = $NETWORK_NAME"
+echo "Running docker_execute_create_topic_in_kafka.sh with "
+echo "CONTAINER_NAME = ${CONTAINER_NAME}"
+echo "KAFKA_TOPIC = ${KAFKA_TOPIC}"
 echo "==================================================="
 
-# TODO: Fix this
-sleep 2s
-
-docker run --rm --network "${NETWORK_NAME}" metron-bro-plugin-kafka_kafka \
-  kafka-topics.sh --create --topic "${KAFKA_TOPIC}" --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
+docker exec -w /kafka/bin/ "${CONTAINER_NAME}" \
+  bash -c "JMX_PORT= ./kafka-topics.sh --create --topic ${KAFKA_TOPIC} --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181"
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
-
