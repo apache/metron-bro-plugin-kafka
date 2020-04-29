@@ -28,5 +28,7 @@ set -e # errexit
 set -E # errtrap
 set -o pipefail
 
+PROJECT_NAME="metron-bro-plugin-kafka"
+
 # Stop docker compose
 COMPOSE_PROJECT_NAME="${PROJECT_NAME}" docker-compose down
