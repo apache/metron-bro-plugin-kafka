@@ -30,7 +30,7 @@ set -o pipefail
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --container-name                [OPTIONAL] The Docker container name. Default: bro"
+  echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1"
   echo "    --pcap-file-name                [REQUIRED] The name of the pcap file"
   echo "    --output-directory-name         [REQUIRED] The name of the output directory"
   echo "    -h/--help                       Usage information."
@@ -38,7 +38,7 @@ function help {
   echo " "
 }
 
-CONTAINER_NAME=bro
+CONTAINER_NAME=metron-bro-plugin-kafka_bro_1
 PCAP_FILE_NAME=
 OUTPUT_DIRECTORY_NAME=
 

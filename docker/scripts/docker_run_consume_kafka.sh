@@ -31,14 +31,14 @@ set -o pipefail
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
+  echo "    --network-name                  [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default"
   echo "    --offset                        [OPTIONAL] The kafka offset to read from. Default: -1"
   echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
 }
 
-NETWORK_NAME=bro-network
+NETWORK_NAME=metron-bro-plugin-kafka_default
 OFFSET=-1
 KAFKA_TOPIC=bro
 
@@ -92,7 +92,7 @@ for i in "$@"; do
   esac
 done
 
-docker run --rm --network "${NETWORK_NAME}" ches/kafka \
+docker run --rm --network "${NETWORK_NAME}" metron-bro-plugin-kafka_kafka \
   kafka-console-consumer.sh --topic "${KAFKA_TOPIC}" --offset "${OFFSET}" --partition 0 --bootstrap-server kafka:9092 --timeout-ms 1000
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}

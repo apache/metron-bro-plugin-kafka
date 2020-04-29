@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -x
 
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
@@ -30,14 +30,14 @@ set -o pipefail
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --container-name                [OPTIONAL] The Docker container name. Default: bro"
+  echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1"
   echo "    --plugin-version                [REQUIRED] The plugin version."
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
 }
 
-CONTAINER_NAME="bro"
+CONTAINER_NAME="metron-bro-plugin-kafka_bro_1"
 PLUGIN_VERSION=
 
 # handle command line options

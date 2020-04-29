@@ -23,32 +23,37 @@ set -e # errexit
 set -E # errtrap
 set -o pipefail
 
-#
-# Executes a wait script for kafka
-#
-
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --network-name                  [OPTIONAL] The Docker network name. Default: bro-network"
+  echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_kafka_1"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
 }
 
-DOCKER_SCRIPTS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && cd  .. > /dev/null && cd in_docker_scripts && pwd)"
+CONTAINER_NAME="metron-bro-plugin-kafka_kafka_1"
+KAFKA_TOPIC=bro
 
-NETWORK_NAME=bro-network
-
-# Handle command line options
+# handle command line options
 for i in "$@"; do
   case $i in
   #
-  # NETWORK_NAME
+  # CONTAINER_NAME
   #
-  #   --network-name
+  #   --container-name
   #
-    --network-name=*)
-      NETWORK_NAME="${i#*=}"
+    --container-name=*)
+      CONTAINER_NAME="${i#*=}"
+      shift # past argument=value
+    ;;
+  #
+  # KAFKA_TOPIC
+  #
+  #   --kafka-topic
+  #
+    --kafka-topic=*)
+      KAFKA_TOPIC="${i#*=}"
       shift # past argument=value
     ;;
   #
@@ -71,12 +76,13 @@ for i in "$@"; do
   esac
 done
 
-echo "Running docker_run_wait_for_kakfa with"
-echo "NETWORK_NAME = $NETWORK_NAME"
+echo "Running docker_execute_create_topic_in_kafka.sh with "
+echo "CONTAINER_NAME = ${CONTAINER_NAME}"
+echo "KAFKA_TOPIC = ${KAFKA_TOPIC}"
 echo "==================================================="
 
-docker run --rm -i -t -w /root --network "${NETWORK_NAME}" -v "${DOCKER_SCRIPTS_PATH}":/root/scripts centos bash -c "bash /root/scripts/wait_for_kafka.sh"
+docker exec -w /kafka/bin/ "${CONTAINER_NAME}" \
+  bash -c "JMX_PORT= ./kafka-topics.sh --create --topic ${KAFKA_TOPIC} --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181"
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
-

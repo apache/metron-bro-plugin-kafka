@@ -1,0 +1,35 @@
+version: '2.4'
+services:
+  zookeeper:
+    build: containers/zookeeper
+    image: metron-bro-plugin-kafka_zookeeper:latest
+    ports:
+      - "2181:2181"
+  kafka:
+    build: containers/kafka
+    image: metron-bro-plugin-kafka_kafka:latest
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      - ZOOKEEPER_IP=zookeeper
+    ports:
+      - "9092:9092"
+  bro:
+    build:
+      context: containers/bro
+      args:
+        BRO_VERSION: "2.5.5"
+        LIBRDKAFKA_VERSION: "0.11.5"
+    image: metron-bro-plugin-kafka_bro:latest
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    volumes:
+      - "${DATA_PATH}:/root/data"
+      - "${TEST_OUTPUT_PATH}:/root/test_output"
+      - "${PLUGIN_ROOT_DIR}:/root/code"
+      - "${OUR_SCRIPTS_PATH}:/root/built_in_scripts"
+    tty: true
