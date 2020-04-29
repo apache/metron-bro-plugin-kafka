@@ -15,7 +15,8 @@
 #  limitations under the License.
 #
 FROM centos:7
-WORKDIR /root
+ARG BRO_VERSION
+ARG LIBRDKAFKA_VERSION
 
 # install development tools
 RUN yum -y groupinstall "Development Tools" && \
@@ -26,13 +27,14 @@ RUN yum -y groupinstall "Development Tools" && \
    cyrus-sasl cyrus-sasl-devel cyrus-sasl-gssapi \
    git jq screen tree vim
 
-# copy in the screen -rc
+# copy in the .screenrc
 COPY .screenrc /root
 
 # install bro
+WORKDIR /root
 RUN git clone https://github.com/bro/bro
 WORKDIR bro/
-RUN git checkout v2.5.5
+RUN git checkout "v${BRO_VERSION}"
 RUN git submodule update --init --recursive
 RUN ./configure
 RUN make
@@ -40,19 +42,21 @@ RUN make install
 ENV PATH="${PATH}:/usr/local/bro/bin"
 ENV PATH="${PATH}:/usr/bin"
 
-# install pip
+# install pip3 and bro-pkg
+WORKDIR /root
+COPY requirements.txt requirements.txt
 RUN yum -y update && \
     yum -y install epel-release && \
-    yum -y install python-pip && \
+    yum -y install python3-pip && \
     yum clean all && \
-    pip install --upgrade pip && \
-    pip install bro-pkg && \
+    python3 -m pip install --upgrade pip && \
+    python3 -m pip install -r requirements.txt && \
     bro-pkg autoconfig
 
 # install librdkafka
-RUN curl -L https://github.com/edenhill/librdkafka/archive/v0.11.5.tar.gz | tar xvz
-WORKDIR librdkafka-0.11.5/
+WORKDIR /root
+RUN curl -L "https://github.com/edenhill/librdkafka/archive/v${LIBRDKAFKA_VERSION}.tar.gz" | tar xvz
+WORKDIR "librdkafka-${LIBRDKAFKA_VERSION}/"
 RUN ./configure --enable-sasl
 RUN make
 RUN make install
-WORKDIR /root

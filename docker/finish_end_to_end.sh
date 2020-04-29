@@ -28,8 +28,7 @@ set -e # errexit
 set -E # errtrap
 set -o pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
+PROJECT_NAME="metron-bro-plugin-kafka"
 
-# Stop all the containers and remote the networks
-bash "${ROOT_DIR}"/scripts/cleanup_docker.sh
-
+# Stop docker compose
+COMPOSE_PROJECT_NAME="${PROJECT_NAME}" docker-compose stop

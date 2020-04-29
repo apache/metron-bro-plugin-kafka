@@ -26,13 +26,13 @@ set -o pipefail
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --network-name                  [OPTIONAL] The Docker network name.  Default: bro-network"
+  echo "    --network-name                  [OPTIONAL] The Docker network name.  Default: metron-bro-plugin-kafka_default"
   echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: bro"
   echo "    -h/--help                       Usage information."
   echo " "
 }
 
-NETWORK_NAME=bro-network
+NETWORK_NAME=metron-bro-plugin-kafka_default
 KAFKA_TOPIC=bro
 
 # handle command line options
@@ -80,7 +80,10 @@ echo "Running docker_run_create_topic_in_kafka with "
 echo "NETWORK_NAME = $NETWORK_NAME"
 echo "==================================================="
 
-docker run --rm --network "${NETWORK_NAME}" ches/kafka \
+# TODO: Fix this
+sleep 2s
+
+docker run --rm --network "${NETWORK_NAME}" metron-bro-plugin-kafka_kafka \
   kafka-topics.sh --create --topic "${KAFKA_TOPIC}" --replication-factor 1 --partitions 1 --zookeeper zookeeper:2181
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}

@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
 #  contributor license agreements.  See the NOTICE file distributed with
@@ -16,20 +14,4 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-
-shopt -s nocasematch
-
-#
-# Waits until kafka is available on the default port
-#
-
-cd /root || exit 1
-
-if [ ! -d /root/scripts ]; then
-  echo "DOCKER_SCRIPTS_PATH has not been set and mapped"
-  exit 1
-fi
-
-cd /root/scripts || exit 1
-bash ./wait-for-it.sh kafka:9092
-
+FROM zookeeper:3.4

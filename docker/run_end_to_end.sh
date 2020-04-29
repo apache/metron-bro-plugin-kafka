@@ -49,18 +49,19 @@ NO_PCAP=false
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 PLUGIN_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. > /dev/null && pwd)"
 SCRIPT_DIR="${ROOT_DIR}"/scripts
-CONTAINER_DIR="${ROOT_DIR}"/containers/bro-localbuild-container
 DATA_PATH="${ROOT_DIR}"/data
 DATE=$(date)
 LOG_DATE=${DATE// /_}
 TEST_OUTPUT_PATH="${ROOT_DIR}/test_output/"${LOG_DATE//:/_}
 KAFKA_TOPIC="bro"
+PROJECT_NAME="metron-bro-plugin-kafka"
+OUR_SCRIPTS_PATH="${PLUGIN_ROOT_DIR}/docker/in_docker_scripts"
 
 cd "${PLUGIN_ROOT_DIR}" || { echo "NO PLUGIN ROOT" ; exit 1; }
 # we may not be checked out from git, check and make it so that we are since
 # bro-pkg requires it
 
-git status 2&>1
+git status &>/dev/null
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "bro-pkg requires the plugin to be a git repo, creating..."
   git init .
@@ -147,43 +148,35 @@ for i in "$@"; do
   esac
 done
 
-EXTRA_ARGS="$*"
 cd "${ROOT_DIR}" || { echo "NO ROOT" ; exit 1; }
-echo "Running build_container with "
+echo "Running docker compose with "
 echo "SKIP_REBUILD_BRO = ${SKIP_REBUILD_BRO}"
 echo "DATA_PATH        = ${DATA_PATH}"
 echo "KAFKA_TOPIC      = ${KAFKA_TOPIC}"
 echo "PLUGIN_VERSION   = ${PLUGIN_VERSION}"
 echo "==================================================="
 
-# Create the network
-bash "${SCRIPT_DIR}"/create_docker_network.sh
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc}
-fi
-
-# Run the zookeeper container
-bash "${SCRIPT_DIR}"/docker_run_zookeeper_container.sh
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc}
-fi
-
-# Wait for zookeeper to be up
-bash "${SCRIPT_DIR}"/docker_run_wait_for_zookeeper.sh
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc}
-fi
-
-# Run the kafka container
-bash "${SCRIPT_DIR}"/docker_run_kafka_container.sh
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc}
-fi
-
-# Wait for kafka to be up
-bash "${SCRIPT_DIR}"/docker_run_wait_for_kafka.sh
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc}
+# Run docker compose, rebuilding as specified
+if [[ "$SKIP_REBUILD_BRO" = false ]]; then
+  COMPOSE_PROJECT_NAME="${PROJECT_NAME}" \
+    DATA_PATH=${DATA_PATH} \
+    TEST_OUTPUT_PATH=${TEST_OUTPUT_PATH} \
+    PLUGIN_ROOT_DIR=${PLUGIN_ROOT_DIR} \
+    OUR_SCRIPTS_PATH=${OUR_SCRIPTS_PATH} \
+    docker-compose up -d --build
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    exit ${rc}
+  fi
+else
+  COMPOSE_PROJECT_NAME="${PROJECT_NAME}" \
+    DATA_PATH=${DATA_PATH} \
+    TEST_OUTPUT_PATH=${TEST_OUTPUT_PATH} \
+    PLUGIN_ROOT_DIR=${PLUGIN_ROOT_DIR} \
+    OUR_SCRIPTS_PATH=${OUR_SCRIPTS_PATH} \
+    docker-compose up -d
+  rc=$?; if [[ ${rc} != 0 ]]; then
+    exit ${rc}
+  fi
 fi
 
 # Create the kafka topic
@@ -192,34 +185,10 @@ rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
 
-# Build the bro container
-if [[ "$SKIP_REBUILD_BRO" = false ]]; then
-  bash "${SCRIPT_DIR}"/build_container.sh \
-   --container-directory="${CONTAINER_DIR}" \
-   --container-name=metron-bro-docker-container:latest
-
-  rc=$?; if [[ ${rc} != 0 ]]; then
-    exit ${rc}
-  fi
-fi
-
 # Download the pcaps
 bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
-
 # By not catching $? here we are accepting that a failed pcap download will not
 # exit the script
-
-mkdir "${TEST_OUTPUT_PATH}" || exit 1
-
-# Run the bro container and optionally the passed script _IN_ the container
-bash "${SCRIPT_DIR}"/docker_run_bro_container.sh \
-  --data-path="${DATA_PATH}" \
-  --test-output-path="${TEST_OUTPUT_PATH}" \
-  "$EXTRA_ARGS"
-
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc}
-fi
 
 # Build the bro plugin
 bash "${SCRIPT_DIR}"/docker_execute_build_bro_plugin.sh --plugin-version="${PLUGIN_VERSION}"
