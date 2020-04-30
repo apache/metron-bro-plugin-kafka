@@ -1,4 +1,4 @@
-e!/usr/bin/env bash
+#!/usr/bin/env bash
 
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more

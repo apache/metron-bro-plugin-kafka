@@ -187,7 +187,7 @@ if [ "$installroot" != "default" ]; then
 fi
 
 echo "Build Directory        : $builddir"
-echo "Zeek Source Directory   : $zeekdist"
+echo "Zeek Source Directory  : $zeekdist"
 
 mkdir -p $builddir
 cd $builddir

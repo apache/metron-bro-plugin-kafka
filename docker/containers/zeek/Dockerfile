@@ -14,18 +14,26 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-FROM centos:7
+FROM centos:8
 ARG ZEEK_VERSION
 ARG LIBRDKAFKA_VERSION
 
-# install development tools
-RUN yum -y groupinstall "Development Tools" && \
-   yum -y install cmake make gcc gcc-c++ \
+# install powertools for libpcap-devel
+RUN dnf install -y 'dnf-command(config-manager)' && \
+    yum config-manager --set-enabled PowerTools
+
+# install epel for screen
+RUN dnf install -y epel-release
+
+# install prereqs then clean dnf cache
+RUN dnf -y update && \
+   dnf -y install cmake make gcc gcc-c++ \
    flex bison libpcap libpcap-devel \
-   openssl-devel python-devel swig \
-   zlib-devel perl \
+   openssl-devel python3 platform-python-devel \
+   swig zlib-devel perl \
    cyrus-sasl cyrus-sasl-devel cyrus-sasl-gssapi \
-   git jq screen tree vim
+   git jq screen tree vim && \
+   dnf -y clean all
 
 # copy in the .screenrc
 COPY .screenrc /root
@@ -45,10 +53,8 @@ ENV PATH="${PATH}:/usr/bin"
 # install pip3 and zkg
 WORKDIR /root
 COPY requirements.txt requirements.txt
-RUN yum -y update && \
-    yum -y install epel-release && \
-    yum -y install python3-pip && \
-    yum clean all && \
+RUN dnf -y install python3-pip && \
+    dnf clean all && \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install -r requirements.txt && \
     zkg autoconfig
