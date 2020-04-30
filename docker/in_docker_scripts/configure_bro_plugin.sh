@@ -25,11 +25,53 @@ shopt -s nocasematch
 # Configures the plugin for all the traffic types
 #
 
+function help {
+  echo " "
+  echo "usage: ${0}"
+  echo "    --kafka-topic                  [OPTIONAL] The kafka topic to configure. Default: bro"
+  echo "    -h/--help                      Usage information."
+  echo " "
+  echo " "
+}
+
+KAFKA_TOPIC=bro
+
+# Handle command line options
+for i in "$@"; do
+  case $i in
+  #
+  # KAFKA_TOPIC
+  #
+  #   --kafka-topic
+  #
+    --kafka-topic=*)
+      KAFKA_TOPIC="${i#*=}"
+      shift # past argument=value
+    ;;
+  #
+  # -h/--help
+  #
+    -h | --help)
+      help
+      exit 0
+      shift # past argument with no value
+    ;;
+  #
+  # Unknown option
+  #
+    *)
+      UNKNOWN_OPTION="${i#*=}"
+      echo "Error: unknown option: $UNKNOWN_OPTION"
+      help
+    ;;
+  esac
+done
+
 echo "Configuring kafka plugin"
 {
   echo "@load packages"
   echo "redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG, Conn::LOG, DPD::LOG, FTP::LOG, Files::LOG, Known::CERTS_LOG, SMTP::LOG, SSL::LOG, Weird::LOG, Notice::LOG, DHCP::LOG, SSH::LOG, Software::LOG, RADIUS::LOG, X509::LOG, Known::DEVICES_LOG, RFB::LOG, Stats::LOG, CaptureLoss::LOG, SIP::LOG);"
-  echo "redef Kafka::topic_name = \"bro\";"
+  echo "redef Kafka::topic_name = \"${KAFKA_TOPIC}\";"
   echo "redef Kafka::tag_json = T;"
   echo "redef Kafka::kafka_conf = table([\"metadata.broker.list\"] = \"kafka:9092\");"
   echo "redef Kafka::logs_to_exclude = set(Conn::LOG, DHCP::LOG);"

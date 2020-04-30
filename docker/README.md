@@ -53,6 +53,10 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 
 - `build_bro_plugin.sh`: Runs `bro-pkg` to build and install the provided version of the plugin.
 - `configure_bro_plugin.sh`: Configures the plugin for the kafka container, and routes all traffic types.
+  ###### Parameters
+  ```bash
+  --kafka-topic                  [OPTIONAL] The kafka topic to configure. Default: bro"
+  ```
 - `process_data_file.sh`: Runs `bro -r` on the passed file
 
 
