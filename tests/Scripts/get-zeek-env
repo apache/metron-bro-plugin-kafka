@@ -1,3 +1,4 @@
+#! /bin/sh
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
 #  contributor license agreements.  See the NOTICE file distributed with
@@ -14,19 +15,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+# BTest helper for getting values for Zeek-related environment variables.
 
-# @TEST-EXEC: bro ../../../scripts/Apache/Kafka/ %INPUT > output
-# @TEST-EXEC: btest-diff output
+base=$(dirname "$0")
+zeek=$(grep ZEEK_DIST "${base}/../../build/CMakeCache.txt" | cut -d = -f 2)
 
-module Kafka;
-
-redef send_all_active_logs = T;
-redef logs_to_send = set(HTTP::LOG, Conn::LOG, SSL::LOG);
-
-print send_to_kafka(HTTP::LOG);
-print send_to_kafka(DHCP::LOG);
-print send_to_kafka(Conn::LOG);
-print send_to_kafka(DNS::LOG);
-print send_to_kafka(SMTP::LOG);
-print send_to_kafka(SSL::LOG);
-print send_to_kafka(Files::LOG);
+if [ "$1" = "zeekbase" ]; then
+    echo "${zeek}"
+elif [ "$1" = "zeekpath" ]; then
+    "${zeek}/build/zeek-path-dev"
+elif [ "$1" = "zeek_plugin_path" ]; then
+    ( cd "${base}/../.." && pwd )
+elif [ "$1" = "zeek_seed_file" ]; then
+    echo "${zeek}/testing/btest/random.seed"
+elif [ "$1" = "path" ]; then
+    echo "${zeek}/build/src:${zeek}/aux/btest:${base}/:${zeek}/aux/zeek-cut:$PATH"
+else
+    echo "usage: $(basename "$0") <var>" >&2
+    exit 1
+fi

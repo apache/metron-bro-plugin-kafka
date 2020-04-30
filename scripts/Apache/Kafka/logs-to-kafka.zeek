@@ -36,7 +36,7 @@ function send_to_kafka(id: Log::ID): bool
                 return T;
 }
 
-event bro_init() &priority=-10
+event zeek_init() &priority=-10
 {
         for (stream_id in Log::active_streams)
         {

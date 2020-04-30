@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef BRO_PLUGIN_BRO_KAFKA_KAFKAWRITER_H
-#define BRO_PLUGIN_BRO_KAFKA_KAFKAWRITER_H
+#ifndef ZEEK_PLUGIN_BRO_KAFKA_KAFKAWRITER_H
+#define ZEEK_PLUGIN_BRO_KAFKA_KAFKAWRITER_H
 
 #include <librdkafka/rdkafkacpp.h>
 #include <string>

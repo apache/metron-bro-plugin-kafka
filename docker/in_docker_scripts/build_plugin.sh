@@ -26,7 +26,7 @@ set -E # errtrap
 set -o pipefail
 
 #
-# Runs bro-pkg to build and install the plugin
+# Runs zkg to build and install the plugin
 #
 
 function help {
@@ -84,9 +84,9 @@ cd /root || exit 1
 
 echo "==================================================="
 
-bro-pkg -vvv install code --version "${PLUGIN_VERSION}" --force
+zkg -vvv install code --version "${PLUGIN_VERSION}" --force
 rc=$?; if [[ ${rc} != 0 ]]; then
-  echo "ERROR running bro-pkg install ${rc}"
+  echo "ERROR running zkg install ${rc}"
   exit ${rc}
 fi
 echo "==================================================="
@@ -100,7 +100,7 @@ echo ""
 echo "==================================================="
 echo ""
 
-bro -NN Apache::Kafka
+zeek -NN Apache::Kafka
 
 echo "==================================================="
 echo ""

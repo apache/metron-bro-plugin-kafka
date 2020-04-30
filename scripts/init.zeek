@@ -24,12 +24,12 @@ export {
         ## Example:  redef Kafka::send_all_active_logs = T;
         const send_all_active_logs: bool = F &redef;
 
-        ## Specify which :bro:type:`Log::ID` to send to kafka.
+        ## Specify which :zeek:type:`Log::ID` to send to kafka.
         ##
         ## Example:  redef Kafka::logs_to_send = set(Conn::Log, DNS::LOG);
         const logs_to_send: set[Log::ID] &redef;
 
-        ## Specify which :bro:type:`Log::ID` to exclude from being sent to kafka.
+        ## Specify which :zeek:type:`Log::ID` to exclude from being sent to kafka.
         ##
         ## Example:  redef Kafka::logs_to_exclude = set(SSH::LOG);
         const logs_to_exclude: set[Log::ID] &redef;
@@ -40,7 +40,7 @@ export {
         const json_timestamps: JSON::TimestampFormat = JSON::TS_EPOCH &redef;
 
         ## Destination kafka topic name
-        const topic_name: string = "bro" &redef;
+        const topic_name: string = "zeek" &redef;
 
         ## Maximum wait on shutdown in milliseconds
         const max_wait_on_shutdown: count = 3000 &redef;

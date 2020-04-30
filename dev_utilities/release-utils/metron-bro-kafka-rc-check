@@ -20,8 +20,8 @@ shopt -s nocasematch
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    -v/--version=<version>   The version of the metron bro plugin kafka release. [Required]"
-  echo "    -c/--candidate=<RC#>      Defines the Release Candidate. [Required]"
+  echo "    -v/--version=<version>   The version of the metron-bro-plugin-kafka release. [Required]"
+  echo "    -c/--candidate=<RC#>     Defines the Release Candidate. [Required]"
   echo "    -h/--help                Usage information."
   echo " "
   echo "example: "
@@ -34,9 +34,9 @@ METRON_DIST=${APACHE_REPO}"dev/metron/metron-bro-plugin-kafka/"
 METRON_KEYS=${APACHE_REPO}"release/metron/KEYS"
 
 #
-#  runs the bro kafka plugin's docker based tests
+#  runs the package kafka plugin's docker based tests
 #
-function run_bro_docker {
+function run_package_docker {
     cd docker &> /dev/null || { echo "failed to change directory to docker" ; exit 1; }
     ./run_end_to_end.sh
 
@@ -48,9 +48,9 @@ function run_bro_docker {
 }
 
 #
-#   runs the finish bro docker script to cleanup
+#   runs the finish package docker script to cleanup
 #
-function finish_bro_docker {
+function finish_package_docker {
     cd docker &> /dev/null || { echo "failed to change directory to docker"; exit 1; }
     ./finish_end_to_end.sh
 
@@ -119,7 +119,7 @@ fi
 if [[ "$VERSION" =~ ^[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2} ]]; then
   PLUGIN_VERSION="$VERSION"
 else
-  echo "[ERROR] "$VERSION" may not be a valid version number"
+  echo "[ERROR] \"$VERSION\" may not be a valid version number"
   exit 1
 fi
 
@@ -139,11 +139,11 @@ else
   exit 1
 fi
 
-echo "Metron Bro Plugin Kafka Version $PLUGIN_VERSION"
+echo "metron-bro-plugin-kafka Version $PLUGIN_VERSION"
 echo "Release Candidate $RC"
 
 PLUGIN_RC_DIST="$METRON_DIST$PLUGIN_VERSION-$UPPER_RC"
-echo "Metron Bro Plugin Kafka RC Distribution Root is $PLUGIN_RC_DIST"
+echo "metron-bro-plugin-kafka RC Distribution Root is $PLUGIN_RC_DIST"
 
 # working directory
 WORK="$HOME/tmp/metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC"
@@ -192,15 +192,15 @@ if ! gpg --import KEYS ; then
   exit 1
 fi
 
-echo "Verifying Metron Bro Plugin Kafka Assembly"
+echo "Verifying metron-bro-plugin-kafka Assembly"
 if ! gpg --verify ./"apache-metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC.tar.gz.asc" "apache-metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC.tar.gz" ; then
-  echo "[ERROR] failed to verify Metron Bro Plugin Kafka Assembly"
+  echo "[ERROR] failed to verify metron-bro-plugin-kafka Assembly"
   exit 1
 fi
 
 echo "Unpacking Assemblies"
 if ! tar -xzf "apache-metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC.tar.gz" ; then
-  echo "[ERROR] failed to unpack Metron Bro Plugin Kafka Assembly"
+  echo "[ERROR] failed to unpack metron-bro-plugin-kafka Assembly"
   exit 1
 fi
 
@@ -209,12 +209,12 @@ echo ""
 read -p "  run test suite [yN] " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-  echo "  please verify that no bro docker containers are running before continuing,"
-        read -p "  no bro docker containers are running, ready to proceed [yN] " -n 1 -r
+  echo "  please verify that no metron-bro-plugin-kafka docker containers are running before continuing,"
+        read -p "  no metron-bro-plugin-kafka docker containers are running, ready to proceed [yN] " -n 1 -r
         if [[ $REPLY =~ ^[Yy]$ ]]; then
-            cd apache-metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC || exit 1
-            run_bro_docker
-            finish_bro_docker
+            cd "apache-metron-bro-plugin-kafka_$PLUGIN_VERSION-$RC" || exit 1
+            run_package_docker
+            finish_package_docker
         else
             echo "  when you are ready and the containers are stopped, please cd into the docker"
             echo "  directory and execute the run_end_to_end.sh script"

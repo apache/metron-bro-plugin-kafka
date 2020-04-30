@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+e!/usr/bin/env bash
 
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
@@ -25,9 +25,9 @@ set -o pipefail
 function help {
   echo " "
   echo "USAGE"
-  echo "    --skip-docker-build             [OPTIONAL] Skip build of bro docker machine."
+  echo "    --skip-docker-build             [OPTIONAL] Skip build of zeek docker machine."
   echo "    --data-path                     [OPTIONAL] The pcap data path. Default: ./data"
-  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: bro"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: zeek"
   echo "    --plugin-version                [OPTIONAL] The plugin version. Default: the current branch name"
   echo "    --no-pcap                       [OPTIONAL] Do not run pcaps."
   echo "    -h/--help                       Usage information."
@@ -44,7 +44,7 @@ if (( BASH_VERSINFO[0] < 4 )); then
   exit 1
 fi
 
-SKIP_REBUILD_BRO=false
+SKIP_REBUILD_ZEEK=false
 NO_PCAP=false
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null && pwd)"
 PLUGIN_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. > /dev/null && pwd)"
@@ -53,17 +53,17 @@ DATA_PATH="${ROOT_DIR}"/data
 DATE=$(date)
 LOG_DATE=${DATE// /_}
 TEST_OUTPUT_PATH="${ROOT_DIR}/test_output/"${LOG_DATE//:/_}
-KAFKA_TOPIC="bro"
+KAFKA_TOPIC="zeek"
 PROJECT_NAME="metron-bro-plugin-kafka"
 OUR_SCRIPTS_PATH="${PLUGIN_ROOT_DIR}/docker/in_docker_scripts"
 
 cd "${PLUGIN_ROOT_DIR}" || { echo "NO PLUGIN ROOT" ; exit 1; }
 # we may not be checked out from git, check and make it so that we are since
-# bro-pkg requires it
+# zkg requires it
 
 git status &>/dev/null
 rc=$?; if [[ ${rc} != 0 ]]; then
-  echo "bro-pkg requires the plugin to be a git repo, creating..."
+  echo "zkg requires the plugin to be a git repo, creating..."
   git init .
   rc=$?; if [[ ${rc} != 0 ]]; then
     echo "ERROR> FAILED TO INITIALIZE GIT IN PLUGIN DIRECTORY. ${rc}"
@@ -91,12 +91,12 @@ PLUGIN_VERSION=$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)
 for i in "$@"; do
   case $i in
   #
-  # SKIP_REBUILD_BRO
+  # SKIP_REBUILD_ZEEK
   #
   #   --skip-docker-build
   #
     --skip-docker-build)
-      SKIP_REBUILD_BRO=true
+      SKIP_REBUILD_ZEEK=true
       shift # past argument
     ;;
   #
@@ -150,14 +150,14 @@ done
 
 cd "${ROOT_DIR}" || { echo "NO ROOT" ; exit 1; }
 echo "Running docker compose with "
-echo "SKIP_REBUILD_BRO = ${SKIP_REBUILD_BRO}"
-echo "DATA_PATH        = ${DATA_PATH}"
-echo "KAFKA_TOPIC      = ${KAFKA_TOPIC}"
-echo "PLUGIN_VERSION   = ${PLUGIN_VERSION}"
+echo "SKIP_REBUILD_ZEEK = ${SKIP_REBUILD_ZEEK}"
+echo "DATA_PATH         = ${DATA_PATH}"
+echo "KAFKA_TOPIC       = ${KAFKA_TOPIC}"
+echo "PLUGIN_VERSION    = ${PLUGIN_VERSION}"
 echo "==================================================="
 
 # Run docker compose, rebuilding as specified
-if [[ "$SKIP_REBUILD_BRO" = false ]]; then
+if [[ "$SKIP_REBUILD_ZEEK" = false ]]; then
   COMPOSE_PROJECT_NAME="${PROJECT_NAME}" \
     DATA_PATH=${DATA_PATH} \
     TEST_OUTPUT_PATH=${TEST_OUTPUT_PATH} \
@@ -190,15 +190,15 @@ bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
 # By not catching $? here we are accepting that a failed pcap download will not
 # exit the script
 
-# Build the bro plugin
-bash "${SCRIPT_DIR}"/docker_execute_build_bro_plugin.sh --plugin-version="${PLUGIN_VERSION}"
+# Build the zeek plugin
+bash "${SCRIPT_DIR}"/docker_execute_build_plugin.sh --plugin-version="${PLUGIN_VERSION}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO BUILD PLUGIN.  CHECK LOGS  ${rc}"
   exit ${rc}
 fi
 
-# Configure the bro plugin
-bash "${SCRIPT_DIR}"/docker_execute_configure_bro_plugin.sh --kafka-topic="${KAFKA_TOPIC}"
+# Configure the plugin
+bash "${SCRIPT_DIR}"/docker_execute_configure_plugin.sh --kafka-topic="${KAFKA_TOPIC}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR> FAILED TO CONFIGURE PLUGIN.  CHECK LOGS  ${rc}"
   exit ${rc}
@@ -206,7 +206,7 @@ fi
 
 if [[ "$NO_PCAP" = false ]]; then
   # for each pcap in the data directory, we want to
-  # run bro then read the output from kafka
+  # run zeek then read the output from kafka
   # and output both of them to the same directory named
   # for the date/pcap
 
@@ -258,5 +258,5 @@ if [[ "$NO_PCAP" = false ]]; then
 fi
 echo ""
 echo "Run complete"
-echo "The kafka and bro output can be found at ${TEST_OUTPUT_PATH}"
+echo "The kafka and zeek output can be found at ${TEST_OUTPUT_PATH}"
 echo "You may now work with the containers if you will.  You need to call finish_end_to_end.sh when you are done"

@@ -177,12 +177,12 @@ function print_log_comparison_insights
   # For example, if count_occurrences_of_each_log_file identified that there
   # were 10 instances of http logs across all of the `results.csv` files,
   # ${OVERALL_LOG_CARDINALITY[http]} should equal 10. If check_for_unequal_log_counts
-  # independently found 10 instances where the http bro and kafka log counts
+  # independently found 10 instances where the http zeek and kafka log counts
   # from the `results.csv` files were not equal, ${LOG_ISSUE_COUNT[http]}
   # would also have 10 entries, causing us to warn the user of that insight.
   for KEY in "${!LOG_ISSUE_COUNT[@]}"; do
     if [[ "${LOG_ISSUE_COUNT[${KEY}]}" == "${OVERALL_LOG_CARDINALITY[${KEY}]}" ]]; then
-      _echo WARN "None of the ${KEY} log counts were the same between bro and kafka.  This may indicate an issue specific to that log."
+      _echo WARN "None of the ${KEY} log counts were the same between zeek and kafka.  This may indicate an issue specific to that log."
     fi
   done
 }
@@ -203,7 +203,7 @@ for file in $RESULTS_FILES; do
 done
 
 if [[ "${#LOGS_WITH_UNEQUAL_RESULTS[@]}" -gt 0 ]]; then
-  _echo ERROR "UNEQUALITY FOUND IN BRO AND KAFKA LOG COUNTS"
+  _echo ERROR "UNEQUALITY FOUND IN ZEEK AND KAFKA LOG COUNTS"
   echo ""
 
   print_unequal_results

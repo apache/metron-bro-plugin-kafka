@@ -24,21 +24,21 @@ set -E # errtrap
 set -o pipefail
 
 #
-# Executes the configure_bro_plugin.sh in the docker container
+# Executes the configure_plugin.sh in the docker container
 #
 
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1"
-  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: bro"
+  echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: zeek"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
 }
 
-CONTAINER_NAME=metron-bro-plugin-kafka_bro_1
-KAFKA_TOPIC=bro
+CONTAINER_NAME=metron-bro-plugin-kafka_zeek_1
+KAFKA_TOPIC=zeek
 
 # Handle command line options
 for i in "$@"; do
@@ -80,15 +80,15 @@ for i in "$@"; do
   esac
 done
 
-echo "Running docker_execute_configure_bro_plugin.sh with "
+echo "Running docker_execute_configure_plugin.sh with "
 echo "CONTAINER_NAME = ${CONTAINER_NAME}"
 echo "KAFKA_TOPIC = ${KAFKA_TOPIC}"
 echo "==================================================="
 
-docker exec -w /root "${CONTAINER_NAME}" bash -c "/root/built_in_scripts/configure_bro_plugin.sh --kafka-topic=\"${KAFKA_TOPIC}\""
+docker exec -w /root "${CONTAINER_NAME}" bash -c "/root/built_in_scripts/configure_plugin.sh --kafka-topic=\"${KAFKA_TOPIC}\""
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc};
 fi
 
-echo "configured the bro kafka plugin"
+echo "configured the kafka plugin"
 

@@ -15,20 +15,18 @@
 #  limitations under the License.
 #
 
-# @TEST-EXEC: bro -r ../../../tests/pcaps/exercise-traffic.pcap ../../../scripts/Apache/Kafka/ %INPUT > output
+# @TEST-EXEC: zeek ../../../scripts/Apache/Kafka/ %INPUT > output
 # @TEST-EXEC: btest-diff output
 
 module Kafka;
 
+redef send_all_active_logs = T;
+redef logs_to_exclude = set(Conn::LOG, DNS::LOG, SSL::LOG);
 
-redef Kafka::mock = T;
-event bro_init() &priority=-10
-{
-    local xxx_filter: Log::Filter = [
-        $name = "kafka-xxx",
-        $writer = Log::WRITER_KAFKAWRITER,
-        $path = "kafka_xxx",
-        $config = table(["topic_name"] = "configuration-table-topic")
-    ];
-    Log::add_filter(Conn::LOG, xxx_filter);
-}
+print send_to_kafka(HTTP::LOG);
+print send_to_kafka(DHCP::LOG);
+print send_to_kafka(Conn::LOG);
+print send_to_kafka(DNS::LOG);
+print send_to_kafka(SMTP::LOG);
+print send_to_kafka(SSL::LOG);
+print send_to_kafka(Files::LOG);

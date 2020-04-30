@@ -15,7 +15,7 @@
 #  limitations under the License.
 #
 FROM centos:7
-ARG BRO_VERSION
+ARG ZEEK_VERSION
 ARG LIBRDKAFKA_VERSION
 
 # install development tools
@@ -30,19 +30,19 @@ RUN yum -y groupinstall "Development Tools" && \
 # copy in the .screenrc
 COPY .screenrc /root
 
-# install bro
+# install zeek
 WORKDIR /root
-RUN git clone https://github.com/bro/bro
-WORKDIR bro/
-RUN git checkout "v${BRO_VERSION}"
+RUN git clone https://github.com/zeek/zeek
+WORKDIR zeek/
+RUN git checkout "v${ZEEK_VERSION}"
 RUN git submodule update --init --recursive
 RUN ./configure
 RUN make
 RUN make install
-ENV PATH="${PATH}:/usr/local/bro/bin"
+ENV PATH="${PATH}:/usr/local/zeek/bin"
 ENV PATH="${PATH}:/usr/bin"
 
-# install pip3 and bro-pkg
+# install pip3 and zkg
 WORKDIR /root
 COPY requirements.txt requirements.txt
 RUN yum -y update && \
@@ -51,7 +51,7 @@ RUN yum -y update && \
     yum clean all && \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install -r requirements.txt && \
-    bro-pkg autoconfig
+    zkg autoconfig
 
 # install librdkafka
 WORKDIR /root

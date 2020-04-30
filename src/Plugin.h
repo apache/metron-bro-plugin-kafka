@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef BRO_PLUGIN_BRO_KAFKA
-#define BRO_PLUGIN_BRO_KAFKA
+#ifndef ZEEK_PLUGIN_BRO_KAFKA
+#define ZEEK_PLUGIN_BRO_KAFKA
 
 #include "KafkaWriter.h"
 #include <plugin/Plugin.h>

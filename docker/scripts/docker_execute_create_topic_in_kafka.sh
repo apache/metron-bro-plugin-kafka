@@ -27,13 +27,13 @@ function help {
   echo " "
   echo "usage: ${0}"
   echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_kafka_1"
-  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: bro"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: zeek"
   echo "    -h/--help                       Usage information."
   echo " "
 }
 
 CONTAINER_NAME="metron-bro-plugin-kafka_kafka_1"
-KAFKA_TOPIC=bro
+KAFKA_TOPIC=zeek
 
 # handle command line options
 for i in "$@"; do
