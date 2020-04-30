@@ -63,7 +63,7 @@ This software is a part of the [Apache Metron](http://metron.apache.org/) projec
 
 ### Manual Installation
 
-Manually installing the plugin should only occur in situations where installing and configuring `zkg` is not reasonable, such as in a docker container.  If you are running zeek in an environment where you do not have Internet connectivity, investigate [bundles](https://zeek-package-manager.readthedocs.io/en/stable/zkg.html#bundle) or creating an internal [package source](https://zeek-package-manager.readthedocs.io/en/stable/source.html).
+Manually installing the plugin should only occur in situations where installing and configuring `zkg` is not reasonable, such as in a docker container.  If you are running zeek in an environment where you do not have Internet connectivity, investigate [bundles](https://docs.zeek.org/projects/package-manager/en/stable/zkg.html#bundle) or creating an internal [package source](https://docs.zeek.org/projects/package-manager/en/stable/source.html).
 
 These instructions could also be helpful if you were interested in distributing this as a package (such as a deb or rpm).
 
