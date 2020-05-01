@@ -70,7 +70,7 @@ done
 echo "Configuring kafka plugin"
 {
   echo "@load packages"
-  echo "redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG, Conn::LOG, DPD::LOG, FTP::LOG, Files::LOG, Known::CERTS_LOG, SMTP::LOG, SSL::LOG, Weird::LOG, Notice::LOG, DHCP::LOG, SSH::LOG, Software::LOG, RADIUS::LOG, X509::LOG, Known::DEVICES_LOG, RFB::LOG, Stats::LOG, CaptureLoss::LOG, SIP::LOG);"
+  echo "redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG, Conn::LOG, DPD::LOG, FTP::LOG, Files::LOG, Known::CERTS_LOG, SMTP::LOG, SSL::LOG, Weird::LOG, Notice::LOG, DHCP::LOG, SSH::LOG, Software::LOG, RADIUS::LOG, X509::LOG, RFB::LOG, Stats::LOG, CaptureLoss::LOG, SIP::LOG);"
   echo "redef Kafka::topic_name = \"${KAFKA_TOPIC}\";"
   echo "redef Kafka::tag_json = T;"
   echo "redef Kafka::kafka_conf = table([\"metadata.broker.list\"] = \"kafka:9092\");"
@@ -78,9 +78,6 @@ echo "Configuring kafka plugin"
   echo "redef Known::cert_tracking = ALL_HOSTS;"
   echo "redef Software::asset_tracking = ALL_HOSTS;"
 } >> /usr/local/zeek/share/zeek/site/local.zeek
-
-# Load "known-devices-and-hostnames.zeek" to create the log Known::DEVICES_LOG
-sed -i '86 a @load policy/protocols/dhcp/known-devices-and-hostnames.zeek' /usr/local/zeek/share/zeek/site/local.zeek
 
 # Comment out the load statement for "log-hostcerts-only.zeek" in zeek's
 # default local.zeek as of 3.1.2 in order to log all certificates to x509.log

@@ -171,7 +171,6 @@ This script does the following:
     │   ├── http.log
     │   ├── kafka-output.log
     │   ├── known_certs.log
-    │   ├── known_devices.log
     │   ├── loaded_scripts.log
     │   ├── notice.log
     │   ├── packet_filter.log
