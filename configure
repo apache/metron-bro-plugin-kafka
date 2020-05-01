@@ -17,6 +17,9 @@
 #  limitations under the License.
 #
 #
+# The upstream version of this is at
+# https://github.com/zeek/zeek-aux/blob/master/plugin-support/skeleton/configure
+#
 # Wrapper for viewing/setting options that the plugin's CMake
 # scripts will recognize.
 #
