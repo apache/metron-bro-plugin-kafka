@@ -16,6 +16,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+#
 # Wrapper for viewing/setting options that the plugin's CMake
 # scripts will recognize.
 #
@@ -25,9 +26,9 @@
 set -e
 command="$0 $*"
 
-if [ -e "$(dirname "$0")/configure.plugin" ]; then
+if [ -e `dirname $0`/configure.plugin ]; then
     # Include custom additions.
-    . "$(dirname "$0")/configure.plugin"
+    . `dirname $0`/configure.plugin
 fi
 
 usage() {
@@ -38,7 +39,6 @@ Usage: $0 [OPTIONS]
   Plugin Options:
     --cmake=PATH               Path to CMake binary
     --zeek-dist=DIR            Path to Zeek source tree
-    --install-root=DIR         Path where to install plugin into
     --install-root=DIR         Path where to install plugin into
     --with-binpac=DIR          Path to BinPAC installation root
     --with-broker=DIR          Path to Broker installation root
@@ -67,13 +67,13 @@ append_cache_entry () {
 
 # set defaults
 builddir=build
-zeekdist=$(cd ../../.. && pwd)
+zeekdist=""
 installroot="default"
 CMakeCacheEntries=""
 
 while [ $# -ne 0 ]; do
     case "$1" in
-        -*=*) optarg=$(echo "$1" | sed 's/[-_a-zA-Z0-9]*=//') ;;
+        -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
         *) optarg= ;;
     esac
 
@@ -81,39 +81,45 @@ while [ $# -ne 0 ]; do
         --help|-h)
             usage
             ;;
+
         --cmake=*)
             CMakeCommand=$optarg
             ;;
+
         --zeek-dist=*)
-            zeekdist=$(cd "$optarg" && pwd)
+            zeekdist=`cd $optarg && pwd`
             ;;
+
         --install-root=*)
             installroot=$optarg
             ;;
+
         --with-binpac=*)
-            append_cache_entry BinPAC_ROOT_DIR PATH "$optarg"
+            append_cache_entry BinPAC_ROOT_DIR PATH $optarg
             binpac_root=$optarg
             ;;
+
         --with-broker=*)
-            append_cache_entry BROKER_ROOT_DIR PATH "$optarg"
+            append_cache_entry BROKER_ROOT_DIR PATH $optarg
             broker_root=$optarg
             ;;
+
         --with-caf=*)
-            append_cache_entry CAF_ROOT_DIR PATH "$optarg"
+            append_cache_entry CAF_ROOT_DIR PATH $optarg
             caf_root=$optarg
             ;;
+
         --with-bifcl=*)
-            append_cache_entry BifCl_EXE PATH "$optarg"
+            append_cache_entry BifCl_EXE PATH $optarg
             ;;
-        --with-openssl=*)
-            append_cache_entry OpenSSL_ROOT_DIR PATH "$optarg"
-            ;;
+
         --enable-debug)
             append_cache_entry BRO_PLUGIN_ENABLE_DEBUG         BOOL   true
             ;;
+
         *)
             if type plugin_option >/dev/null 2>&1; then
-                plugin_option "$1" && shift && continue;
+                plugin_option $1 && shift && continue;
             fi
 
             echo "Invalid option '$1'.  Try $0 --help to see available options."
@@ -145,28 +151,28 @@ if [ -z "$zeekdist" ]; then
         exit 1
     fi
 
-    append_cache_entry BRO_CONFIG_PREFIX PATH "$(${zeek_config} --prefix)"
-    append_cache_entry BRO_CONFIG_INCLUDE_DIR PATH "$(${zeek_config} --include_dir)"
-    append_cache_entry BRO_CONFIG_PLUGIN_DIR PATH "$(${zeek_config} --plugin_dir)"
-    append_cache_entry BRO_CONFIG_CMAKE_DIR PATH "$(${zeek_config} --cmake_dir)"
-    append_cache_entry CMAKE_MODULE_PATH PATH "$(${zeek_config} --cmake_dir)"
+    append_cache_entry BRO_CONFIG_PREFIX PATH `${zeek_config} --prefix`
+    append_cache_entry BRO_CONFIG_INCLUDE_DIR PATH `${zeek_config} --include_dir`
+    append_cache_entry BRO_CONFIG_PLUGIN_DIR PATH `${zeek_config} --plugin_dir`
+    append_cache_entry BRO_CONFIG_CMAKE_DIR PATH `${zeek_config} --cmake_dir`
+    append_cache_entry CMAKE_MODULE_PATH PATH `${zeek_config} --cmake_dir`
 
-    build_type=$(${zeek_config} --build_type)
+    build_type=`${zeek_config} --build_type`
 
     if [ "$build_type" = "debug" ]; then
         append_cache_entry BRO_PLUGIN_ENABLE_DEBUG BOOL true
     fi
 
     if [ -z "$binpac_root" ]; then
-        append_cache_entry BinPAC_ROOT_DIR PATH "$(${zeek_config} --binpac_root)"
+        append_cache_entry BinPAC_ROOT_DIR PATH `${zeek_config} --binpac_root`
     fi
 
     if [ -z "$broker_root" ]; then
-        append_cache_entry BROKER_ROOT_DIR PATH "$(${zeek_config} --broker_root)"
+        append_cache_entry BROKER_ROOT_DIR PATH `${zeek_config} --broker_root`
     fi
 
     if [ -z "$caf_root" ]; then
-        append_cache_entry CAF_ROOT_DIR PATH "$(${zeek_config} --caf_root)"
+        append_cache_entry CAF_ROOT_DIR PATH `${zeek_config} --caf_root`
     fi
 else
     if [ ! -e "$zeekdist/zeek-path-dev.in" ]; then
@@ -176,24 +182,24 @@ else
 
     # BRO_DIST is the canonical/historical name used by plugin CMake scripts
     # ZEEK_DIST doesn't serve a function at the moment, but set/provided anyway
-    append_cache_entry BRO_DIST  PATH "$zeekdist"
-    append_cache_entry ZEEK_DIST PATH "$zeekdist"
-    append_cache_entry CMAKE_MODULE_PATH PATH "$zeekdist/cmake"
+    append_cache_entry BRO_DIST  PATH $zeekdist
+    append_cache_entry ZEEK_DIST PATH $zeekdist
+    append_cache_entry CMAKE_MODULE_PATH PATH $zeekdist/cmake
 fi
 
 if [ "$installroot" != "default" ]; then
-    mkdir -p "$installroot"
-    append_cache_entry BRO_PLUGIN_INSTALL_ROOT PATH "$installroot"
+    mkdir -p $installroot
+    append_cache_entry BRO_PLUGIN_INSTALL_ROOT PATH $installroot
 fi
 
 echo "Build Directory        : $builddir"
-echo "Zeek Source Directory  : $zeekdist"
+echo "Zeek Source Directory   : $zeekdist"
 
 mkdir -p $builddir
 cd $builddir
 
-"$CMakeCommand" "$CMakeCacheEntries" ..
+"$CMakeCommand" $CMakeCacheEntries ..
 
 echo "# This is the command used to configure this build" > config.status
-echo "$command" >> config.status
+echo $command >> config.status
 chmod u+x config.status
