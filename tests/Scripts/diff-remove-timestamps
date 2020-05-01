@@ -15,6 +15,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+# The upstream of this file is at
+# https://github.com/zeek/zeek-aux/blob/master/plugin-support/skeleton/tests/Scripts/diff-remove-timestamps
+#
 # Replace anything which looks like timestamps with XXXs (including the #start/end markers in logs).
 
 # Get us "modern" regexps with sed.
