@@ -19,7 +19,7 @@ services:
     build:
       context: containers/zeek
       args:
-        ZEEK_VERSION: "3.1.2"
+        ZEEK_VERSION: "3.0.5"
         LIBRDKAFKA_VERSION: "0.11.6"
     image: metron-bro-plugin-kafka_zeek:latest
     depends_on:
