@@ -84,7 +84,13 @@ cd /root || exit 1
 
 echo "==================================================="
 
-zkg -vvv install code --version "${PLUGIN_VERSION}" --force
+zkg -vvv test code
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR running zkg test ${rc}"
+  exit ${rc}
+fi
+
+zkg -vvv install code --skiptests --version "${PLUGIN_VERSION}" --force
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR running zkg install ${rc}"
   exit ${rc}
