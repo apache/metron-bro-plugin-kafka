@@ -21,7 +21,7 @@ shopt -s nocasematch
 shopt -s globstar nullglob
 shopt -s nocasematch
 set -u # nounset
-set -e # errexit
+# errexit omitted to enable printfiles function call
 set -E # errtrap
 set -o pipefail
 
@@ -36,6 +36,19 @@ function help {
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
+}
+
+function printfiles {
+  echo "==================================================="
+  echo "ERR"
+  cat /root/.zkg/testing/code/clones/code/zkg.test_command.stderr
+  echo "==================================================="
+  echo "OUT"
+  cat /root/.zkg/testing/code/clones/code/zkg.test_command.stdout
+  echo "==================================================="
+  echo ""
+  echo "==================================================="
+  echo ""
 }
 
 PLUGIN_VERSION=
@@ -87,24 +100,16 @@ echo "==================================================="
 zkg -vvv test code
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR running zkg test ${rc}"
+  printfiles
   exit ${rc}
 fi
 
 zkg -vvv install code --skiptests --version "${PLUGIN_VERSION}" --force
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR running zkg install ${rc}"
+  printfiles
   exit ${rc}
 fi
-echo "==================================================="
-echo "ERR"
-cat /root/.zkg/testing/code/clones/code/zkg.test_command.stderr
-echo "==================================================="
-echo "OUT"
-cat /root/.zkg/testing/code/clones/code/zkg.test_command.stdout
-echo "==================================================="
-echo ""
-echo "==================================================="
-echo ""
 
 zeek -NN Apache::Kafka
 
