@@ -345,10 +345,12 @@ redef Kafka::max_wait_on_shutdown = 3000;
 
 A comma separated list of debug contexts in librdkafka which you want to
 enable.  The available contexts are:
+* all
 * generic
 * broker
 * topic
 * metadata
+* feature
 * queue
 * msg
 * protocol
@@ -356,7 +358,10 @@ enable.  The available contexts are:
 * security
 * fetch
 * feature
-* all  
+* interceptor
+* plugin
+* consumer
+* admin
 
 ## Kerberos
 
