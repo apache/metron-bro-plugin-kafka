@@ -16,13 +16,13 @@ This software is a part of the [Apache Metron](https://metron.apache.org/) proje
 
 `zkg` is the preferred mechanism for installing this plugin, as it will dynamically retrieve, build, test, and load the plugin.  Note, that you will still need to [activate](#activation) and configure the plugin after your installation.
 
-1. Install [librdkafka](https://github.com/edenhill/librdkafka), a native client library for Kafka.  This plugin has been tested against librdkafka v1.4.2.
+1. Install [librdkafka](https://github.com/edenhill/librdkafka), a native client library for Kafka.  This plugin has been tested against librdkafka v1.4.2-RC3.
 
     In order to use this plugin within a kerberized Kafka environment, you will also need `libsasl2` installed and will need to pass `--enable-sasl` to the `configure` script.
 
     ```
-    $ curl -L https://github.com/edenhill/librdkafka/archive/v1.4.2.tar.gz | tar xvz
-    $ cd librdkafka-1.4.2/
+    $ curl -L https://github.com/edenhill/librdkafka/archive/v1.4.2-RC3.tar.gz | tar xvz
+    $ cd librdkafka-1.4.2-RC3/
     $ ./configure --enable-sasl
     $ make
     $ sudo make install
@@ -40,7 +40,7 @@ This software is a part of the [Apache Metron](https://metron.apache.org/) proje
     Verify the following REQUIRED external dependencies:
     (Ensure their installation on all relevant systems before proceeding):
       from zeek/apache/metron-bro-plugin-kafka (master):
-        librdkafka ~1.4.2
+        librdkafka ~1.4.2-RC3
 
     Proceed? [Y/n]
     zeek/apache/metron-bro-plugin-kafka asks for LIBRDKAFKA_ROOT (Path to librdkafka installation tree) ? [/usr/local/lib]
@@ -67,13 +67,13 @@ Manually installing the plugin should *only* occur in situations where installin
 
 These instructions could also be helpful if you were interested in distributing this as a package (such as a deb or rpm).
 
-1. Install [librdkafka](https://github.com/edenhill/librdkafka), a native client library for Kafka.  This plugin has been tested against librdkafka v1.4.2.
+1. Install [librdkafka](https://github.com/edenhill/librdkafka), a native client library for Kafka.  This plugin has been tested against librdkafka v1.4.2-RC3.
 
     In order to use this plugin within a kerberized Kafka environment, you will also need `libsasl2` installed and will need to pass `--enable-sasl` to the `configure` script.
 
     ```
-    $ curl -L https://github.com/edenhill/librdkafka/archive/v1.4.2.tar.gz | tar xvz
-    $ cd librdkafka-1.4.2/
+    $ curl -L https://github.com/edenhill/librdkafka/archive/v1.4.2-RC3.tar.gz | tar xvz
+    $ cd librdkafka-1.4.2-RC3/
     $ ./configure --enable-sasl
     $ make
     $ sudo make install
@@ -306,7 +306,7 @@ redef Kafka::topic_name = "zeek";
 The global configuration settings for Kafka.  These values are passed through
 directly to librdkafka.  Any valid librdkafka settings can be defined in this
 table.  The full set of valid librdkafka settings are available
-[here](https://github.com/edenhill/librdkafka/blob/v1.4.2/CONFIGURATION.md).
+[here](https://github.com/edenhill/librdkafka/blob/v1.4.2-RC3/CONFIGURATION.md).
 
 ```
 redef Kafka::kafka_conf = table(
