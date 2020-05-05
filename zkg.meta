@@ -10,6 +10,6 @@ depends =
   zeek >=3.0.0
   zkg >=2.0
 external_depends =
-  librdkafka ~1.4.2
+  librdkafka ~1.4.2-RC1
 user_vars =
   LIBRDKAFKA_ROOT [/usr/local/lib] "Path to librdkafka installation tree"
