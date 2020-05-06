@@ -2,7 +2,7 @@
 description = A Zeek log writer plugin that sends logging output to Kafka.
 tags = log writer, zeek plugin, kafka
 script_dir = build/scripts/Apache/Kafka
-build_command = ./configure --zeek-dist=%(zeek_dist)s --with-librdkafka=%(LIBRDKAFKA_ROOT)s && make
+build_command = ./configure --with-librdkafka=%(LIBRDKAFKA_ROOT)s && make
 test_command = ( cd tests && btest -d )
 plugin_dir = build
 version = 0.3.0
