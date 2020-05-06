@@ -82,7 +82,7 @@ These instructions could also be helpful if you were interested in distributing 
 1. Build the plugin using the following commands.
 
     ```
-    $ ./configure --zeek-dist=$zeek_dist --with-librdkafka=$librdkafka_root
+    $ ./configure --with-librdkafka=$librdkafka_root
     $ make
     $ sudo make install
     ```
