@@ -20,7 +20,7 @@
 shopt -s nocasematch
 
 #
-# Configures the bro kafka plugin
+# Configures the zeek kafka plugin
 # Configures the kafka broker
 # Configures the plugin for all the traffic types
 #
@@ -28,13 +28,13 @@ shopt -s nocasematch
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --kafka-topic                  [OPTIONAL] The kafka topic to configure. Default: bro"
+  echo "    --kafka-topic                  [OPTIONAL] The kafka topic to configure. Default: zeek"
   echo "    -h/--help                      Usage information."
   echo " "
   echo " "
 }
 
-KAFKA_TOPIC=bro
+KAFKA_TOPIC=zeek
 
 # Handle command line options
 for i in "$@"; do
@@ -70,20 +70,16 @@ done
 echo "Configuring kafka plugin"
 {
   echo "@load packages"
-  echo "redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG, Conn::LOG, DPD::LOG, FTP::LOG, Files::LOG, Known::CERTS_LOG, SMTP::LOG, SSL::LOG, Weird::LOG, Notice::LOG, DHCP::LOG, SSH::LOG, Software::LOG, RADIUS::LOG, X509::LOG, Known::DEVICES_LOG, RFB::LOG, Stats::LOG, CaptureLoss::LOG, SIP::LOG);"
+  echo "redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG, Conn::LOG, DPD::LOG, FTP::LOG, Files::LOG, Known::CERTS_LOG, SMTP::LOG, SSL::LOG, Weird::LOG, Notice::LOG, DHCP::LOG, SSH::LOG, Software::LOG, RADIUS::LOG, X509::LOG, RFB::LOG, Stats::LOG, CaptureLoss::LOG, SIP::LOG);"
   echo "redef Kafka::topic_name = \"${KAFKA_TOPIC}\";"
   echo "redef Kafka::tag_json = T;"
   echo "redef Kafka::kafka_conf = table([\"metadata.broker.list\"] = \"kafka:9092\");"
   echo "redef Kafka::logs_to_exclude = set(Conn::LOG, DHCP::LOG);"
   echo "redef Known::cert_tracking = ALL_HOSTS;"
   echo "redef Software::asset_tracking = ALL_HOSTS;"
-} >> /usr/local/bro/share/bro/site/local.bro
+} >> /usr/local/zeek/share/zeek/site/local.zeek
 
-# Load "known-devices-and-hostnames.bro" which is necessary in bro 2.5.5 to
-# create the log Known::DEVICES_LOG
-sed -i '86 a @load policy/protocols/dhcp/known-devices-and-hostnames.bro' /usr/local/bro/share/bro/site/local.bro
-
-# Comment out the load statement for "log-hostcerts-only.bro" in bro 2.5.5's
-# default local.bro in order to log all certificates to x509.log
-sed -i 's%^@load protocols/ssl/log-hostcerts-only%#&%' /usr/local/bro/share/bro/site/local.bro
+# Comment out the load statement for "log-hostcerts-only.zeek" in zeek's
+# default local.zeek as of 3.1.2 in order to log all certificates to x509.log
+sed -i 's%^@load protocols/ssl/log-hostcerts-only%#&%' /usr/local/zeek/share/zeek/site/local.zeek
 

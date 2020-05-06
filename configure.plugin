@@ -16,6 +16,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+#
 # Hooks to add custom options to the configure script.
 #
 
@@ -31,13 +32,15 @@ plugin_option()
 {
   case "$1" in
     --with-librdkafka=*)
-      append_cache_entry LibRDKafka_ROOT_DIR PATH $optarg
+      append_cache_entry LibRDKafka_ROOT_DIR PATH "${optarg}"
+      return 0
       ;;
     --with-openssl=*)
-      append_cache_entry OpenSSL_ROOT_DIR PATH $optarg
+      append_cache_entry OpenSSL_ROOT_DIR PATH "${optarg}"
+      return 0
       ;;
     *)
       return 1;
-    ;;
+      ;;
     esac
 }

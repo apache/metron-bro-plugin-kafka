@@ -15,5 +15,15 @@
 #  limitations under the License.
 #
 
-# @TEST-EXEC: bro -NN Apache::Kafka | sed 's/, version.*)/)/' > output
+# @TEST-EXEC: zeek ../../../scripts/Apache/Kafka/ %INPUT > output
 # @TEST-EXEC: btest-diff output
+
+module Kafka;
+
+redef logs_to_send = set(HTTP::LOG, DHCP::LOG);
+redef logs_to_exclude = set(Conn::LOG, DNS::LOG);
+
+print send_to_kafka(HTTP::LOG);
+print send_to_kafka(DHCP::LOG);
+print send_to_kafka(Conn::LOG);
+print send_to_kafka(DNS::LOG);

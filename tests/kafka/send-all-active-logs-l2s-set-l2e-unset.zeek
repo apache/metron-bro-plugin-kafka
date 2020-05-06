@@ -15,7 +15,7 @@
 #  limitations under the License.
 #
 
-# @TEST-EXEC: bro ../../../scripts/Apache/Kafka/ %INPUT > output
+# @TEST-EXEC: zeek ../../../scripts/Apache/Kafka/ %INPUT > output
 # @TEST-EXEC: btest-diff output
 
 module Kafka;

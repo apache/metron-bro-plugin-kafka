@@ -33,14 +33,14 @@ function help {
   echo "usage: ${0}"
   echo "    --network-name                  [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default"
   echo "    --offset                        [OPTIONAL] The kafka offset to read from. Default: -1"
-  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: bro"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: zeek"
   echo "    -h/--help                       Usage information."
   echo " "
 }
 
 NETWORK_NAME=metron-bro-plugin-kafka_default
 OFFSET=-1
-KAFKA_TOPIC=bro
+KAFKA_TOPIC=zeek
 
 # handle command line options
 for i in "$@"; do

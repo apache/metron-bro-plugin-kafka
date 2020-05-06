@@ -15,13 +15,10 @@
 #  limitations under the License.
 #
 
-#
-# This is loaded unconditionally at Bro startup. Include scripts here that should
-# always be loaded.
-#
-# Normally, that will be only code that initializes built-in elements. Load
-# your standard scripts in
-# scripts/<plugin-namespace>/<plugin-name>/__load__.bro instead.
-#
+# @TEST-EXEC: zeek -r ../../../tests/pcaps/exercise-traffic.pcap ../../../scripts/Apache/Kafka/ %INPUT > output
+# @TEST-EXEC: btest-diff output
 
-@load ./init.bro
+module Kafka;
+
+redef Kafka::logs_to_send = set(Conn::LOG);
+redef Kafka::mock = T;

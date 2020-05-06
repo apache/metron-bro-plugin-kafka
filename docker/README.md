@@ -15,7 +15,7 @@
 
 ## Docker support for testing metron-bro-plugin-kafka
 
-These scripts and containers provide support for building and testing Bro and the metron-bro-plugin-kafka using a number of Docker containers.
+These scripts and containers provide support for building and testing Zeek and the metron-bro-plugin-kafka using a number of Docker containers.
 The use of these scripts and containers allow an easier, automated workflow for testing new features, fixes, or regressions than before.
 One of the goals is for this to be extensible, such that new scripts can be introduced and run as well.  This will allow, for example, one or more
 testing scripts to be added to a pull request, and subsequently to a test suite.
@@ -25,7 +25,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 
 ```bash
 ├── containers
-│   └── bro
+│   └── zeek
 │   └── kafka
 │   └── zookeeper
 ├── data
@@ -34,38 +34,38 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 └── test_output
 ```
 - `containers`: The parent of all of the containers that this project defines.  We use several containers, not all of them ours.
-  - `bro`: The directory for our bro container, used for building bro, the librdkafka, and our plugin, as well as running bro.
+  - `zeek`: The directory for our zeek container, used for building zeek, the librdkafka, and our plugin, as well as running zeek.
   - `kafka`: The directory for our kafka container.
   - `zookeeper`: The directory for our zookeeper container.
 - `data`: The default path for pcap data to be used in tests.
-- `in_docker_scripts`: This directory is mapped to the bro docker container as /root/built_in_scripts.  These represent the library of scripts we provide to be run in the docker container.
+- `in_docker_scripts`: This directory is mapped to the zeek docker container as /root/built_in_scripts.  These represent the library of scripts we provide to be run in the docker container.
 - `scripts`: These are the scripts that are run on the host for creating the docker bits, running containers, running or executing commands against containers ( such as executing one of the built_in_scripts ), and cleaning up resources.
-- `test_output`: Directory where the bro logs and kafka logs per test/pcap are stored.
+- `test_output`: Directory where the zeek logs and kafka logs per test/pcap are stored.
 
 
 #### Scripts that execute _in_ the docker container
 
 ```bash
-├── build_bro_plugin.sh
-├── configure_bro_plugin.sh
+├── build_zeek_plugin.sh
+├── configure_zeek_plugin.sh
 ├── process_data_file.sh
 ```
 
-- `build_bro_plugin.sh`: Runs `bro-pkg` to build and install the provided version of the plugin.
-- `configure_bro_plugin.sh`: Configures the plugin for the kafka container, and routes all traffic types.
+- `build_zeek_plugin.sh`: Runs `zeek-pkg` to build and install the provided version of the plugin.
+- `configure_zeek_plugin.sh`: Configures the plugin for the kafka container, and routes all traffic types.
   ###### Parameters
   ```bash
-  --kafka-topic                  [OPTIONAL] The kafka topic to configure. Default: bro"
+  --kafka-topic                  [OPTIONAL] The kafka topic to configure. Default: zeek"
   ```
-- `process_data_file.sh`: Runs `bro -r` on the passed file
+- `process_data_file.sh`: Runs `zeek -r` on the passed file
 
 
 #### Scripts executed on the host to setup and interact with the docker containers
 
 ```bash
 ├── analyze_results.sh
-├── docker_execute_build_bro_plugin.sh
-├── docker_execute_configure_bro_plugin.sh
+├── docker_execute_build_zeek_plugin.sh
+├── docker_execute_configure_zeek_plugin.sh
 ├── docker_execute_create_topic_in_kafka.sh
 ├── docker_execute_process_data_file.sh
 ├── docker_execute_shell.sh
@@ -81,51 +81,51 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --test-directory               [REQUIRED] The directory for the tests
   ```
-- `docker_execute_build_bro_plugin.sh`: Executes `build_bro_plugin.sh` in the bro container
+- `docker_execute_build_zeek_plugin.sh`: Executes `build_zeek_plugin.sh` in the zeek container
   ###### Parameters
   ```bash
-   --container-name              [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
+   --container-name              [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1
   ```
-- `docker_execute_configure_bro_plugin.sh`: Executes `configure_bro_plugin.sh` in the bro container
+- `docker_execute_configure_zeek_plugin.sh`: Executes `configure_zeek_plugin.sh` in the zeek container
   ###### Parameters
   ```bash
-  --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
+  --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1
   ```
 - `docker_execute_create_topic_in_kafka.sh`: Creates the specified kafka topic in the kafka container
   ###### Parameters
   ```bash
   --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_kafka_1
-  --kafka-topic                  [OPTIONAL] The kafka topic to create. Default: bro
+  --kafka-topic                  [OPTIONAL] The kafka topic to create. Default: zeek
   ```
-- `docker_execute_process_data_file.sh`: Executes `process_data_file.sh` in the bro container
+- `docker_execute_process_data_file.sh`: Executes `process_data_file.sh` in the zeek container
   ###### Parameters
    ```bash
-   --container-name              [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
+   --container-name              [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1
    ```
 - `docker_execute_shell.sh`: `docker execute -i -t bash` to get a shell in a given container
   ###### Parameters
   ```bash
-  --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1
+  --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1
   ```
 - `docker_run_consume_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic $KAFKA_TOPIC --offset $OFFSET --partition 0 --bootstrap-server kafka:9092`
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default
   --offset                       [OPTIONAL] The kafka offset. Default: 0
-  --kafka-topic                  [OPTIONAL] The kafka topic to consume from. Default: bro
+  --kafka-topic                  [OPTIONAL] The kafka topic to consume from. Default: zeek
   ```
 - `docker_run_get_offset_kafka.sh`: Runs an instance of the kafka container and gets the current offset for the specified topic
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default
-  --kafka-topic                  [OPTIONAL] The kafka topic to get the offset from. Default: bro
+  --kafka-topic                  [OPTIONAL] The kafka topic to get the offset from. Default: zeek
   ```
 - `download_sample_pcaps.sh`: Downloads the sample pcaps to a specified directory. If they exist, it is a no-op
   
    > The sample pcaps are:
-   >  -  https://github.com/bro/try-bro/blob/master/manager/static/pcaps/exercise_traffic.pcap
+   >  -  https://github.com/zeek/try-zeek/blob/master/manager/static/pcaps/exercise_traffic.pcap
    >  -  http://downloads.digitalcorpora.org/corpora/network-packet-dumps/2008-nitroba/nitroba.pcap 
-   >  -  https://github.com/bro/try-bro/raw/master/manager/static/pcaps/ssh.pcap
+   >  -  https://github.com/zeek/try-zeek/raw/master/manager/static/pcaps/ssh.pcap
    >  -  https://github.com/markofu/pcaps/blob/master/PracticalPacketAnalysis/ppa-capture-files/ftp.pcap?raw=true 
    >  -  https://github.com/EmpowerSecurityAcademy/wireshark/blob/master/radius_localhost.pcapng?raw=true 
    >  -  https://github.com/kholia/my-pcaps/blob/master/VNC/07-vnc
@@ -153,12 +153,12 @@ This script does the following:
 1. Runs docker compose
 1. Creates the specified topic
 1. Downloads sample PCAP data
-1. Runs the bro container in the background
-1. Builds the bro plugin
-1. Configures the bro plugin
-1. Runs bro against all the pcap data, one at a time
-1. Executes a kafka client to read the data from bro for each pcap file
-1. Stores the output kafka messages and the bro logs into the test_output directory
+1. Runs the zeek container in the background
+1. Builds the zeek plugin
+1. Configures the zeek plugin
+1. Runs zeek against all the pcap data, one at a time
+1. Executes a kafka client to read the data from zeek for each pcap file
+1. Stores the output kafka messages and the zeek logs into the test_output directory
     ```bash
     >tree Tue_Jan__8_21_54_10_EST_2019
     Tue_Jan__8_21_54_10_EST_2019
@@ -171,7 +171,6 @@ This script does the following:
     │   ├── http.log
     │   ├── kafka-output.log
     │   ├── known_certs.log
-    │   ├── known_devices.log
     │   ├── loaded_scripts.log
     │   ├── notice.log
     │   ├── packet_filter.log
@@ -194,10 +193,10 @@ This script does the following:
     │   ├── software.log
     │   └── stats.log
     ```
-1. Creates a results.csv for each pcap that has the line counts of the kafka and the bro output for each log
+1. Creates a results.csv for each pcap that has the line counts of the kafka and the zeek output for each log
 1. Prints all the results.csv to the screen
 
-As we can see, the output is a folder named for the test run time, with a sub folder per pcap, containing all the bro logs and the `kafka_output.log`.
+As we can see, the output is a folder named for the test run time, with a sub folder per pcap, containing all the zeek logs and the `kafka_output.log`.
 
 
 At this point the containers are up and running in the background.
@@ -207,7 +206,7 @@ Other scripts may then be used to do your testing, for example running:
 ./scripts/docker_execute_shell.sh
 ```
 
-> NOTE: If the scripts are run repeatedly, and there is no change in bro or the librdkafka, the line `./run_end_to_end.sh` can be replaced by `./run_end_to_end.sh --skip-docker-build`, which uses the `--skip-docker-build` flag to not rebuild the containers, saving the significant time of rebuilding bro and librdkafka.
+> NOTE: If the scripts are run repeatedly, and there is no change in zeek or the librdkafka, the line `./run_end_to_end.sh` can be replaced by `./run_end_to_end.sh --skip-docker-build`, which uses the `--skip-docker-build` flag to not rebuild the containers, saving the significant time of rebuilding zeek and librdkafka.
 
 > NOTE: After you are done, you must call the `finish_end_to_end.sh` script to cleanup.
 
@@ -215,12 +214,12 @@ Other scripts may then be used to do your testing, for example running:
 ##### `run_end_to_end.sh`
 ###### Parameters
 ```bash
---skip-docker-build             [OPTIONAL] Skip build of bro docker machine.
+--skip-docker-build             [OPTIONAL] Skip build of zeek docker machine.
 --no-pcaps                      [OPTIONAL] Do not run pcaps.
 --data-path                     [OPTIONAL] The pcap data path. Default: ./data
---kafka-topic                   [OPTIONAL] The kafka topic name to use. Default: bro
+--kafka-topic                   [OPTIONAL] The kafka topic name to use. Default: zeek
 --plugin-version                [OPTIONAL] The plugin version. Default: the current branch name
 ```
 
-> NOTE: The provided `--plugin-version` is passed to the [`bro-pkg install`](https://docs.zeek.org/projects/package-manager/en/stable/bro-pkg.html#install-command) command within the container, which allows you to specify a version tag, branch name, or commit hash.  However, that tag, branch, or commit *must* be available in the currently checked out plugin repository.
+> NOTE: The provided `--plugin-version` is passed to the [`zeek-pkg install`](https://docs.zeek.org/projects/package-manager/en/stable/zeek-pkg.html#install-command) command within the container, which allows you to specify a version tag, branch name, or commit hash.  However, that tag, branch, or commit *must* be available in the currently checked out plugin repository.
 

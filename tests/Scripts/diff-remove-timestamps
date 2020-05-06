@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
 #  contributor license agreements.  See the NOTICE file distributed with
@@ -14,11 +15,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+# The upstream of this file is at
+# https://github.com/zeek/zeek-aux/blob/master/plugin-support/skeleton/tests/Scripts/diff-remove-timestamps
+#
+# Replace anything which looks like timestamps with XXXs (including the #start/end markers in logs).
 
-# @TEST-EXEC: bro -r ../../../tests/pcaps/exercise-traffic.pcap ../../../scripts/Apache/Kafka/ %INPUT > output
-# @TEST-EXEC: btest-diff output
+# Get us "modern" regexps with sed.
+if [ `uname` == "Linux" ]; then
+   sed="sed -r"
+else
+   sed="sed -E"
+fi
 
-module Kafka;
-
-redef Kafka::logs_to_send = set(Conn::LOG);
-redef Kafka::mock = T;
+$sed 's/(0\.000000)|([0-9]{9,10}\.[0-9]{2,8})/XXXXXXXXXX.XXXXXX/g' | \
+$sed 's/^ *#(open|close).(19|20)..-..-..-..-..-..$/#\1 XXXX-XX-XX-XX-XX-XX/g'

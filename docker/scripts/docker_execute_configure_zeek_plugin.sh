@@ -1,4 +1,4 @@
-#!/usr/bin/env bash -x
+#!/usr/bin/env bash
 
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
@@ -24,23 +24,23 @@ set -E # errtrap
 set -o pipefail
 
 #
-# Executes the build_bro_plugin.sh script in the container
+# Executes the configure_plugin.sh in the docker container
 #
 
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1"
-  echo "    --plugin-version                [REQUIRED] The plugin version."
+  echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: zeek"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
 }
 
-CONTAINER_NAME="metron-bro-plugin-kafka_bro_1"
-PLUGIN_VERSION=
+CONTAINER_NAME=metron-bro-plugin-kafka_zeek_1
+KAFKA_TOPIC=zeek
 
-# handle command line options
+# Handle command line options
 for i in "$@"; do
   case $i in
   #
@@ -52,17 +52,15 @@ for i in "$@"; do
       CONTAINER_NAME="${i#*=}"
       shift # past argument=value
     ;;
-
   #
-  # PLUGIN_VERSION
+  # KAFKA_TOPIC
   #
-  #   --plugin-version
+  #   --kafka-topic
   #
-    --plugin-version=*)
-      PLUGIN_VERSION="${i#*=}"
+    --kafka-topic=*)
+      KAFKA_TOPIC="${i#*=}"
       shift # past argument=value
     ;;
-
   #
   # -h/--help
   #
@@ -71,7 +69,6 @@ for i in "$@"; do
       exit 0
       shift # past argument with no value
     ;;
-
   #
   # Unknown option
   #
@@ -83,19 +80,15 @@ for i in "$@"; do
   esac
 done
 
-if [[ -z "${PLUGIN_VERSION}" ]]; then
-  echo "PLUGIN_VERSION must be passed"
-  exit 1
-fi
-
-echo "Running build_bro_plugin with "
-echo "CONTAINER_NAME = $CONTAINER_NAME"
+echo "Running docker_execute_configure_plugin.sh with "
+echo "CONTAINER_NAME = ${CONTAINER_NAME}"
+echo "KAFKA_TOPIC = ${KAFKA_TOPIC}"
 echo "==================================================="
 
-docker exec -w /root "${CONTAINER_NAME}" bash -c "/root/built_in_scripts/build_bro_plugin.sh --plugin-version=${PLUGIN_VERSION}"
+docker exec -w /root "${CONTAINER_NAME}" bash -c "/root/built_in_scripts/configure_plugin.sh --kafka-topic=\"${KAFKA_TOPIC}\""
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc};
 fi
 
-echo "Built the bro plugin"
+echo "configured the kafka plugin"
 

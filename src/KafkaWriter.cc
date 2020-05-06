@@ -29,7 +29,7 @@ KafkaWriter::KafkaWriter(WriterFrontend* frontend):
     topic(NULL)
 {
   /**
-   * We need thread-local copies of all user-defined settings coming from bro
+   * We need thread-local copies of all user-defined settings coming from zeek
    * scripting land.  accessing these is not thread-safe and 'DoInit' is
    * potentially accessed from multiple threads.
    */
@@ -94,8 +94,8 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     // Timeformat object, default to TS_EPOCH
     threading::formatter::JSON::TimeFormat tf = threading::formatter::JSON::TS_EPOCH;
 
-    // Allow overriding of the kafka topic via the Bro script constant 'topic_name'
-    // which can be applied when adding a new Bro log filter.
+    // Allow overriding of the kafka topic via the Zeek script constant
+    // 'topic_name' which can be applied when adding a new Zeek log filter.
     topic_name_override = GetConfigValue(info, "topic_name");
 
     if(!topic_name_override.empty()) {
@@ -114,8 +114,8 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     /**
      * Format the timestamps
      * NOTE: This string comparision implementation is currently the necessary
-     * way to do it, as there isn't a way to pass the Bro enum into C++ enum.
-     * This makes the user interface consistent with the existing Bro Logging
+     * way to do it, as there isn't a way to pass the Zeek enum into C++ enum.
+     * This makes the user interface consistent with the existing Zeek Logging
      * configuration for the ASCII log output.
      */
     if ( strcmp(json_timestamps.c_str(), "JSON::TS_EPOCH") == 0 ) {
@@ -230,10 +230,10 @@ bool KafkaWriter::DoFinish(double network_time)
 
         delete topic;
         delete producer;
+        delete topic_conf;
     }
     delete formatter;
     delete conf;
-    delete topic_conf;
 
     return success;
 }
@@ -268,7 +268,7 @@ bool KafkaWriter::DoWrite(int num_fields, const threading::Field* const* fields,
 }
 
 /**
- * Writer-specific method implementing a change of fthe buffering
+ * Writer-specific method implementing a change of the buffering
  * state.	If buffering is disabled, the writer should attempt to
  * write out information as quickly as possible even if doing so may
  * have a performance impact. If enabled (which is the default), it

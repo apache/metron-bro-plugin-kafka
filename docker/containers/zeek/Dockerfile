@@ -14,44 +14,50 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-FROM centos:7
-ARG BRO_VERSION
+FROM centos:8
+ARG ZEEK_VERSION
 ARG LIBRDKAFKA_VERSION
 
-# install development tools
-RUN yum -y groupinstall "Development Tools" && \
-   yum -y install cmake make gcc gcc-c++ \
+# install powertools for libpcap-devel
+RUN dnf install -y 'dnf-command(config-manager)' && \
+    yum config-manager --set-enabled PowerTools
+
+# install epel for screen
+RUN dnf install -y epel-release
+
+# install prereqs then clean dnf cache
+RUN dnf -y update && \
+   dnf -y install cmake make gcc gcc-c++ \
    flex bison libpcap libpcap-devel \
-   openssl-devel python-devel swig \
-   zlib-devel perl \
+   openssl-devel python3 platform-python-devel \
+   swig zlib-devel perl \
    cyrus-sasl cyrus-sasl-devel cyrus-sasl-gssapi \
-   git jq screen tree vim
+   git jq screen tree vim && \
+   dnf -y clean all
 
 # copy in the .screenrc
 COPY .screenrc /root
 
-# install bro
+# install zeek
 WORKDIR /root
-RUN git clone https://github.com/bro/bro
-WORKDIR bro/
-RUN git checkout "v${BRO_VERSION}"
+RUN git clone https://github.com/zeek/zeek
+WORKDIR zeek/
+RUN git checkout "v${ZEEK_VERSION}"
 RUN git submodule update --init --recursive
 RUN ./configure
 RUN make
 RUN make install
-ENV PATH="${PATH}:/usr/local/bro/bin"
+ENV PATH="${PATH}:/usr/local/zeek/bin"
 ENV PATH="${PATH}:/usr/bin"
 
-# install pip3 and bro-pkg
+# install pip3 and zkg
 WORKDIR /root
 COPY requirements.txt requirements.txt
-RUN yum -y update && \
-    yum -y install epel-release && \
-    yum -y install python3-pip && \
-    yum clean all && \
+RUN dnf -y install python3-pip && \
+    dnf clean all && \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install -r requirements.txt && \
-    bro-pkg autoconfig
+    zkg autoconfig
 
 # install librdkafka
 WORKDIR /root

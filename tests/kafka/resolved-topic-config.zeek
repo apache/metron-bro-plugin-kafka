@@ -15,15 +15,12 @@
 #  limitations under the License.
 #
 
-# @TEST-EXEC: bro ../../../scripts/Apache/Kafka/ %INPUT > output
+# @TEST-EXEC: zeek -r ../../../tests/pcaps/exercise-traffic.pcap ../../../scripts/Apache/Kafka/ %INPUT > output
 # @TEST-EXEC: btest-diff output
 
 module Kafka;
 
-redef logs_to_send = set(HTTP::LOG, DHCP::LOG);
-redef logs_to_exclude = set(Conn::LOG, DNS::LOG);
 
-print send_to_kafka(HTTP::LOG);
-print send_to_kafka(DHCP::LOG);
-print send_to_kafka(Conn::LOG);
-print send_to_kafka(DNS::LOG);
+redef Kafka::logs_to_send = set(Conn::LOG);
+redef Kafka::topic_name = "const-variable-topic";
+redef Kafka::mock = T;

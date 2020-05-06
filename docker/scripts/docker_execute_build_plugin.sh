@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -x
 
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
@@ -24,25 +24,23 @@ set -E # errtrap
 set -o pipefail
 
 #
-# Executes the process_data_dir.sh script in the container
+# Executes the build_plugin.sh script in the container
 #
 
 function help {
   echo " "
   echo "usage: ${0}"
   echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1"
-  echo "    --pcap-file-name                [REQUIRED] The name of the pcap file"
-  echo "    --output-directory-name         [REQUIRED] The name of the output directory"
+  echo "    --plugin-version                [REQUIRED] The plugin version."
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
 }
 
-CONTAINER_NAME=metron-bro-plugin-kafka_zeek_1
-PCAP_FILE_NAME=
-OUTPUT_DIRECTORY_NAME=
+CONTAINER_NAME="metron-bro-plugin-kafka_zeek_1"
+PLUGIN_VERSION=
 
-# Handle command line options
+# handle command line options
 for i in "$@"; do
   case $i in
   #
@@ -56,22 +54,12 @@ for i in "$@"; do
     ;;
 
   #
-  # PCAP_FILE_NAME
+  # PLUGIN_VERSION
   #
-  #   --pcap-file-name
+  #   --plugin-version
   #
-    --pcap-file-name=*)
-      PCAP_FILE_NAME="${i#*=}"
-      shift # past argument=value
-    ;;
-
-  #
-  # OUTPUT_DIRECTORY_NAME
-  #
-  #   --output-directory-name
-  #
-    --output-directory-name=*)
-      OUTPUT_DIRECTORY_NAME="${i#*=}"
+    --plugin-version=*)
+      PLUGIN_VERSION="${i#*=}"
       shift # past argument=value
     ;;
 
@@ -95,19 +83,19 @@ for i in "$@"; do
   esac
 done
 
-echo "Running docker_execute_process_data_dir with "
+if [[ -z "${PLUGIN_VERSION}" ]]; then
+  echo "PLUGIN_VERSION must be passed"
+  exit 1
+fi
+
+echo "Running build_plugin with "
 echo "CONTAINER_NAME = $CONTAINER_NAME"
-echo "PCAP_FILE_NAME = ${PCAP_FILE_NAME}"
-echo "OUTPUT_DIRECTORY_NAME = ${OUTPUT_DIRECTORY_NAME}"
 echo "==================================================="
 
-echo "executing process_data_file.sh in the zeek docker container"
-echo " "
-
-docker exec -w /root "${CONTAINER_NAME}" bash -c "built_in_scripts/process_data_file.sh --pcap-file-name=${PCAP_FILE_NAME} --output-directory-name=${OUTPUT_DIRECTORY_NAME}"
-
+docker exec -w /root "${CONTAINER_NAME}" bash -c "/root/built_in_scripts/build_plugin.sh --plugin-version=${PLUGIN_VERSION}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc};
 fi
 
-echo "done processing ${PCAP_FILE_NAME}"
+echo "Built the plugin"
+

@@ -24,8 +24,8 @@ set -E # errtrap
 set -o pipefail
 
 #
-# For a given directory, finds all the bro log output, and splits the kafka output file
-# by bro log, such that there is a bro log -> bro log kafka log
+# For a given directory, finds all the zeek log output, and splits the kafka
+# output file by zeek log, such that there is a zeek log -> zeek log kafka log
 #
 
 function help {
@@ -89,7 +89,7 @@ cd "${LOG_DIRECTORY}" || exit 1
 # and extract the start
 # then we want to grep that name > name.kafka.log from the KAFKA_OUTPUT_FILE
 RESULTS_FILE="${LOG_DIRECTORY}/results.csv"
-echo "LOG,BRO_COUNT,KAFKA_COUNT" >> "${RESULTS_FILE}"
+echo "LOG,ZEEK_COUNT,KAFKA_COUNT" >> "${RESULTS_FILE}"
 for log in "${LOG_DIRECTORY}"/*.log
 do
   BASE_LOG_FILE_NAME=$(basename "$log" .log)
@@ -98,9 +98,9 @@ do
       grep {\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log > "${LOG_DIRECTORY}"/"${BASE_LOG_FILE_NAME}".kafka.log
 
       KAKFA_COUNT=$(cat "${LOG_DIRECTORY}/${BASE_LOG_FILE_NAME}.kafka.log" | wc -l)
-      BRO_COUNT=$(grep -v "^#" "${log}" | wc -l)
+      ZEEK_COUNT=$(grep -v "^#" "${log}" | wc -l)
 
-      echo "${BASE_LOG_FILE_NAME},${BRO_COUNT},${KAKFA_COUNT}" >> "${RESULTS_FILE}"
+      echo "${BASE_LOG_FILE_NAME},${ZEEK_COUNT},${KAKFA_COUNT}" >> "${RESULTS_FILE}"
     fi
   fi
 done

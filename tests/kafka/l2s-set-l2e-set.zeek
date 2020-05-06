@@ -15,9 +15,14 @@
 #  limitations under the License.
 #
 
-#
-# This is loaded when a user activates the plugin. Include scripts here that should be
-# loaded automatically at that point.
-#
+# @TEST-EXEC: zeek ../../../scripts/Apache/Kafka/ %INPUT > output
+# @TEST-EXEC: btest-diff output
 
-@load ./logs-to-kafka.bro
+module Kafka;
+
+redef logs_to_send = set(HTTP::LOG, Conn::LOG);
+redef logs_to_exclude = set(Conn::LOG, DNS::LOG);
+
+print send_to_kafka(HTTP::LOG);
+print send_to_kafka(Conn::LOG);
+print send_to_kafka(DNS::LOG);

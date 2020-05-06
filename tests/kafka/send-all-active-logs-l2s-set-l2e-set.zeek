@@ -15,12 +15,14 @@
 #  limitations under the License.
 #
 
-# @TEST-EXEC: bro ../../../scripts/Apache/Kafka/ %INPUT > output
+# @TEST-EXEC: zeek ../../../scripts/Apache/Kafka/ %INPUT > output
 # @TEST-EXEC: btest-diff output
 
 module Kafka;
 
 redef send_all_active_logs = T;
+redef logs_to_send = set(HTTP::LOG, Conn::LOG);
+redef logs_to_exclude = set(HTTP::LOG, SSL::LOG);
 
 print send_to_kafka(HTTP::LOG);
 print send_to_kafka(DHCP::LOG);

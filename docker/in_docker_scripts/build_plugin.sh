@@ -18,49 +18,54 @@
 #
 
 shopt -s nocasematch
+shopt -s globstar nullglob
+shopt -s nocasematch
 set -u # nounset
-set -e # errexit
+# set -e (errexit) omitted to enable printfiles function call
 set -E # errtrap
 set -o pipefail
 
 #
-# Executes the configure_bro_plugin.sh in the docker container
+# Runs zkg to build and install the plugin
 #
 
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_bro_1"
-  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: bro"
+  echo "    --plugin-version                [REQUIRED] The plugin version."
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
 }
 
-CONTAINER_NAME=metron-bro-plugin-kafka_bro_1
-KAFKA_TOPIC=bro
+function printfiles {
+  echo "==================================================="
+  echo "ERR"
+  cat /root/.zkg/testing/code/clones/code/zkg.test_command.stderr
+  echo "==================================================="
+  echo "OUT"
+  cat /root/.zkg/testing/code/clones/code/zkg.test_command.stdout
+  echo "==================================================="
+  echo ""
+  echo "==================================================="
+  echo ""
+}
+
+PLUGIN_VERSION=
 
 # Handle command line options
 for i in "$@"; do
   case $i in
   #
-  # CONTAINER_NAME
+  # PLUGIN_VERSION
   #
-  #   --container-name
+  #   --plugin-version
   #
-    --container-name=*)
-      CONTAINER_NAME="${i#*=}"
+    --plugin-version=*)
+      PLUGIN_VERSION="${i#*=}"
       shift # past argument=value
     ;;
-  #
-  # KAFKA_TOPIC
-  #
-  #   --kafka-topic
-  #
-    --kafka-topic=*)
-      KAFKA_TOPIC="${i#*=}"
-      shift # past argument=value
-    ;;
+
   #
   # -h/--help
   #
@@ -69,6 +74,7 @@ for i in "$@"; do
       exit 0
       shift # past argument with no value
     ;;
+
   #
   # Unknown option
   #
@@ -80,15 +86,33 @@ for i in "$@"; do
   esac
 done
 
-echo "Running docker_execute_configure_bro_plugin.sh with "
-echo "CONTAINER_NAME = ${CONTAINER_NAME}"
-echo "KAFKA_TOPIC = ${KAFKA_TOPIC}"
-echo "==================================================="
-
-docker exec -w /root "${CONTAINER_NAME}" bash -c "/root/built_in_scripts/configure_bro_plugin.sh --kafka-topic=\"${KAFKA_TOPIC}\""
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc};
+if [[ -z "${PLUGIN_VERSION}" ]]; then
+  echo "PLUGIN_VERSION must be passed"
+  exit 1
 fi
 
-echo "configured the bro kafka plugin"
+echo "PLUGIN_VERSION = ${PLUGIN_VERSION}"
+
+cd /root || exit 1
+
+echo "==================================================="
+
+zkg -vvv test code
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR running zkg test ${rc}"
+  printfiles
+  exit ${rc}
+fi
+
+zkg -vvv install code --skiptests --version "${PLUGIN_VERSION}" --force
+rc=$?; if [[ ${rc} != 0 ]]; then
+  echo "ERROR running zkg install ${rc}"
+  printfiles
+  exit ${rc}
+fi
+
+zeek -NN Apache::Kafka
+
+echo "==================================================="
+echo ""
 

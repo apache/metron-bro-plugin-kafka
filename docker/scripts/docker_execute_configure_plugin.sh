@@ -18,41 +18,49 @@
 #
 
 shopt -s nocasematch
-shopt -s globstar nullglob
-shopt -s nocasematch
 set -u # nounset
 set -e # errexit
 set -E # errtrap
 set -o pipefail
 
 #
-# Runs bro-pkg to build and install the plugin
+# Executes the configure_plugin.sh in the docker container
 #
 
 function help {
   echo " "
   echo "usage: ${0}"
-  echo "    --plugin-version                [REQUIRED] The plugin version."
+  echo "    --container-name                [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1"
+  echo "    --kafka-topic                   [OPTIONAL] The kafka topic to create. Default: zeek"
   echo "    -h/--help                       Usage information."
   echo " "
   echo " "
 }
 
-PLUGIN_VERSION=
+CONTAINER_NAME=metron-bro-plugin-kafka_zeek_1
+KAFKA_TOPIC=zeek
 
 # Handle command line options
 for i in "$@"; do
   case $i in
   #
-  # PLUGIN_VERSION
+  # CONTAINER_NAME
   #
-  #   --plugin-version
+  #   --container-name
   #
-    --plugin-version=*)
-      PLUGIN_VERSION="${i#*=}"
+    --container-name=*)
+      CONTAINER_NAME="${i#*=}"
       shift # past argument=value
     ;;
-
+  #
+  # KAFKA_TOPIC
+  #
+  #   --kafka-topic
+  #
+    --kafka-topic=*)
+      KAFKA_TOPIC="${i#*=}"
+      shift # past argument=value
+    ;;
   #
   # -h/--help
   #
@@ -61,7 +69,6 @@ for i in "$@"; do
       exit 0
       shift # past argument with no value
     ;;
-
   #
   # Unknown option
   #
@@ -73,35 +80,15 @@ for i in "$@"; do
   esac
 done
 
-if [[ -z "${PLUGIN_VERSION}" ]]; then
-  echo "PLUGIN_VERSION must be passed"
-  exit 1
-fi
-
-echo "PLUGIN_VERSION = ${PLUGIN_VERSION}"
-
-cd /root || exit 1
-
+echo "Running docker_execute_configure_plugin.sh with "
+echo "CONTAINER_NAME = ${CONTAINER_NAME}"
+echo "KAFKA_TOPIC = ${KAFKA_TOPIC}"
 echo "==================================================="
 
-bro-pkg -vvv install code --version "${PLUGIN_VERSION}" --force
+docker exec -w /root "${CONTAINER_NAME}" bash -c "/root/built_in_scripts/configure_plugin.sh --kafka-topic=\"${KAFKA_TOPIC}\""
 rc=$?; if [[ ${rc} != 0 ]]; then
-  echo "ERROR running bro-pkg install ${rc}"
-  exit ${rc}
+  exit ${rc};
 fi
-echo "==================================================="
-echo "ERR"
-cat /root/.zkg/testing/code/clones/code/zkg.test_command.stderr
-echo "==================================================="
-echo "OUT"
-cat /root/.zkg/testing/code/clones/code/zkg.test_command.stdout
-echo "==================================================="
-echo ""
-echo "==================================================="
-echo ""
 
-bro -NN Apache::Kafka
-
-echo "==================================================="
-echo ""
+echo "configured the kafka plugin"
 

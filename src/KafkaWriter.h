@@ -15,12 +15,13 @@
  * limitations under the License.
  */
 
-#ifndef BRO_PLUGIN_BRO_KAFKA_KAFKAWRITER_H
-#define BRO_PLUGIN_BRO_KAFKA_KAFKAWRITER_H
+#ifndef ZEEK_PLUGIN_BRO_KAFKA_KAFKAWRITER_H
+#define ZEEK_PLUGIN_BRO_KAFKA_KAFKAWRITER_H
 
 #include <librdkafka/rdkafkacpp.h>
 #include <string>
 #include <Type.h>
+#include <Desc.h>
 #include <logging/WriterBackend.h>
 #include <threading/formatters/JSON.h>
 #include <threading/Formatter.h>

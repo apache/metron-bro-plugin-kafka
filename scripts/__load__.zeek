@@ -1,4 +1,3 @@
-#! /bin/sh
 #
 #  Licensed to the Apache Software Foundation (ASF) under one or more
 #  contributor license agreements.  See the NOTICE file distributed with
@@ -15,22 +14,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-# BTest helper for getting values for Bro-related environment variables.
 
-base=`dirname $0`
-bro=`cat ${base}/../../build/CMakeCache.txt | grep BRO_DIST | cut -d = -f 2`
+#
+# This is loaded automatically at Zeek startup once the plugin gets activated
+# and its BiF elements have become available. Include code here that should
+# always execute unconditionally at that time.
+#
+# Note that often you may want your plugin's accompanying scripts not here, but
+# in scripts/<plugin-namespace>/<plugin-name>/__load__.zeek. That's processed
+# only on explicit `@load <plugin-namespace>/<plugin-name>`.
+#
 
-if [ "$1" = "brobase" ]; then
-    echo ${bro}
-elif [ "$1" = "bropath" ]; then
-    ${bro}/build/bro-path-dev
-elif [ "$1" = "bro_plugin_path" ]; then
-    ( cd ${base}/../.. && pwd )
-elif [ "$1" = "bro_seed_file" ]; then
-    echo ${bro}/testing/btest/random.seed
-elif [ "$1" = "path" ]; then
-    echo ${bro}/build/src:${bro}/aux/btest:${base}/:${bro}/aux/bro-cut:$PATH
-else
-    echo "usage: `basename $0` <var>" >&2
-    exit 1
-fi
+@load ./init.zeek
