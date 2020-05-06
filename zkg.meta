@@ -5,7 +5,7 @@ script_dir = build/scripts/Apache/Kafka
 build_command = ./configure --zeek-dist=%(zeek_dist)s --with-librdkafka=%(LIBRDKAFKA_ROOT)s && make
 test_command = ( cd tests && btest -d )
 plugin_dir = build
-version = 0.3
+version = 0.3.0
 depends =
   zeek >=3.0.0
   zkg >=2.0
