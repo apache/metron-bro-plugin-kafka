@@ -58,7 +58,7 @@ This software is a part of the [Apache Metron](https://metron.apache.org/) proje
 
     ```
     $ zeek -N Apache::Kafka
-    Apache::Kafka - Writes logs to Kafka (dynamic, version 0.3)
+    Apache::Kafka - Writes logs to Kafka (dynamic, version 0.3.0)
     ```
 
 ### Manual Installation
@@ -91,7 +91,7 @@ These instructions could also be helpful if you were interested in distributing 
 
     ```
     $ zeek -N Apache::Kafka
-    Apache::Kafka - Writes logs to Kafka (dynamic, version 0.3)
+    Apache::Kafka - Writes logs to Kafka (dynamic, version 0.3.0)
     ```
 
 ## Activation
