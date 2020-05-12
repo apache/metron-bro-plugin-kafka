@@ -93,7 +93,7 @@ for i in "$@"; do
 done
 
 docker run --rm --network "${NETWORK_NAME}" metron-bro-plugin-kafka_kafka \
-  kafka-console-consumer.sh --topic "${KAFKA_TOPIC}" --offset "${OFFSET}" --partition 0 --bootstrap-server kafka:9092 --timeout-ms 1000
+  kafka-console-consumer.sh --topic "${KAFKA_TOPIC}" --offset "${OFFSET}" --partition 0 --bootstrap-server kafka-1:9092 --timeout-ms 1000
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi

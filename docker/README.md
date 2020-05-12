@@ -94,7 +94,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 - `docker_execute_create_topic_in_kafka.sh`: Creates the specified kafka topic in the kafka container
   ###### Parameters
   ```bash
-  --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_kafka_1
+  --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_kafka-1_1
   --kafka-topic                  [OPTIONAL] The kafka topic to create. Default: zeek
   ```
 - `docker_execute_process_data_file.sh`: Executes `process_data_file.sh` in the zeek container
@@ -107,7 +107,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1
   ```
-- `docker_run_consume_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic $KAFKA_TOPIC --offset $OFFSET --partition 0 --bootstrap-server kafka:9092`
+- `docker_run_consume_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic $KAFKA_TOPIC --offset $OFFSET --partition 0 --bootstrap-server kafka-1:9092`
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default
