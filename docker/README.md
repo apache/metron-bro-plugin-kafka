@@ -46,13 +46,13 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 #### Scripts that execute _in_ the docker container
 
 ```bash
-├── build_zeek_plugin.sh
-├── configure_zeek_plugin.sh
+├── build_plugin.sh
+├── configure_plugin.sh
 ├── process_data_file.sh
 ```
 
-- `build_zeek_plugin.sh`: Runs `zeek-pkg` to build and install the provided version of the plugin.
-- `configure_zeek_plugin.sh`: Configures the plugin for the kafka container, and routes all traffic types.
+- `build_plugin.sh`: Runs `zkg` to build and install the provided version of the plugin.
+- `configure_plugin.sh`: Configures the plugin for the kafka container, and routes all traffic types.
   ###### Parameters
   ```bash
   --kafka-topic                  [OPTIONAL] The kafka topic to configure. Default: zeek"
@@ -64,8 +64,8 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 
 ```bash
 ├── analyze_results.sh
-├── docker_execute_build_zeek_plugin.sh
-├── docker_execute_configure_zeek_plugin.sh
+├── docker_execute_build_plugin.sh
+├── docker_execute_configure_plugin.sh
 ├── docker_execute_create_topic_in_kafka.sh
 ├── docker_execute_process_data_file.sh
 ├── docker_execute_shell.sh
@@ -81,12 +81,12 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --test-directory               [REQUIRED] The directory for the tests
   ```
-- `docker_execute_build_zeek_plugin.sh`: Executes `build_zeek_plugin.sh` in the zeek container
+- `docker_execute_build_plugin.sh`: Executes `build_plugin.sh` in the zeek container
   ###### Parameters
   ```bash
    --container-name              [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1
   ```
-- `docker_execute_configure_zeek_plugin.sh`: Executes `configure_zeek_plugin.sh` in the zeek container
+- `docker_execute_configure_plugin.sh`: Executes `configure_plugin.sh` in the zeek container
   ###### Parameters
   ```bash
   --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1
