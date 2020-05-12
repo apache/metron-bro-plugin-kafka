@@ -4,7 +4,7 @@ services:
     build: containers/zookeeper
     image: metron-bro-plugin-kafka_zookeeper:latest
     ports:
-      - "2181:2181"
+      - "2181"
   kafka:
     build: containers/kafka
     image: metron-bro-plugin-kafka_kafka:latest
@@ -12,9 +12,11 @@ services:
       zookeeper:
         condition: service_healthy
     environment:
-      - ZOOKEEPER_IP=zookeeper
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - KAFKA_ADVERTISED_PORT=9092
     ports:
-      - "9092:9092"
+      - "9092"
   zeek:
     build:
       context: containers/zeek

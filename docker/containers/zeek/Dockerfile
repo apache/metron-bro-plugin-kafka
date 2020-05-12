@@ -14,7 +14,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-FROM centos:8
+ARG FROM_IMAGE="centos"
+ARG FROM_IMAGE_TAG="8"
+
+FROM "${FROM_IMAGE}":"${FROM_IMAGE_TAG}"
+
 ARG ZEEK_VERSION
 ARG LIBRDKAFKA_VERSION
 

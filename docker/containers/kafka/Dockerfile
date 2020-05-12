@@ -14,6 +14,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-FROM ches/kafka:0.10.2.1
-HEALTHCHECK --interval=5s --timeout=10s --start-period=2s --retries=2 \
-  CMD JMX_PORT= /kafka/bin/kafka-configs.sh --describe --zookeeper zookeeper:2181 --entity-type brokers || exit 1
+ARG FROM_IMAGE="wurstmeister/kafka"
+ARG FROM_IMAGE_TAG="2.12-2.5.0"
+
+FROM "${FROM_IMAGE}":"${FROM_IMAGE_TAG}"
+
+HEALTHCHECK --interval=5s --timeout=10s --start-period=2s --retries=3 \
+  CMD JMX_PORT= /opt/kafka/bin/kafka-configs.sh --describe --zookeeper zookeeper:2181 --entity-type brokers || exit 1
