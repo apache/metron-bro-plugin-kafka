@@ -24,8 +24,7 @@ set -E # errtrap
 set -o pipefail
 
 #
-# Runs a kafka container with the console consumer for the provided topic.  The
-# consumer should quit when it has read all of the messages available.
+# Runs a kafka container to retrieve the offset for the provided topic
 #
 
 function help {

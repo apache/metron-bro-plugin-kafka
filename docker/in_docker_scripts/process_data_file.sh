@@ -70,7 +70,7 @@ echo "OUTPUT_DIRECTORY_NAME = ${OUTPUT_DIRECTORY_NAME}"
 cd /root || exit 1
 echo "================================"
 if [ ! -d /root/data ]; then
-  echo "DATA_PATH has not been set and mapped"
+  echo "DATA_PATH is not available"
   exit 1
 fi
 cd /root/test_output/"${OUTPUT_DIRECTORY_NAME}" || exit 1

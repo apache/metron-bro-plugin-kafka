@@ -28,6 +28,7 @@ function help {
   echo "    --skip-docker-build             [OPTIONAL] Skip build of zeek docker machine."
   echo "    --data-path                     [OPTIONAL] The pcap data path. Default: ./data"
   echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: zeek"
+  echo "    --partitions                    [OPTIONAL] The number of kafka partitions to create. Default: 2"
   echo "    --plugin-version                [OPTIONAL] The plugin version. Default: the current branch name"
   echo "    --no-pcap                       [OPTIONAL] Do not run pcaps."
   echo "    -h/--help                       Usage information."
@@ -54,6 +55,7 @@ DATE=$(date)
 LOG_DATE=${DATE// /_}
 TEST_OUTPUT_PATH="${ROOT_DIR}/test_output/"${LOG_DATE//:/_}
 KAFKA_TOPIC="zeek"
+PARTITIONS=2
 PROJECT_NAME="metron-bro-plugin-kafka"
 OUR_SCRIPTS_PATH="${PLUGIN_ROOT_DIR}/docker/in_docker_scripts"
 
@@ -108,7 +110,6 @@ for i in "$@"; do
       NO_PCAP=true
       shift # past argument
     ;;
-
   #
   # DATA_PATH
   #
@@ -116,7 +117,6 @@ for i in "$@"; do
       DATA_PATH="${i#*=}"
       shift # past argument=value
     ;;
-
   #
   # KAFKA_TOPIC
   #
@@ -126,7 +126,15 @@ for i in "$@"; do
       KAFKA_TOPIC="${i#*=}"
       shift # past argument=value
     ;;
-
+  #
+  # PARTITIONS
+  #
+  #   --partitions
+  #
+    --partitions=*)
+      PARTITIONS="${i#*=}"
+      shift # past argument=value
+    ;;
   #
   # PLUGIN_VERSION
   #
@@ -136,7 +144,6 @@ for i in "$@"; do
       PLUGIN_VERSION="${i#*=}"
       shift # past argument=value
     ;;
-
   #
   # -h/--help
   #
@@ -148,12 +155,17 @@ for i in "$@"; do
   esac
 done
 
-cd "${ROOT_DIR}" || { echo "NO ROOT" ; exit 1; }
-echo "Running docker compose with "
-echo "SKIP_REBUILD_ZEEK = ${SKIP_REBUILD_ZEEK}"
-echo "DATA_PATH         = ${DATA_PATH}"
-echo "KAFKA_TOPIC       = ${KAFKA_TOPIC}"
-echo "PLUGIN_VERSION    = ${PLUGIN_VERSION}"
+cd "${ROOT_DIR}" || { echo "ROOT_DIR unavailable" ; exit 1; }
+echo "Running the end to end tests with"
+echo "COMPOSE_PROJECT_NAME = ${PROJECT_NAME}"
+echo "SKIP_REBUILD_ZEEK    = ${SKIP_REBUILD_ZEEK}"
+echo "KAFKA_TOPIC          = ${KAFKA_TOPIC}"
+echo "PARTITIONS           = ${PARTITIONS}"
+echo "PLUGIN_VERSION       = ${PLUGIN_VERSION}"
+echo "DATA_PATH            = ${DATA_PATH}"
+echo "TEST_OUTPUT_PATH     = ${TEST_OUTPUT_PATH}"
+echo "PLUGIN_ROOT_DIR      = ${PLUGIN_ROOT_DIR}"
+echo "OUR_SCRIPTS_PATH     = ${OUR_SCRIPTS_PATH}"
 echo "==================================================="
 
 # Run docker compose, rebuilding as specified
@@ -180,7 +192,7 @@ else
 fi
 
 # Create the kafka topic
-bash "${SCRIPT_DIR}"/docker_execute_create_topic_in_kafka.sh --kafka-topic="${KAFKA_TOPIC}"
+bash "${SCRIPT_DIR}"/docker_execute_create_topic_in_kafka.sh --kafka-topic="${KAFKA_TOPIC}" --partitions="${PARTITIONS}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
@@ -220,23 +232,31 @@ if [[ "$NO_PCAP" = false ]]; then
     mkdir "${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}" || exit 1
     echo "MADE ${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
 
-    # get the current offset in kafka
+    # get the offsets in kafka for the provided topic
     # this is where we are going to _start_
-    OFFSET=$(bash "${SCRIPT_DIR}"/docker_run_get_offset_kafka.sh --kafka-topic="${KAFKA_TOPIC}" | sed "s/^${KAFKA_TOPIC}:0:\(.*\)$/\1/")
-    echo "OFFSET------------------> ${OFFSET}"
+    OFFSETS=$(bash "${SCRIPT_DIR}"/docker_run_get_offset_kafka.sh --kafka-topic="${KAFKA_TOPIC}")
 
-    bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
-    rc=$?; if [[ ${rc} != 0 ]]; then
-      echo "ERROR> FAILED TO PROCESS ${file} DATA.  CHECK LOGS, please run the finish_end_to_end.sh when you are done."
-      exit ${rc}
-    fi
+    # loop through each partition
+    while IFS= read -r line; do
+      # shellcheck disable=SC2001
+      OFFSET=$(echo "${line}" | sed "s/^${KAFKA_TOPIC}:.*:\(.*\)$/\1/")
+      # shellcheck disable=SC2001
+      PARTITION=$(echo "${line}" | sed "s/^${KAFKA_TOPIC}:\(.*\):.*$/\1/")
+      echo "PARTITION---------------> ${PARTITION}"
+      echo "OFFSET------------------> ${OFFSET}"
 
-    KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
-    bash "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset="${OFFSET}" --kafka-topic="${KAFKA_TOPIC}" | "${ROOT_DIR}"/remove_timeout_message.sh | tee "${KAFKA_OUTPUT_FILE}"
+      bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
+      rc=$?; if [[ ${rc} != 0 ]]; then
+        echo "ERROR> FAILED TO PROCESS ${file} DATA.  CHECK LOGS, please run the finish_end_to_end.sh when you are done."
+        exit ${rc}
+      fi
 
-    rc=$?; if [[ ${rc} != 0 ]]; then
-      echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"
-    fi
+      KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
+      bash "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset="${OFFSET}" --partition="${PARTITION}" --kafka-topic="${KAFKA_TOPIC}" | "${ROOT_DIR}"/remove_timeout_message.sh | tee -a "${KAFKA_OUTPUT_FILE}"
+      rc=$?; if [[ ${rc} != 0 ]]; then
+        echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"
+      fi
+    done <<< "${OFFSETS}"
 
     "${SCRIPT_DIR}"/split_kafka_output_by_log.sh --log-directory="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
     rc=$?; if [[ ${rc} != 0 ]]; then

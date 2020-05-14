@@ -96,6 +96,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_kafka-1_1
   --kafka-topic                  [OPTIONAL] The kafka topic to create. Default: zeek
+  --partitions                   [OPTIONAL] The number of kafka partitions to create. Default: 2
   ```
 - `docker_execute_process_data_file.sh`: Executes `process_data_file.sh` in the zeek container
   ###### Parameters
@@ -107,11 +108,12 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ```bash
   --container-name               [OPTIONAL] The Docker container name. Default: metron-bro-plugin-kafka_zeek_1
   ```
-- `docker_run_consume_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic $KAFKA_TOPIC --offset $OFFSET --partition 0 --bootstrap-server kafka-1:9092`
+- `docker_run_consume_kafka.sh`: Runs an instance of the kafka container, with the console consumer `kafka-console-consumer.sh --topic $KAFKA_TOPIC --offset $OFFSET --partition $PARTITION --bootstrap-server kafka-1:9092`
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default
-  --offset                       [OPTIONAL] The kafka offset. Default: 0
+  --offset                       [OPTIONAL] The kafka offset to read from. Default: -1
+  --partition                    [OPTIONAL] The kafka partition to read from. Default: 0
   --kafka-topic                  [OPTIONAL] The kafka topic to consume from. Default: zeek
   ```
 - `docker_run_get_offset_kafka.sh`: Runs an instance of the kafka container and gets the current offset for the specified topic
@@ -151,7 +153,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
 This script does the following:
 
 1. Runs docker compose
-1. Creates the specified topic
+1. Creates the specified topic with the specified number of partitions
 1. Downloads sample PCAP data
 1. Runs the zeek container in the background
 1. Builds the zeek plugin
@@ -218,8 +220,9 @@ Other scripts may then be used to do your testing, for example running:
 --no-pcaps                      [OPTIONAL] Do not run pcaps.
 --data-path                     [OPTIONAL] The pcap data path. Default: ./data
 --kafka-topic                   [OPTIONAL] The kafka topic name to use. Default: zeek
+--partitions                    [OPTIONAL] The number of kafka partitions to create. Default: 2
 --plugin-version                [OPTIONAL] The plugin version. Default: the current branch name
 ```
 
-> NOTE: The provided `--plugin-version` is passed to the [`zeek-pkg install`](https://docs.zeek.org/projects/package-manager/en/stable/zeek-pkg.html#install-command) command within the container, which allows you to specify a version tag, branch name, or commit hash.  However, that tag, branch, or commit *must* be available in the currently checked out plugin repository.
+> NOTE: The provided `--plugin-version` is passed to the [`zkg install`](https://docs.zeek.org/projects/package-manager/en/stable/zeek-pkg.html#install-command) command within the container, which allows you to specify a version tag, branch name, or commit hash.  However, that tag, branch, or commit *must* be available in the currently checked out plugin repository.
 

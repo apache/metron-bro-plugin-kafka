@@ -25,7 +25,8 @@ set -o pipefail
 
 #
 # Runs a kafka container with the console consumer for the appropriate topic.
-# The consumer should quit when it has read all of the messages available.
+# The consumer should quit when it has read all of the messages available on
+# the given partition.
 #
 
 function help {
@@ -33,6 +34,7 @@ function help {
   echo "usage: ${0}"
   echo "    --network-name                  [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default"
   echo "    --offset                        [OPTIONAL] The kafka offset to read from. Default: -1"
+  echo "    --partition                     [OPTIONAL] The kafka partition to read from. Default: 0"
   echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: zeek"
   echo "    -h/--help                       Usage information."
   echo " "
@@ -40,6 +42,7 @@ function help {
 
 NETWORK_NAME=metron-bro-plugin-kafka_default
 OFFSET=-1
+PARTITION=0
 KAFKA_TOPIC=zeek
 
 # handle command line options
@@ -64,6 +67,15 @@ for i in "$@"; do
       shift # past argument=value
     ;;
   #
+  # PARTITION
+  #
+  #   --partition
+  #
+    --partition=*)
+      PARTITION="${i#*=}"
+      shift # past argument=value
+    ;;
+  #
   # KAFKA_TOPIC
   #
   #   --kafka-topic
@@ -80,7 +92,6 @@ for i in "$@"; do
       exit 0
       shift # past argument with no value
     ;;
-
   #
   # Unknown option
   #
@@ -93,7 +104,7 @@ for i in "$@"; do
 done
 
 docker run --rm --network "${NETWORK_NAME}" metron-bro-plugin-kafka_kafka \
-  kafka-console-consumer.sh --topic "${KAFKA_TOPIC}" --offset "${OFFSET}" --partition 0 --bootstrap-server kafka-1:9092 --timeout-ms 1000
+  kafka-console-consumer.sh --topic "${KAFKA_TOPIC}" --offset "${OFFSET}" --partition "${PARTITION}" --bootstrap-server kafka-1:9092 --timeout-ms 1000
 rc=$?; if [[ ${rc} != 0 ]]; then
   exit ${rc}
 fi
