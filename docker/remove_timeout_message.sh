@@ -33,7 +33,7 @@ SKIP_EXCEPTION_TEXT=false
 while read -r CMD; do
     if [[ ${CMD} =~ ('ERROR Error processing message') ]]; then
         LAST_CMD=${CMD}
-    elif [[ ${CMD} =~ ('kafka.consumer.ConsumerTimeoutException') ]]; then
+    elif [[ ${CMD} =~ ('org.apache.kafka.common.errors.TimeoutException') ]]; then
         SKIP_EXCEPTION_TEXT=true
     elif [[ "$SKIP_EXCEPTION_TEXT" = true ]]; then
         if [[ ! ${CMD} =~ (^at) ]]; then
