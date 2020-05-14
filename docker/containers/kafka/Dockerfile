@@ -21,3 +21,4 @@ FROM "${FROM_IMAGE}":"${FROM_IMAGE_TAG}"
 
 HEALTHCHECK --interval=5s --timeout=10s --start-period=2s --retries=3 \
   CMD JMX_PORT= /opt/kafka/bin/kafka-configs.sh --describe --zookeeper zookeeper:2181 --entity-type brokers || exit 1
+

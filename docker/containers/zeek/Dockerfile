@@ -22,12 +22,15 @@ FROM "${FROM_IMAGE}":"${FROM_IMAGE_TAG}"
 ARG ZEEK_VERSION
 ARG LIBRDKAFKA_VERSION
 
-# install powertools for libpcap-devel
-RUN dnf install -y 'dnf-command(config-manager)' && \
-    yum config-manager --set-enabled PowerTools
-
 # install epel for screen
 RUN dnf install -y epel-release
+
+# copy in the .screenrc
+COPY .screenrc /root
+
+# install powertools for libpcap-devel
+RUN dnf install -y 'dnf-command(config-manager)' && \
+    dnf config-manager --set-enabled PowerTools
 
 # install prereqs then clean dnf cache
 RUN dnf -y update && \
@@ -39,18 +42,15 @@ RUN dnf -y update && \
    git jq screen tree vim && \
    dnf -y clean all
 
-# copy in the .screenrc
-COPY .screenrc /root
-
 # install zeek
 WORKDIR /root
 RUN git clone https://github.com/zeek/zeek
 WORKDIR zeek/
-RUN git checkout "v${ZEEK_VERSION}"
-RUN git submodule update --init --recursive
-RUN ./configure
-RUN make
-RUN make install
+RUN git checkout "v${ZEEK_VERSION}" && \
+  git submodule update --init --recursive && \
+  ./configure && \
+  make && \
+  make install
 ENV PATH="${PATH}:/usr/local/zeek/bin"
 ENV PATH="${PATH}:/usr/bin"
 
@@ -67,6 +67,7 @@ RUN dnf -y install python3-pip && \
 WORKDIR /root
 RUN curl -L "https://github.com/edenhill/librdkafka/archive/v${LIBRDKAFKA_VERSION}.tar.gz" | tar xvz
 WORKDIR "librdkafka-${LIBRDKAFKA_VERSION}/"
-RUN ./configure --enable-sasl
-RUN make
-RUN make install
+RUN ./configure --enable-sasl && \
+  make && \
+  make install
+
