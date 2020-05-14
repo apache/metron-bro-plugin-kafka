@@ -106,8 +106,4 @@ echo " "
 
 docker exec -w /root "${CONTAINER_NAME}" bash -c "built_in_scripts/process_data_file.sh --pcap-file-name=${PCAP_FILE_NAME} --output-directory-name=${OUTPUT_DIRECTORY_NAME}"
 
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc};
-fi
-
 echo "done processing ${PCAP_FILE_NAME}"

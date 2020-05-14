@@ -176,9 +176,6 @@ if [[ "$SKIP_REBUILD_ZEEK" = false ]]; then
     PLUGIN_ROOT_DIR=${PLUGIN_ROOT_DIR} \
     OUR_SCRIPTS_PATH=${OUR_SCRIPTS_PATH} \
     docker-compose up -d --build
-  rc=$?; if [[ ${rc} != 0 ]]; then
-    exit ${rc}
-  fi
 else
   COMPOSE_PROJECT_NAME="${PROJECT_NAME}" \
     DATA_PATH=${DATA_PATH} \
@@ -186,35 +183,19 @@ else
     PLUGIN_ROOT_DIR=${PLUGIN_ROOT_DIR} \
     OUR_SCRIPTS_PATH=${OUR_SCRIPTS_PATH} \
     docker-compose up -d
-  rc=$?; if [[ ${rc} != 0 ]]; then
-    exit ${rc}
-  fi
 fi
 
 # Create the kafka topic
 bash "${SCRIPT_DIR}"/docker_execute_create_topic_in_kafka.sh --kafka-topic="${KAFKA_TOPIC}" --partitions="${PARTITIONS}"
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc}
-fi
 
 # Download the pcaps
 bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
-# By not catching $? here we are accepting that a failed pcap download will not
-# exit the script
 
 # Build the zeek plugin
 bash "${SCRIPT_DIR}"/docker_execute_build_plugin.sh --plugin-version="${PLUGIN_VERSION}"
-rc=$?; if [[ ${rc} != 0 ]]; then
-  echo "ERROR> FAILED TO BUILD PLUGIN.  CHECK LOGS  ${rc}"
-  exit ${rc}
-fi
 
 # Configure the plugin
 bash "${SCRIPT_DIR}"/docker_execute_configure_plugin.sh --kafka-topic="${KAFKA_TOPIC}"
-rc=$?; if [[ ${rc} != 0 ]]; then
-  echo "ERROR> FAILED TO CONFIGURE PLUGIN.  CHECK LOGS  ${rc}"
-  exit ${rc}
-fi
 
 if [[ "$NO_PCAP" = false ]]; then
   # for each pcap in the data directory, we want to
@@ -246,35 +227,17 @@ if [[ "$NO_PCAP" = false ]]; then
       echo "OFFSET------------------> ${OFFSET}"
 
       bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
-      rc=$?; if [[ ${rc} != 0 ]]; then
-        echo "ERROR> FAILED TO PROCESS ${file} DATA.  CHECK LOGS, please run the finish_end_to_end.sh when you are done."
-        exit ${rc}
-      fi
 
       KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
       bash "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset="${OFFSET}" --partition="${PARTITION}" --kafka-topic="${KAFKA_TOPIC}" | "${ROOT_DIR}"/remove_timeout_message.sh | tee -a "${KAFKA_OUTPUT_FILE}"
-      rc=$?; if [[ ${rc} != 0 ]]; then
-        echo "ERROR> FAILED TO PROCESS ${DATA_PATH} DATA.  CHECK LOGS"
-      fi
     done <<< "${OFFSETS}"
 
     "${SCRIPT_DIR}"/split_kafka_output_by_log.sh --log-directory="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
-    rc=$?; if [[ ${rc} != 0 ]]; then
-      echo "ERROR> ISSUE ENCOUNTERED WHEN SPLITTING KAFKA OUTPUT LOGS"
-    fi
   done
 
   "${SCRIPT_DIR}"/print_results.sh --test-directory="${TEST_OUTPUT_PATH}"
-  rc=$?; if [[ ${rc} != 0 ]]; then
-    echo "ERROR> ISSUE ENCOUNTERED WHEN PRINTING RESULTS"
-    exit ${rc}
-  fi
 
   "${SCRIPT_DIR}"/analyze_results.sh --test-directory="${TEST_OUTPUT_PATH}"
-  rc=$?; if [[ ${rc} != 0 ]]; then
-    echo "ERROR> ISSUE ENCOUNTERED WHEN ANALYZING RESULTS"
-    exit ${rc}
-  fi
 fi
 echo ""
 echo "Run complete"
