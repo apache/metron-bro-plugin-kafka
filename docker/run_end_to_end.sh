@@ -186,24 +186,22 @@ else
 fi
 
 # Create the kafka topic
-bash "${SCRIPT_DIR}"/docker_execute_create_topic_in_kafka.sh --kafka-topic="${KAFKA_TOPIC}" --partitions="${PARTITIONS}"
+"${SCRIPT_DIR}"/docker_execute_create_topic_in_kafka.sh --kafka-topic="${KAFKA_TOPIC}" --partitions="${PARTITIONS}"
 
 # Download the pcaps
-bash "${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
+"${SCRIPT_DIR}"/download_sample_pcaps.sh --data-path="${DATA_PATH}"
 
 # Build the zeek plugin
-bash "${SCRIPT_DIR}"/docker_execute_build_plugin.sh --plugin-version="${PLUGIN_VERSION}"
+"${SCRIPT_DIR}"/docker_execute_build_plugin.sh --plugin-version="${PLUGIN_VERSION}"
 
 # Configure the plugin
-bash "${SCRIPT_DIR}"/docker_execute_configure_plugin.sh --kafka-topic="${KAFKA_TOPIC}"
+"${SCRIPT_DIR}"/docker_execute_configure_plugin.sh --kafka-topic="${KAFKA_TOPIC}"
 
 if [[ "$NO_PCAP" = false ]]; then
   # for each pcap in the data directory, we want to
   # run zeek then read the output from kafka
   # and output both of them to the same directory named
   # for the date/pcap
-
-
   for file in "${DATA_PATH}"/**/*.pcap*
   do
     # get the file name
@@ -215,7 +213,7 @@ if [[ "$NO_PCAP" = false ]]; then
 
     # get the offsets in kafka for the provided topic
     # this is where we are going to _start_
-    OFFSETS=$(bash "${SCRIPT_DIR}"/docker_run_get_offset_kafka.sh --kafka-topic="${KAFKA_TOPIC}")
+    OFFSETS=$("${SCRIPT_DIR}"/docker_run_get_offset_kafka.sh --kafka-topic="${KAFKA_TOPIC}")
 
     # loop through each partition
     while IFS= read -r line; do
@@ -223,13 +221,14 @@ if [[ "$NO_PCAP" = false ]]; then
       OFFSET=$(echo "${line}" | sed "s/^${KAFKA_TOPIC}:.*:\(.*\)$/\1/")
       # shellcheck disable=SC2001
       PARTITION=$(echo "${line}" | sed "s/^${KAFKA_TOPIC}:\(.*\):.*$/\1/")
+
       echo "PARTITION---------------> ${PARTITION}"
       echo "OFFSET------------------> ${OFFSET}"
 
-      bash "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
+      "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
 
       KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
-      bash "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset="${OFFSET}" --partition="${PARTITION}" --kafka-topic="${KAFKA_TOPIC}" | "${ROOT_DIR}"/remove_timeout_message.sh | tee -a "${KAFKA_OUTPUT_FILE}"
+      "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset="${OFFSET}" --partition="${PARTITION}" --kafka-topic="${KAFKA_TOPIC}" | "${ROOT_DIR}"/remove_timeout_message.sh | tee -a "${KAFKA_OUTPUT_FILE}"
     done <<< "${OFFSETS}"
 
     "${SCRIPT_DIR}"/split_kafka_output_by_log.sh --log-directory="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
@@ -243,3 +242,4 @@ echo ""
 echo "Run complete"
 echo "The kafka and zeek output can be found at ${TEST_OUTPUT_PATH}"
 echo "You may now work with the containers if you will.  You need to call finish_end_to_end.sh when you are done"
+

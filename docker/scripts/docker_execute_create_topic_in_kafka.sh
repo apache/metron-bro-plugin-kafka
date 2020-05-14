@@ -95,3 +95,4 @@ echo "==================================================="
 
 docker exec -w /opt/kafka/bin/ "${CONTAINER_NAME}" \
   bash -c "JMX_PORT= ./kafka-topics.sh --create --topic ${KAFKA_TOPIC} --replication-factor 1 --partitions ${PARTITIONS} --zookeeper zookeeper:2181"
+

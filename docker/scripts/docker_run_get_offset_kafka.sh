@@ -82,3 +82,4 @@ done
 
 docker run --rm --network "${NETWORK_NAME}" metron-bro-plugin-kafka_kafka \
   kafka-run-class.sh kafka.tools.GetOffsetShell --topic "${KAFKA_TOPIC}" --broker-list "kafka-1:9092,kafka-2:9092"
+

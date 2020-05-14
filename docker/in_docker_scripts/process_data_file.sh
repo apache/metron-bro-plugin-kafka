@@ -67,12 +67,13 @@ done
 echo "PCAP_FILE_NAME = ${PCAP_FILE_NAME}"
 echo "OUTPUT_DIRECTORY_NAME = ${OUTPUT_DIRECTORY_NAME}"
 
-cd /root || exit 1
 echo "================================"
 if [ ! -d /root/data ]; then
   echo "DATA_PATH is not available"
   exit 1
 fi
+
 cd /root/test_output/"${OUTPUT_DIRECTORY_NAME}" || exit 1
 find /root/data -type f -name "${PCAP_FILE_NAME}" -print0 | xargs -0 zeek /usr/local/zeek/share/zeek/site/local.zeek -C -r
 echo "done with ${PCAP_FILE_NAME}"
+
