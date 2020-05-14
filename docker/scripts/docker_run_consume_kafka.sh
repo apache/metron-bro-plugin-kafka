@@ -33,7 +33,7 @@ function help {
   echo " "
   echo "usage: ${0}"
   echo "    --network-name                  [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default"
-  echo "    --offset                        [OPTIONAL] The kafka offset to read from. Default: -1"
+  echo "    --offset                        [OPTIONAL] The kafka offset to read from. Default: 0"
   echo "    --partition                     [OPTIONAL] The kafka partition to read from. Default: 0"
   echo "    --kafka-topic                   [OPTIONAL] The kafka topic to consume from. Default: zeek"
   echo "    -h/--help                       Usage information."
@@ -41,7 +41,7 @@ function help {
 }
 
 NETWORK_NAME=metron-bro-plugin-kafka_default
-OFFSET=-1
+OFFSET=0
 PARTITION=0
 KAFKA_TOPIC=zeek
 

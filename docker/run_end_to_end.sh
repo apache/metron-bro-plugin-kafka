@@ -212,8 +212,11 @@ if [[ "$NO_PCAP" = false ]]; then
     echo "MADE ${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
 
     # get the offsets in kafka for the provided topic
-    # this is where we are going to _start_
+    # this is where we are going to _start_, and must happen
+    # before processing the pcap
     OFFSETS=$("${SCRIPT_DIR}"/docker_run_get_offset_kafka.sh --kafka-topic="${KAFKA_TOPIC}")
+
+    "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
 
     # loop through each partition
     while IFS= read -r line; do
@@ -224,8 +227,6 @@ if [[ "$NO_PCAP" = false ]]; then
 
       echo "PARTITION---------------> ${PARTITION}"
       echo "OFFSET------------------> ${OFFSET}"
-
-      "${SCRIPT_DIR}"/docker_execute_process_data_file.sh --pcap-file-name="${BASE_FILE_NAME}" --output-directory-name="${DOCKER_DIRECTORY_NAME}"
 
       KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
       "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset="${OFFSET}" --partition="${PARTITION}" --kafka-topic="${KAFKA_TOPIC}" | "${ROOT_DIR}"/remove_timeout_message.sh | tee -a "${KAFKA_OUTPUT_FILE}"

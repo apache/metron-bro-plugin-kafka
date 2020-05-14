@@ -112,7 +112,7 @@ testing scripts to be added to a pull request, and subsequently to a test suite.
   ###### Parameters
   ```bash
   --network-name                 [OPTIONAL] The Docker network name. Default: metron-bro-plugin-kafka_default
-  --offset                       [OPTIONAL] The kafka offset to read from. Default: -1
+  --offset                       [OPTIONAL] The kafka offset to read from. Default: 0
   --partition                    [OPTIONAL] The kafka partition to read from. Default: 0
   --kafka-topic                  [OPTIONAL] The kafka topic to consume from. Default: zeek
   ```
