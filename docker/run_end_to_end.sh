@@ -197,7 +197,7 @@ fi
 # Configure the plugin
 "${SCRIPT_DIR}"/docker_execute_configure_plugin.sh --kafka-topic="${KAFKA_TOPIC}"
 
-if [[ "$NO_PCAP" = false ]]; then
+if [[ "$NO_PCAP" == false ]]; then
   # for each pcap in the data directory, we want to
   # run zeek then read the output from kafka
   # and output both of them to the same directory named
@@ -239,6 +239,7 @@ if [[ "$NO_PCAP" = false ]]; then
 
   "${SCRIPT_DIR}"/analyze_results.sh --test-directory="${TEST_OUTPUT_PATH}"
 fi
+
 echo ""
 echo "Run complete"
 echo "The kafka and zeek output can be found at ${TEST_OUTPUT_PATH}"
