@@ -229,7 +229,7 @@ if [[ "$NO_PCAP" == false ]]; then
       echo "OFFSET------------------> ${OFFSET}"
 
       KAFKA_OUTPUT_FILE="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}/kafka-output.log"
-      "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset="${OFFSET}" --partition="${PARTITION}" --kafka-topic="${KAFKA_TOPIC}" | "${ROOT_DIR}"/remove_timeout_message.sh | tee -a "${KAFKA_OUTPUT_FILE}"
+      "${SCRIPT_DIR}"/docker_run_consume_kafka.sh --offset="${OFFSET}" --partition="${PARTITION}" --kafka-topic="${KAFKA_TOPIC}" 1> >(tee -a "${KAFKA_OUTPUT_FILE}") 2>/dev/null
     done <<< "${OFFSETS}"
 
     "${SCRIPT_DIR}"/split_kafka_output_by_log.sh --log-directory="${TEST_OUTPUT_PATH}/${DOCKER_DIRECTORY_NAME}"
