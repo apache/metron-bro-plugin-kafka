@@ -87,7 +87,7 @@ fi
 # set errexit for the rest of the run
 set -e
 
-PLUGIN_VERSION=$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)
+PLUGIN_VERSION=$(git rev-parse --verify HEAD)
 
 # Handle command line options
 for i in "$@"; do
