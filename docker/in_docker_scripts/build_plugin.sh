@@ -97,7 +97,7 @@ cd /root || exit 1
 
 echo "==================================================="
 
-zkg -vvv test code
+zkg -vvv test code --version "${PLUGIN_VERSION}"
 rc=$?; if [[ ${rc} != 0 ]]; then
   echo "ERROR running zkg test ${rc}"
   printfiles
