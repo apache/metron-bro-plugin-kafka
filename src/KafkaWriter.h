@@ -20,7 +20,6 @@
 
 #include <librdkafka/rdkafkacpp.h>
 #include <string>
-#include <Type.h>
 #include <Desc.h>
 #include <logging/WriterBackend.h>
 #include <threading/formatters/JSON.h>
