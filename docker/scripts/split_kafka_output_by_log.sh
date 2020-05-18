@@ -95,7 +95,7 @@ do
   BASE_LOG_FILE_NAME=$(basename "$log" .log)
 
   # skip kafka-output.log
-  if [[ "$BASE_LOG_FILE_NAME" == "kafka-output.log" ]]; then
+  if [[ "$BASE_LOG_FILE_NAME" == "kafka-output" ]]; then
     continue
   fi
 
