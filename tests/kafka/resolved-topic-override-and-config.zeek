@@ -15,11 +15,10 @@
 #  limitations under the License.
 #
 
-# @TEST-EXEC: zeek -r ../../../tests/pcaps/exercise-traffic.pcap ../../../scripts/Apache/Kafka/ %INPUT > output
+# @TEST-EXEC: zeek -r ../../../tests/pcaps/exercise-traffic.pcap ../../../scripts/Apache/Kafka/ %INPUT | sort > output
 # @TEST-EXEC: btest-diff output
 
 module Kafka;
-
 
 redef Kafka::logs_to_send = set(Conn::LOG);
 redef Kafka::topic_name = "const-variable-topic";
@@ -35,3 +34,4 @@ event zeek_init() &priority=-10
     ];
     Log::add_filter(Conn::LOG, xxx_filter);
 }
+

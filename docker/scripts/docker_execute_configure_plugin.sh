@@ -86,9 +86,6 @@ echo "KAFKA_TOPIC = ${KAFKA_TOPIC}"
 echo "==================================================="
 
 docker exec -w /root "${CONTAINER_NAME}" bash -c "/root/built_in_scripts/configure_plugin.sh --kafka-topic=\"${KAFKA_TOPIC}\""
-rc=$?; if [[ ${rc} != 0 ]]; then
-  exit ${rc};
-fi
 
 echo "configured the kafka plugin"
 

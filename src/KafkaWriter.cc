@@ -290,7 +290,7 @@ bool KafkaWriter::DoSetBuf(bool enabled)
 bool KafkaWriter::DoFlush(double network_time)
 {
     if (!mocking) {
-        producer->poll(0);
+        producer->flush(0);
     }
     return true;
 }
