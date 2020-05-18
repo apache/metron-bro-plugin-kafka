@@ -79,7 +79,7 @@ if [[ -z "$LOG_DIRECTORY" ]]; then
 fi
 
 echo "Running ${SCRIPT_NAME} with"
-echo "$LOG_DIRECTORY = $LOG_DIRECTORY"
+echo "LOG_DIRECTORY = $LOG_DIRECTORY"
 echo "==================================================="
 
 # Move over to the docker area
@@ -93,15 +93,20 @@ echo "LOG,ZEEK_COUNT,KAFKA_COUNT" >> "${RESULTS_FILE}"
 for log in "${LOG_DIRECTORY}"/*.log
 do
   BASE_LOG_FILE_NAME=$(basename "$log" .log)
-  if [[ ! "$BASE_LOG_FILE_NAME" == "kafka-output.log" ]]; then
-    if [[ $(grep {\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log) ]]; then
-      grep {\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log > "${LOG_DIRECTORY}"/"${BASE_LOG_FILE_NAME}".kafka.log
 
-      KAKFA_COUNT=$(cat "${LOG_DIRECTORY}/${BASE_LOG_FILE_NAME}.kafka.log" | wc -l)
-      ZEEK_COUNT=$(grep -v "^#" "${log}" | wc -l)
+  # skip kafka-output.log
+  if [[ "$BASE_LOG_FILE_NAME" == "kafka-output.log" ]]; then
+    continue
+  fi
 
-      echo "${BASE_LOG_FILE_NAME},${ZEEK_COUNT},${KAKFA_COUNT}" >> "${RESULTS_FILE}"
-    fi
+  # search the kafka output for each log and count them
+  if grep -q \{\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log ; then
+    grep \{\""${BASE_LOG_FILE_NAME}"\": "${LOG_DIRECTORY}"/kafka-output.log > "${LOG_DIRECTORY}"/"${BASE_LOG_FILE_NAME}".kafka.log
+
+    KAKFA_COUNT=$(cat "${LOG_DIRECTORY}/${BASE_LOG_FILE_NAME}.kafka.log" | wc -l)
+    ZEEK_COUNT=$(grep -v "^#" "${log}" | wc -l)
+
+    echo "${BASE_LOG_FILE_NAME},${ZEEK_COUNT},${KAKFA_COUNT}" >> "${RESULTS_FILE}"
   fi
 done
 
