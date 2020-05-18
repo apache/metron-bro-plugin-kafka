@@ -87,6 +87,7 @@ fi
 # set errexit for the rest of the run
 set -e
 
+# use the local hash as refs will use remotes by default
 PLUGIN_VERSION=$(git rev-parse --verify HEAD)
 
 # Handle command line options
