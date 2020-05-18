@@ -104,5 +104,5 @@ for i in "$@"; do
 done
 
 docker run --rm --network "${NETWORK_NAME}" metron-bro-plugin-kafka_kafka \
-  kafka-console-consumer.sh --topic "${KAFKA_TOPIC}" --offset "${OFFSET}" --partition "${PARTITION}" --bootstrap-server kafka-1:9092 --timeout-ms 1000
+  kafka-console-consumer.sh --topic "${KAFKA_TOPIC}" --offset "${OFFSET}" --partition "${PARTITION}" --bootstrap-server kafka-1:9092 --timeout-ms 5000
 
