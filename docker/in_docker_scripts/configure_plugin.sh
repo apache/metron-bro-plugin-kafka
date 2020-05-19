@@ -23,6 +23,7 @@ shopt -s nocasematch
 # Configures the zeek kafka plugin
 # Configures the kafka broker
 # Configures the plugin for all the traffic types
+# Configures the plugin to add some additional json values
 #
 
 function help {
@@ -74,6 +75,7 @@ echo "Configuring kafka plugin"
   echo "redef Kafka::topic_name = \"${KAFKA_TOPIC}\";"
   echo "redef Kafka::tag_json = T;"
   echo "redef Kafka::kafka_conf = table([\"metadata.broker.list\"] = \"kafka-1:9092,kafka-2:9092\");"
+  echo "redef Kafka::additional_message_values = table([\"FIRST_STATIC_NAME\"] = \"FIRST_STATIC_VALUE\", [\"SECOND_STATIC_NAME\"] = \"SECOND_STATIC_VALUE\");"
   echo "redef Kafka::logs_to_exclude = set(Conn::LOG, DHCP::LOG);"
   echo "redef Known::cert_tracking = ALL_HOSTS;"
   echo "redef Software::asset_tracking = ALL_HOSTS;"

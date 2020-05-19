@@ -53,6 +53,14 @@ export {
                 ["metadata.broker.list"] = "localhost:9092"
         ) &redef;
 
+##  Key value pairs that will be added to outgoing messages at the root level
+##  for example:          ["bro_server"] = "this_server_name"
+##  will results in a  "bro_server":"this_server_name" field added to the outgoing
+##  json
+##  note this depends on tag_json being T
+const additional_message_values: table[string] of string = table(
+                                              ) &redef;
+
         ## A comma separated list of librdkafka debug contexts
         const debug: string = "" &redef;
 

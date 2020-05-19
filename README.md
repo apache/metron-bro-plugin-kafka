@@ -224,6 +224,22 @@ event zeek_init() &priority=-10
 }
 ```
 
+### Example 6 - Add static values to each outgoing Kafka message
+It is possible to define name value pairs and have them added to each outgoing Kafka json message when tagged_json is set to true.  Each will be added to the root json object.
+    * the Kafka::additional_message_values table can be configured with each name and value
+    * based on the following configuration, each outgoing message will have "FIRST_STATIC_NAME": "FIRST_STATIC_VALUE", "SECOND_STATIC_NAME": "SECOND_STATIC_VALUE" added.
+```bash
+@load packages
+redef Kafka::logs_to_send = set(HTTP::LOG, DNS::LOG, Conn::LOG, DPD::LOG, FTP::LOG, Files::LOG, Known::CERTS_LOG, SMTP::LOG, SSL::LOG, Weird::LOG, Notice::LOG, DHCP::LOG, SSH::LOG, Software::LOG, RADIUS::LOG, X509::LOG, RFB::LOG, Stats::LOG, CaptureLoss::LOG, SIP::LOG);
+redef Kafka::topic_name = "zeek";
+redef Kafka::tag_json = T;
+redef Kafka::kafka_conf = table(["metadata.broker.list"] = "kafka-1:9092,kafka-2:9092");
+redef Kafka::additional_message_values = table(["FIRST_STATIC_NAME"] = "FIRST_STATIC_VALUE", ["SECOND_STATIC_NAME"] = "SECOND_STATIC_VALUE");
+redef Kafka::logs_to_exclude = set(Conn::LOG, DHCP::LOG);
+redef Known::cert_tracking = ALL_HOSTS;
+redef Software::asset_tracking = ALL_HOSTS;
+```
+
 #### Notes
  * `logs_to_send` is mutually exclusive with `$pred`, thus for each log you want to set `$pred` on, you must individually setup a `Log::add_filter` and refrain from including that log in `logs_to_send`.
  * The [`is_v6_addr()`](https://docs.zeek.org/en/v3.1.2/scripts/base/bif/zeek.bif.zeek.html#id-is_v6_addr) function can also be used in your `$pred` to identify if an IP address is IPv6.

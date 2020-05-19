@@ -18,6 +18,7 @@
 module Kafka;
 
 const kafka_conf: config;
+const additional_message_values : config;
 const topic_name: string;
 const max_wait_on_shutdown: count;
 const tag_json: bool;

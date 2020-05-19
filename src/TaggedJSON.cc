@@ -25,7 +25,7 @@ TaggedJSON::TaggedJSON(string sn, MsgThread* t, JSON::TimeFormat tf): JSON(t, tf
 TaggedJSON::~TaggedJSON()
 {}
 
-bool TaggedJSON::Describe(ODesc* desc, int num_fields, const Field* const* fields, Value** vals) const
+bool TaggedJSON::Describe(ODesc* desc, int num_fields, const Field* const* fields, Value** vals, map<string,string> &const_vals) const
 {
     desc->AddRaw("{");
 
@@ -34,10 +34,26 @@ bool TaggedJSON::Describe(ODesc* desc, int num_fields, const Field* const* field
     desc->AddRaw(stream_name);
     desc->AddRaw("\": ");
 
+
+
     // append the JSON formatted log record itself
     JSON::Describe(desc, num_fields, fields, vals);
+    if (const_vals.size() > 0) {
 
-    desc->AddRaw("}");
+      map<string, string>::iterator it = const_vals.begin();
+      while (it != const_vals.end()) {
+        desc->AddRaw(",");
+        desc->AddRaw("\"");
+        desc->AddRaw(it->first);
+        desc->AddRaw("\": ");
+        desc->AddRaw("\"");
+        desc->AddRaw(it->second);
+        desc->AddRaw("\"");
+        it++;
+      }
+    }
+
+  desc->AddRaw("}");
     return true;
 }
 }}
