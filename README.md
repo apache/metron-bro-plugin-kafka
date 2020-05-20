@@ -179,6 +179,48 @@ event zeek_init() &priority=-10
 }
 ```
 
+#### Dynamically send each zeek log to a topic with its same name.
+
+ * ej. `CONN::LOG` logs are sent to the `conn` topic or `Known::CERTS_LOG` to the `known-certs` topic.
+
+```
+@load packages/metron-bro-plugin-kafka/Apache/Kafka
+redef Kafka::logs_to_send = set(DHCP::LOG, RADIUS::LOG, DNS::LOG);
+redef Kafka::topic_name = "";
+redef Kafka::tag_json = T;
+
+event zeek_init() &priority=-10
+{
+    for (stream_id in Log::active_streams) {
+        # Convert stream type enum to string
+        const stream_string: string = fmt("%s", stream_id);
+
+        # replace `::` by `_` from the log string name
+	    # ej. CONN::LOG to CONN_LOG or Known::CERTS_LOG to Known_CERTS_LOG
+        const stream_name: string = sub(stream_string, /::/, "_");
+
+        # lowercase the whole string for nomalization
+        const topic_name_lower: string = to_lower(stream_name);
+
+        # remove the _log at the of each topic name
+        const topic_name_under: string = sub(topic_name_lower, /_log$/, "");
+
+        # replace `_` by `-` for compatibility with acceptable Kafka topic naes
+        const topic_name: string = sub(topic_name_under, /_/, "-");
+
+        if (|Kafka::logs_to_send| == 0 || stream_id in Kafka::logs_to_send)
+        {
+            local log_filter: Log::Filter = [
+                $name = fmt("kafka-%s", stream_id),
+                $writer = Log::WRITER_KAFKAWRITER,
+                $path = fmt("%s", topic_name)
+            ];
+            Log::add_filter(stream_id, log_filter);
+        }
+    }
+}
+```
+
 ### Example 5 - Zeek log filtering
 
 You may want to configure zeek to filter log messages with certain characteristics from being sent to your kafka topics.  For instance, Apache Metron currently doesn't support IPv6 source or destination IPs in the default enrichments, so it may be helpful to filter those log messages from being sent to kafka (although there are [multiple ways](#notes) to approach this).  In this example we will do that that, and are assuming a somewhat standard zeek kafka plugin configuration, such that:
