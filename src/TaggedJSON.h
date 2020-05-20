@@ -41,7 +41,7 @@ class TaggedJSON : public JSON {
 public:
     TaggedJSON(string stream_name, MsgThread* t, JSON::TimeFormat tf);
     virtual ~TaggedJSON();
-    virtual bool Describe(ODesc* desc, int num_fields, const Field* const* fields, Value** vals) const;
+    virtual bool Describe(ODesc* desc, int num_fields, const Field* const* fields, Value** vals, map<string,string> &const_vals) const;
 
 private:
     string stream_name;

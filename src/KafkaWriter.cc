@@ -68,6 +68,22 @@ KafkaWriter::KafkaWriter(WriterFrontend* frontend):
       Unref(index);
       delete k;
   }
+
+  Val* mvals = BifConst::Kafka::additional_message_values->AsTableVal();
+  c = val->AsTable()->InitForIteration();
+  while ((v = mvals->AsTable()->NextEntry(k, c))) {
+
+    // fetch the key and value
+    ListVal* index = mvals->AsTableVal()->RecoverIndex(k);
+    string key = index->Index(0)->AsString()->CheckString();
+    string val = v->Value()->AsString()->CheckString();
+    additional_message_values.insert (additional_message_values.begin(), pair<string, string> (key, val));
+
+    // cleanup
+    Unref(index);
+    delete k;
+  }
+
 }
 
 KafkaWriter::~KafkaWriter()
@@ -126,7 +142,7 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     }
     else if ( strcmp(json_timestamps.c_str(), "JSON::TS_ISO8601") == 0 ) {
       tf = threading::formatter::JSON::TS_ISO8601;
-    } 
+    }
     else {
       Error(Fmt("KafkaWriter::DoInit: Invalid JSON timestamp format %s",
         json_timestamps.c_str()));
@@ -136,7 +152,7 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     // initialize the formatter
     if(BifConst::Kafka::tag_json) {
       formatter = new threading::formatter::TaggedJSON(info.path, this, tf);
-    } 
+    }
     else {
       formatter = new threading::formatter::JSON(this, tf);
     }
@@ -147,9 +163,6 @@ bool KafkaWriter::DoInit(const WriterInfo& info, int num_fields, const threading
     bool is_debug(!debug.empty());
     if(is_debug) {
       MsgThread::Info(Fmt("Debug is turned on and set to: %s.  Available debug context: %s.", debug.c_str(), RdKafka::get_debug_contexts().c_str()));
-    }
-    else {
-      MsgThread::Info(Fmt("Debug is turned off."));
     }
 
     // kafka global configuration
@@ -249,7 +262,12 @@ bool KafkaWriter::DoWrite(int num_fields, const threading::Field* const* fields,
         buff.Clear();
 
         // format the log entry
+      if(BifConst::Kafka::tag_json) {
+          dynamic_cast<threading::formatter::TaggedJSON*>(formatter)->Describe(&buff, num_fields, fields, vals,
+                              additional_message_values);
+       } else {
         formatter->Describe(&buff, num_fields, fields, vals);
+       }
 
         // send the formatted log entry to kafka
         const char *raw = (const char *) buff.Bytes();
