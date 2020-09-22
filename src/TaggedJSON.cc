@@ -19,13 +19,13 @@
 
 namespace threading { namespace formatter {
 
-TaggedJSON::TaggedJSON(string sn, MsgThread* t, JSON::TimeFormat tf): JSON(t, tf), stream_name(sn)
+TaggedJSON::TaggedJSON(std::string sn, MsgThread* t, JSON::TimeFormat tf): JSON(t, tf), stream_name(sn)
 {}
 
 TaggedJSON::~TaggedJSON()
 {}
 
-bool TaggedJSON::Describe(ODesc* desc, int num_fields, const Field* const* fields, Value** vals, map<string,string> &const_vals) const
+bool TaggedJSON::Describe(ODesc* desc, int num_fields, const Field* const* fields, Value** vals, std::map<std::string,std::string> &const_vals) const
 {
     desc->AddRaw("{");
 
@@ -40,7 +40,7 @@ bool TaggedJSON::Describe(ODesc* desc, int num_fields, const Field* const* field
     JSON::Describe(desc, num_fields, fields, vals);
     if (const_vals.size() > 0) {
 
-      map<string, string>::iterator it = const_vals.begin();
+      std::map<std::string, std::string>::iterator it = const_vals.begin();
       while (it != const_vals.end()) {
         desc->AddRaw(",");
         desc->AddRaw("\"");
@@ -56,4 +56,5 @@ bool TaggedJSON::Describe(ODesc* desc, int num_fields, const Field* const* field
   desc->AddRaw("}");
     return true;
 }
-}}
+} // namespace formatter
+} // namespace threading

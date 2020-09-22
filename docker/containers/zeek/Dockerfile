@@ -57,7 +57,7 @@ ENV PATH="${PATH}:/usr/bin"
 # install pip3 and zkg
 WORKDIR /root
 COPY requirements.txt requirements.txt
-RUN dnf -y install python3-pip && \
+RUN dnf -y install python3-pip diffutils && \
     dnf clean all && \
     python3 -m pip install --upgrade pip && \
     python3 -m pip install -r requirements.txt && \
