@@ -18,17 +18,19 @@
 #ifndef ZEEK_PLUGIN_BRO_KAFKA_TAGGEDJSON_H
 #define ZEEK_PLUGIN_BRO_KAFKA_TAGGEDJSON_H
 
-#include <string>
 #include <Desc.h>
+#include <map>
+#include <string>
 #include <threading/Formatter.h>
 #include <threading/formatters/JSON.h>
 
-using threading::formatter::JSON;
+using threading::Field;
 using threading::MsgThread;
 using threading::Value;
-using threading::Field;
+using threading::formatter::JSON;
 
-namespace threading { namespace formatter {
+namespace threading {
+namespace formatter {
 
 /*
  * A JSON formatter that prepends or 'tags' the content with a log stream
@@ -37,15 +39,16 @@ namespace threading { namespace formatter {
  *   { 'http' : { ... }}
  */
 class TaggedJSON : public JSON {
-
 public:
-    TaggedJSON(string stream_name, MsgThread* t, JSON::TimeFormat tf);
-    virtual ~TaggedJSON();
-    virtual bool Describe(ODesc* desc, int num_fields, const Field* const* fields, Value** vals, map<string,string> &const_vals) const;
+  TaggedJSON(std::string stream_name, MsgThread *t, JSON::TimeFormat tf);
+  virtual ~TaggedJSON();
+  virtual bool Describe(ODesc *desc, int num_fields, const Field *const *fields,
+                        Value **vals, std::map<std::string, std::string> &const_vals) const;
 
 private:
-    string stream_name;
+  std::string stream_name;
 };
 
-}}
+} // namespace formatter
+} // namespace threading
 #endif

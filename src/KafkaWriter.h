@@ -19,6 +19,7 @@
 #define ZEEK_PLUGIN_BRO_KAFKA_KAFKAWRITER_H
 
 #include <librdkafka/rdkafkacpp.h>
+#include <map>
 #include <string>
 #include <Desc.h>
 #include <logging/WriterBackend.h>
@@ -65,17 +66,17 @@ protected:
     virtual bool DoHeartbeat(double network_time, double current_time);
 
 private:
-    string GetConfigValue(const WriterInfo& info, const string name) const;
-    void raise_topic_resolved_event(const string topic);
-    static const string default_topic_key;
-    string stream_id;
+    std::string GetConfigValue(const WriterInfo& info, const std::string name) const;
+    void raise_topic_resolved_event(const std::string topic);
+    static const std::string default_topic_key;
+    std::string stream_id;
     bool tag_json;
     bool mocking;
-    string json_timestamps;
-    map<string, string> kafka_conf;
-    map<string, string> additional_message_values;
-    string topic_name;
-    string topic_name_override;
+    std::string json_timestamps;
+    std::map<std::string, std::string> kafka_conf;
+    std::map<std::string, std::string> additional_message_values;
+    std::string topic_name;
+    std::string topic_name_override;
     threading::formatter::Formatter *formatter;
     RdKafka::Producer* producer;
     RdKafka::Topic* topic;
